@@ -5,7 +5,7 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "master-db"
-database_id = "local-master-db"
+database_id = "a6867172-3457-4cc1-869c-0ae5e65e8dfd"
 
 [vars]
 MASTER_ADMIN_KEY = "master_admin_secret_999"
