@@ -135,7 +135,12 @@
         </div>
       </div>
 
-      <div id="preview-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-300">
+      <!-- 6-Second Auto-Rotation Progress Bar -->
+      <div id="highlights-progress-container" class="hidden w-full h-1 bg-[var(--border-subtle)]/70 rounded-full overflow-hidden mb-8 relative">
+        <div id="highlights-progress-bar" class="h-full bg-gradient-to-r from-[#9A7833] via-[#C5A059] to-[#E5C378] w-0 rounded-full shadow-[0_0_8px_rgba(197,160,89,0.5)]"></div>
+      </div>
+
+      <div id="preview-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Loading Skeleton -->
         <div class="gallery-surface rounded-2xl p-4 animate-pulse">
           <div class="aspect-[4/3] bg-[var(--mat-bg)] rounded-xl mb-4"></div>
@@ -212,7 +217,7 @@
     let isHoverPaused = false;
     let isTransitioning = false;
     let interactionsBound = false;
-    const ROTATE_DELAY_MS = 5000;
+    const ROTATE_DELAY_MS = 6000;
 
     function getHighlightBatchSize() {
       if (window.innerWidth >= 1024) return 3;
@@ -289,6 +294,49 @@
       }
     }
 
+    function resetAndStartProgressBar() {
+      const bar = document.getElementById("highlights-progress-bar");
+      const progContainer = document.getElementById("highlights-progress-container");
+      if (!bar) return;
+
+      if (allHighlights.length <= getHighlightBatchSize()) {
+        if (progContainer) progContainer.classList.add("hidden");
+        return;
+      }
+      if (progContainer) {
+        progContainer.classList.remove("hidden");
+      }
+
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      void bar.offsetWidth; // force reflow
+
+      if (!isUserPaused && !isHoverPaused && document.visibilityState === 'visible') {
+        bar.style.transition = `width ${ROTATE_DELAY_MS}ms linear`;
+        bar.style.width = '100%';
+      }
+    }
+
+    function pauseProgressBar() {
+      const bar = document.getElementById("highlights-progress-bar");
+      if (!bar) return;
+      const computedWidth = window.getComputedStyle(bar).width;
+      bar.style.transition = 'none';
+      bar.style.width = computedWidth;
+    }
+
+    function resumeProgressBar() {
+      const bar = document.getElementById("highlights-progress-bar");
+      if (!bar || isUserPaused || isHoverPaused || document.visibilityState !== 'visible') return;
+      const parentWidth = bar.parentElement ? bar.parentElement.clientWidth : 1;
+      const currentPx = parseFloat(window.getComputedStyle(bar).width) || 0;
+      const currentPercent = parentWidth > 0 ? currentPx / parentWidth : 0;
+      const remainingTimeMs = Math.max(500, Math.round((1 - currentPercent) * ROTATE_DELAY_MS));
+
+      bar.style.transition = `width ${remainingTimeMs}ms linear`;
+      bar.style.width = '100%';
+    }
+
     function renderHighlights() {
       const container = document.getElementById("preview-grid");
       if (!container || !currentActiveBatch.length) return;
@@ -300,7 +348,7 @@
         const artistName = window.getArtistFullName(art);
         const technique = window.getField(art, 'technique') || (window.i18n.getLang() === 'th' ? 'ภาพพิมพ์ร่วมสมัย' : 'Contemporary Printmaking');
         const card = document.createElement("div");
-        card.className = "gallery-surface rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[var(--border-subtle)]";
+        card.className = "highlight-card gallery-surface rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[var(--border-subtle)] will-change-transform";
         
         card.innerHTML = `
           <a href="/artwork.html?id=${art.id}" class="block">
@@ -368,26 +416,58 @@
       if (!nextBatch || !nextBatch.length) return;
 
       isTransitioning = true;
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Phase 1: Animate existing cards out with direction shift
       if (container) {
-        container.style.opacity = '0';
-        container.style.transform = 'scale(0.985)';
+        const currentCards = container.querySelectorAll('.highlight-card');
+        currentCards.forEach((c, idx) => {
+          c.style.transition = prefersReduced ? 'opacity 250ms ease' : `all 280ms cubic-bezier(0.4, 0, 0.2, 1) ${idx * 40}ms`;
+          c.style.opacity = '0';
+          if (!prefersReduced) {
+            c.style.transform = direction > 0 ? 'translateX(-24px)' : 'translateX(24px)';
+          }
+        });
       }
 
+      // Phase 2: Render new batch with primed offset and staggered glide-in
       setTimeout(() => {
         currentActiveBatch = nextBatch;
         renderHighlights();
+
         if (container) {
-          container.style.opacity = '1';
-          container.style.transform = 'scale(1)';
+          const newCards = container.querySelectorAll('.highlight-card');
+          newCards.forEach((c, idx) => {
+            c.style.opacity = '0';
+            if (!prefersReduced) {
+              c.style.transform = direction > 0 ? 'translateX(28px)' : 'translateX(-28px)';
+            }
+            c.style.transition = prefersReduced ? 'opacity 350ms ease' : `all 420ms cubic-bezier(0.16, 1, 0.3, 1) ${idx * 65}ms`;
+          });
+
+          // Force reflow
+          void container.offsetHeight;
+
+          // Animate cards into resting place
+          newCards.forEach((c) => {
+            c.style.opacity = '1';
+            if (!prefersReduced) {
+              c.style.transform = 'translateX(0)';
+            }
+          });
         }
+
+        resetAndStartProgressBar();
+
         setTimeout(() => {
           isTransitioning = false;
-        }, 300);
-      }, 220);
+        }, 450);
+      }, 280);
     }
 
     function startHighlightAutoRotate() {
       if (autoRotateInterval) clearInterval(autoRotateInterval);
+      resetAndStartProgressBar();
       autoRotateInterval = setInterval(() => {
         if (!isUserPaused && !isHoverPaused && document.visibilityState === 'visible') {
           advanceHighlights(1);
@@ -435,6 +515,11 @@
             ? (window.i18n.getLang() === 'th' ? "เล่นอัตโนมัติ (Resume)" : "Resume auto-play")
             : (window.i18n.getLang() === 'th' ? "หยุดชั่วคราว (Pause)" : "Pause auto-play");
           updateHighlightCounter();
+          if (isUserPaused) {
+            pauseProgressBar();
+          } else {
+            resumeProgressBar();
+          }
         });
       }
 
@@ -442,10 +527,12 @@
         section.addEventListener("mouseenter", () => {
           isHoverPaused = true;
           updateHighlightCounter();
+          pauseProgressBar();
         });
         section.addEventListener("mouseleave", () => {
           isHoverPaused = false;
           updateHighlightCounter();
+          resumeProgressBar();
         });
 
         // Touch gestures for mobile
@@ -465,6 +552,14 @@
           }
         }, { passive: true });
       }
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') {
+          pauseProgressBar();
+        } else {
+          resumeProgressBar();
+        }
+      });
 
       // Responsive resize: re-render to match batch size without losing position
       let resizeTimer = null;
@@ -493,6 +588,7 @@
                 currentActiveBatch = allHighlights.slice(0, batchSize);
               }
               renderHighlights();
+              resetAndStartProgressBar();
             }
           }
         }, 200);
