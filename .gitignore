@@ -12,9 +12,16 @@ npm-debug.log*
 scripts/*-local.sqlite
 scripts/*-local.sqlite-journal
 
-# Environment variables
+# Environment variables & secrets
 .env
-.env.local
+.env.*
+*.env
+*.secret
+*.key
+*.pem
+secrets/
+credentials/
+event-manifest.local.json
 
 # Operating System
 .DS_Store
