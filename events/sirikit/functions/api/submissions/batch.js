@@ -45,7 +45,7 @@ export async function onRequestPost(context) {
 
   async function uploadToCloudinary(base64DataUrl) {
     if (!base64DataUrl || typeof base64DataUrl !== 'string' || !base64DataUrl.startsWith('data:image/')) {
-      return '';
+      return { url: '', public_id: '' };
     }
     try {
       const formData = new FormData();
@@ -58,13 +58,16 @@ export async function onRequestPost(context) {
       if (!res.ok) {
         const errText = await res.text();
         console.warn('Cloudinary upload error:', res.status, errText);
-        return '';
+        return { url: '', public_id: '' };
       }
       const data = await res.json();
-      return data.secure_url || data.url || '';
+      return {
+        url: data.secure_url || data.url || '',
+        public_id: data.public_id || ''
+      };
     } catch (e) {
       console.warn('Cloudinary upload exception:', e.message);
-      return '';
+      return { url: '', public_id: '' };
     }
   }
 
@@ -77,7 +80,7 @@ export async function onRequestPost(context) {
     const insertStmt = env.DB.prepare(`
       INSERT INTO submissions (
         title, artist_name, description,
-        image_url, thumbnail_url,
+        image_url, thumbnail_url, cloudinary_public_id,
         artist_avatar_url, artist_bio,
         nationality, technique, dimensions,
         year_created, price, status, display_order,
@@ -85,7 +88,7 @@ export async function onRequestPost(context) {
         technique_th, description_th
       ) VALUES (
         ?, ?, ?,
-        ?, ?,
+        ?, ?, ?,
         ?, ?,
         ?, ?, ?,
         ?, ?, ?, ?,
@@ -109,19 +112,22 @@ export async function onRequestPost(context) {
       // 2. Upload image_data_url to Cloudinary
       // 3. Fallback: empty string (NEVER mockup)
       let img = item.image_url || item.imageUrl || '';
+      let artPublicId = item.cloudinary_public_id || '';
       if (!img && item.image_data_url) {
-        img = await uploadToCloudinary(item.image_data_url);
+        const uploadRes = await uploadToCloudinary(item.image_data_url);
+        img = uploadRes.url;
+        artPublicId = uploadRes.public_id;
       }
 
       // Artist Avatar resolution:
       // Strictly NO mockup! If not provided, empty string
       let avatar = item.artist_avatar_url || item.artistAvatarUrl || '';
-      // If user had an unsplash mockup url passed in, strip it
       if (avatar && avatar.includes('unsplash.com')) {
         avatar = '';
       }
       if (!avatar && item.artist_avatar_data_url) {
-        avatar = await uploadToCloudinary(item.artist_avatar_data_url);
+        const avUploadRes = await uploadToCloudinary(item.artist_avatar_data_url);
+        avatar = avUploadRes.url;
       }
 
       const bio = cleanDash(item.artist_bio || item.bio || item.ประวัติ);
@@ -135,7 +141,7 @@ export async function onRequestPost(context) {
       batchStatements.push(
         insertStmt.bind(
           title, artist, desc,
-          img, img,
+          img, img, artPublicId,
           avatar, bio,
           nat, tech, dims,
           yr, pr, stat, currentOrder,
