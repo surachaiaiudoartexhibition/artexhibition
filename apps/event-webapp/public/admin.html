@@ -311,34 +311,81 @@
       </div>
     </div>
 
-    <!-- Status Tabs -->
-    <div class="flex border-b border-[var(--border-subtle)] gap-2 sm:gap-6 text-sm">
-      <button onclick="switchTab('pending')" id="tab-pending" class="pb-3 font-semibold border-b-2 border-[var(--color-accent)] text-[var(--color-accent-light)] flex items-center gap-2 cursor-pointer transition-colors">
-        <span data-i18n="tab_pending">รอการตรวจสอบ (Pending)</span>
-        <span id="badge-count-pending" class="px-2 py-0.5 corner-cut-6 text-xs bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] font-mono">0</span>
-      </button>
-      <button onclick="switchTab('approved')" id="tab-approved" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-colors">
-        <span data-i18n="tab_approved">อนุมัติแล้ว (Approved)</span>
-        <span id="badge-count-approved" class="px-2 py-0.5 corner-cut-6 text-xs bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono">0</span>
-      </button>
-      <button onclick="switchTab('rejected')" id="tab-rejected" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-colors">
-        <span data-i18n="tab_rejected">ปฏิเสธ (Rejected)</span>
-        <span id="badge-count-rejected" class="px-2 py-0.5 corner-cut-6 text-xs bg-rose-500/15 text-rose-400 border border-rose-500/30 font-mono">0</span>
-      </button>
-      <button onclick="switchTab('')" id="tab-all" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] cursor-pointer transition-colors" data-i18n="tab_all">
-        ทั้งหมด
-      </button>
+    <!-- Master View Switcher: Artworks Moderation vs Artists Management -->
+    <div class="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2 gap-4">
+      <div class="flex items-center gap-3 sm:gap-6 text-sm font-semibold">
+        <button type="button" onclick="switchAdminSection('artworks')" id="btn-section-artworks" class="pb-3 border-b-2 border-[var(--color-accent)] text-[var(--color-accent-light)] flex items-center gap-2 cursor-pointer transition-all">
+          <span>🖼️ ตรวจสอบและจัดการผลงาน (Artworks)</span>
+          <span id="badge-total-artworks" class="px-2 py-0.5 corner-cut-6 text-xs bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] font-mono">0</span>
+        </button>
+        <button type="button" onclick="switchAdminSection('artists')" id="btn-section-artists" class="pb-3 border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-all">
+          <span>👨‍🎨 ทำเนียบและจัดการศิลปิน (Artists)</span>
+          <span id="badge-total-artists" class="px-2 py-0.5 corner-cut-6 text-xs bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] border border-[var(--border-subtle)] font-mono">0</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs">
+        <span id="section-hint-text" class="hidden sm:inline text-[var(--text-muted)]">กำลังดู: รายการผลงาน</span>
+      </div>
+    </div>
+
+    <!-- Section A: Artworks Moderation Panel -->
+    <div id="panel-artworks-section" class="space-y-4">
+      <!-- Status Tabs -->
+      <div id="artworks-status-tabs" class="flex border-b border-[var(--border-subtle)] gap-2 sm:gap-6 text-sm">
+        <button onclick="switchTab('pending')" id="tab-pending" class="pb-3 font-semibold border-b-2 border-[var(--color-accent)] text-[var(--color-accent-light)] flex items-center gap-2 cursor-pointer transition-colors">
+          <span data-i18n="tab_pending">รอการตรวจสอบ (Pending)</span>
+          <span id="badge-count-pending" class="px-2 py-0.5 corner-cut-6 text-xs bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] font-mono">0</span>
+        </button>
+        <button onclick="switchTab('approved')" id="tab-approved" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-colors">
+          <span data-i18n="tab_approved">อนุมัติแล้ว (Approved)</span>
+          <span id="badge-count-approved" class="px-2 py-0.5 corner-cut-6 text-xs bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono">0</span>
+        </button>
+        <button onclick="switchTab('rejected')" id="tab-rejected" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-colors">
+          <span data-i18n="tab_rejected">ปฏิเสธ (Rejected)</span>
+          <span id="badge-count-rejected" class="px-2 py-0.5 corner-cut-6 text-xs bg-rose-500/15 text-rose-400 border border-rose-500/30 font-mono">0</span>
+        </button>
+        <button onclick="switchTab('')" id="tab-all" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] cursor-pointer transition-colors" data-i18n="tab_all">
+          ทั้งหมด
+        </button>
+      </div>
+
+      <!-- Submissions List -->
+      <div id="submissions-list" class="space-y-4">
+        <div class="gallery-surface corner-cut-20 p-8 text-center text-[var(--text-subtle)] border border-[var(--border-subtle)]">
+          กำลังโหลดรายการผลงาน...
+        </div>
+      </div>
+    </div>
+
+    <!-- Section B: Dedicated Artists Management Panel -->
+    <div id="panel-artists-section" class="hidden space-y-4">
+      <!-- Toolbar & Search -->
+      <div class="p-4 sm:p-5 gallery-surface corner-cut-16 border border-[var(--border-subtle)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-md">
+        <div class="relative flex-1 max-w-md">
+          <svg class="w-4 h-4 text-[var(--color-accent-gold)] absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0118 0z" />
+          </svg>
+          <input type="text" id="artist-admin-search" oninput="filterAdminArtists(this.value)" placeholder="ค้นหาชื่อศิลปิน, อีเมล, เบอร์โทร หรือสัญชาติ..." class="w-full pl-10 pr-4 py-2 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-6 text-xs text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent)]">
+        </div>
+
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <button type="button" onclick="loadAdminArtists()" class="px-3.5 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--color-accent-glow)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-xs text-[var(--text-main)] font-semibold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+            <span>🔄</span> <span>รีเฟรชรายชื่อศิลปิน</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Artists List Container -->
+      <div id="artists-admin-list" class="space-y-4">
+        <div class="gallery-surface corner-cut-20 p-8 text-center text-[var(--text-subtle)] border border-[var(--border-subtle)]">
+          กำลังโหลดรายชื่อศิลปิน...
+        </div>
+      </div>
     </div>
 
     <!-- Toast / Notification container -->
     <div id="toast-container" class="hidden"></div>
-
-    <!-- Submissions List -->
-    <div id="submissions-list" class="space-y-4">
-      <div class="gallery-surface corner-cut-20 p-8 text-center text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-        กำลังโหลดรายการผลงาน...
-      </div>
-    </div>
 
     <!-- Full Artwork & Artist Editor Modal -->
     <div id="edit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md hidden">
@@ -592,6 +639,119 @@
       </div>
     </div>
 
+    <!-- Dedicated Artist Profile Editor Modal (NEW!) -->
+    <div id="edit-artist-admin-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md hidden">
+      <div class="gallery-surface max-w-2xl w-full corner-cut-20 p-5 sm:p-7 space-y-5 border border-[var(--border-accent)] shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
+        <div class="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+          <div>
+            <h3 class="font-serif-luxury text-lg sm:text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
+              <span>👨‍🎨</span>
+              <span>แก้ไขข้อมูลศิลปิน (Edit Artist Profile)</span>
+            </h3>
+            <p id="edit-artist-modal-sub" class="text-xs text-[var(--text-subtle)] mt-0.5 font-mono"></p>
+          </div>
+          <button onclick="closeEditArtistAdminModal()" class="text-[var(--text-subtle)] hover:text-[var(--text-main)] text-2xl leading-none cursor-pointer">&times;</button>
+        </div>
+
+        <input type="hidden" id="edit-artist-old-name">
+
+        <!-- Avatar Replacement Box -->
+        <div class="space-y-3 bg-[var(--bg-base)] p-4 corner-cut-12 border border-[var(--border-subtle)]">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold flex items-center gap-1.5">
+              <span>📸</span> <span>รูปภาพโปรไฟล์ศิลปิน (Artist Portrait)</span>
+            </span>
+            <span id="admin-artist-avatar-status" class="text-[11px] font-mono text-[var(--text-subtle)]"></span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+            <div class="w-20 h-20 bg-[var(--mat-bg)] corner-cut-12 overflow-hidden border border-[var(--border-accent)] flex items-center justify-center relative shrink-0">
+              <img id="admin-artist-avatar-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Avatar" class="w-full h-full object-cover">
+            </div>
+
+            <div class="flex-1 space-y-2 w-full">
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="px-3 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] hover:brightness-110 text-[var(--color-accent-light)] border border-[var(--border-accent)] text-xs font-semibold cursor-pointer transition inline-flex items-center gap-1.5">
+                  <span>📸 เลือกรูปถ่ายใหม่</span>
+                  <input type="file" id="admin-artist-avatar-file" accept="image/*" class="hidden" onchange="handleAdminArtistAvatarChange(event)">
+                </label>
+                <button type="button" onclick="clearAdminArtistAvatar()" class="px-2.5 py-1.5 corner-cut-6 text-xs text-rose-400 hover:text-rose-200 border border-rose-800/40 hover:bg-rose-900/40 transition cursor-pointer">
+                  ลบรูปถ่าย
+                </button>
+              </div>
+
+              <!-- Upload Progress -->
+              <div id="admin-artist-avatar-prog-wrap" class="hidden space-y-1">
+                <div class="flex justify-between text-[10px] font-mono text-[var(--color-accent-gold)]">
+                  <span>กำลังอัปโหลดรูปศิลปิน...</span>
+                  <span id="admin-artist-avatar-prog-pct">0%</span>
+                </div>
+                <div class="w-full bg-[var(--mat-bg)] h-1 corner-cut-2 overflow-hidden">
+                  <div id="admin-artist-avatar-prog-bar" class="bg-[var(--color-accent)] h-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <input type="hidden" id="admin-artist-avatar-url">
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-[var(--bg-base)] p-4 corner-cut-12 border border-[var(--border-subtle)] text-xs">
+          <!-- Academic Title TH & EN -->
+          <div>
+            <label class="block font-semibold text-[var(--color-accent-gold)] mb-1">ตำแหน่งทางวิชาการ (ไทย / TH)</label>
+            <input type="text" id="admin-artist-academic-th" placeholder="เช่น ศ.ดร., รศ., ผศ., อาจารย์" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold text-[var(--color-accent-light)] mb-1">Academic Title (EN)</label>
+            <input type="text" id="admin-artist-academic-en" placeholder="e.g. Prof. Dr., Assoc. Prof." class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Name TH & EN -->
+          <div>
+            <label class="block font-semibold text-[var(--color-accent-gold)] mb-1">ชื่อศิลปิน (ไทย / TH) *</label>
+            <input type="text" id="admin-artist-name-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none font-semibold">
+          </div>
+          <div>
+            <label class="block font-semibold text-[var(--color-accent-light)] mb-1">Artist Name (EN)</label>
+            <input type="text" id="admin-artist-name-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none font-semibold">
+          </div>
+
+          <!-- Nationality & Email -->
+          <div>
+            <label class="block font-semibold text-[var(--text-muted)] mb-1">สัญชาติ / ประเทศ (Nationality)</label>
+            <input type="text" id="admin-artist-nationality" placeholder="e.g. Thailand, Japan, France" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold text-[var(--text-muted)] mb-1">อีเมลติดต่อ (Email)</label>
+            <input type="email" id="admin-artist-email" placeholder="artist@example.com" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Phone -->
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-[var(--text-muted)] mb-1">เบอร์โทรศัพท์ (Phone)</label>
+            <input type="text" id="admin-artist-phone" placeholder="08x-xxx-xxxx" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Bio -->
+          <div class="sm:col-span-2">
+            <label class="block font-semibold text-[var(--text-muted)] mb-1">ประวัติย่อ / แนวความคิดศิลปิน (Bio / Statement)</label>
+            <textarea id="admin-artist-bio" rows="3" placeholder="ประวัติการศึกษา นิทรรศการ หรือแนวคิดในการสร้างสรรค์..." class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none leading-relaxed"></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 border-t border-[var(--border-subtle)] pt-4 text-xs">
+          <button type="button" onclick="closeEditArtistAdminModal()" class="px-4 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] font-semibold transition cursor-pointer">
+            ยกเลิก
+          </button>
+          <button type="button" id="btn-save-admin-artist" onclick="saveAdminArtistEdit()" class="px-5 py-2 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-black font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md">
+            <span>💾 บันทึกข้อมูลศิลปิน</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Image Crop & Rotate Modal -->
     <div id="crop-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md hidden">
       <div class="gallery-surface max-w-4xl w-full corner-cut-20 p-5 sm:p-6 space-y-4 border border-[var(--border-accent)] shadow-2xl flex flex-col max-h-[92vh]">
@@ -713,12 +873,16 @@
   <script>
     let currentTab = "pending";
     let allLoadedSubmissions = [];
+    let currentAdminSection = "artworks";
+    let allAdminArtists = [];
+    let pendingAdminAvatarFile = null;
 
     document.addEventListener("DOMContentLoaded", async () => {
       window.i18n.renderSwitcher('lang-switcher');
       window.addEventListener('languageChanged', () => {
         window.i18n.apply();
         renderSubmissions();
+        renderAdminArtists();
       });
 
       try {
@@ -729,12 +893,307 @@
       } catch (e) {}
 
       loadDashboardSubmissions();
+      loadAdminArtists();
       loadJuryConfig();
       loadEventInfo();
     });
 
     function getAdminKey() {
       return document.getElementById("admin-key-input").value.trim();
+    }
+
+    function switchAdminSection(section) {
+      currentAdminSection = section;
+      const btnArtworks = document.getElementById("btn-section-artworks");
+      const btnArtists = document.getElementById("btn-section-artists");
+      const panelArtworks = document.getElementById("panel-artworks-section");
+      const panelArtists = document.getElementById("panel-artists-section");
+      const hintText = document.getElementById("section-hint-text");
+
+      if (section === "artworks") {
+        if (btnArtworks) btnArtworks.className = "pb-3 border-b-2 border-[var(--color-accent)] text-[var(--color-accent-light)] flex items-center gap-2 cursor-pointer transition-all";
+        if (btnArtists) btnArtists.className = "pb-3 border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-all";
+        if (panelArtworks) panelArtworks.classList.remove("hidden");
+        if (panelArtists) panelArtists.classList.add("hidden");
+        if (hintText) hintText.textContent = "กำลังดู: ตรวจสอบและจัดการผลงาน";
+      } else {
+        if (btnArtists) btnArtists.className = "pb-3 border-b-2 border-[var(--color-accent)] text-[var(--color-accent-light)] flex items-center gap-2 cursor-pointer transition-all";
+        if (btnArtworks) btnArtworks.className = "pb-3 border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-all";
+        if (panelArtists) panelArtists.classList.remove("hidden");
+        if (panelArtworks) panelArtworks.classList.add("hidden");
+        if (hintText) hintText.textContent = "กำลังดู: ทำเนียบและจัดการศิลปิน";
+        loadAdminArtists();
+      }
+    }
+
+    async function loadAdminArtists() {
+      const container = document.getElementById("artists-admin-list");
+      try {
+        const res = await fetch("/api/artists?_t=" + Date.now());
+        const data = await res.json();
+        allAdminArtists = (data && data.artists) ? data.artists : [];
+
+        const badge = document.getElementById("badge-total-artists");
+        if (badge) badge.textContent = allAdminArtists.length;
+
+        renderAdminArtists();
+      } catch (err) {
+        console.error("Failed to load artists for admin:", err);
+        if (container) {
+          container.innerHTML = `<div class="gallery-surface corner-cut-20 p-8 text-center text-rose-400 border border-[var(--border-subtle)]">ไม่สามารถโหลดข้อมูลศิลปินได้: ${err.message}</div>`;
+        }
+      }
+    }
+
+    function renderAdminArtists(list = null) {
+      const container = document.getElementById("artists-admin-list");
+      if (!container) return;
+
+      const artists = list !== null ? list : allAdminArtists;
+      if (artists.length === 0) {
+        container.innerHTML = `
+          <div class="gallery-surface corner-cut-20 p-12 text-center text-[var(--text-subtle)] border border-[var(--border-subtle)] space-y-2">
+            <p class="text-base font-semibold text-[var(--text-muted)]">ไม่พบรายชื่อศิลปิน</p>
+            <p class="text-xs text-[var(--text-subtle)]">ศิลปินจะปรากฏที่นี่เมื่อมีการส่งผลงานในระบบ</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = artists.map(artist => {
+        const name = artist.artist_name || "-";
+        const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes("unsplash.com"));
+        const nationality = artist.nationality || "-";
+        const email = artist.artist_email || "-";
+        const phone = artist.artist_phone || "-";
+        const bio = artist.artist_bio && artist.artist_bio.trim() !== "-" ? artist.artist_bio.trim() : "";
+        const count = artist.artworks_count || (artist.artworks ? artist.artworks.length : 0);
+
+        // Artworks thumbnails
+        const validArtworks = (artist.artworks || []).filter(a => Boolean((a.thumbnail_url || a.image_url || '').trim()));
+        const artThumbs = validArtworks.slice(0, 5).map(a => {
+          const title = window.getField(a, 'title') || a.title || "-";
+          const img = a.thumbnail_url || a.image_url;
+          return `
+            <a href="/artwork.html?id=${a.id}" target="_blank" class="relative w-12 h-12 corner-cut-6 overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-base)] shrink-0 hover:border-[var(--color-accent-gold)] transition group/thumb block" title="${title} (#${a.id})">
+              <img src="${img}" alt="${title}" class="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform" onerror="this.parentElement.style.display='none';">
+            </a>
+          `;
+        }).join("");
+
+        return `
+          <div class="p-5 sm:p-6 gallery-surface corner-cut-16 border border-[var(--border-subtle)] hover:border-[var(--border-accent)] transition shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-5 group">
+            <div class="flex items-start sm:items-center gap-4 min-w-0 flex-1">
+              <!-- Avatar or Initials -->
+              <div class="w-14 h-14 sm:w-16 sm:h-16 corner-cut-12 overflow-hidden border border-[var(--border-accent)] bg-[var(--mat-bg)] shrink-0 flex items-center justify-center shadow-inner relative">
+                ${hasAvatar ? `
+                  <img src="${artist.artist_avatar_url}" alt="${name}" class="w-full h-full object-cover">
+                ` : `
+                  <span class="font-serif-luxury text-xl font-bold text-[var(--color-accent-gold)]">${name.slice(0, 2)}</span>
+                `}
+              </div>
+
+              <!-- Info -->
+              <div class="min-w-0 flex-1 space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="font-serif-luxury text-base sm:text-lg font-bold text-[var(--text-main)] leading-snug">
+                    ${name}
+                  </h3>
+                  <span>${window.getCountryFlagBadge(nationality, { size: 'sm', showName: true })}</span>
+                  <span class="px-2 py-0.5 corner-cut-4 text-[11px] font-mono bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] font-semibold">
+                    ${count} ผลงาน
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3 text-xs text-[var(--text-subtle)] font-mono flex-wrap">
+                  ${email !== '-' ? `<span>✉️ ${email}</span>` : ''}
+                  ${phone !== '-' ? `<span>📞 ${phone}</span>` : ''}
+                </div>
+
+                ${bio ? `<p class="text-xs text-[var(--text-muted)] italic line-clamp-1">"${bio}"</p>` : ''}
+
+                <!-- Artworks Previews -->
+                ${artThumbs ? `
+                  <div class="flex items-center gap-2 pt-1.5 flex-wrap">
+                    <span class="text-[10px] text-[var(--text-subtle)] font-mono">ผลงาน:</span>
+                    ${artThumbs}
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2 shrink-0 self-end md:self-auto border-t md:border-t-0 border-[var(--border-subtle)] pt-3 md:pt-0 w-full md:w-auto justify-end flex-wrap">
+              <button onclick="viewArtistArtworks('${encodeURIComponent(name)}')" class="px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-xs text-[var(--text-main)] font-semibold border border-[var(--border-subtle)] transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="กรองดูผลงานทั้งหมดของศิลปินท่านนี้ในแท็บผลงาน">
+                <span>🖼️ ดูผลงาน</span>
+              </button>
+
+              <button onclick="openEditArtistAdminModal('${encodeURIComponent(name)}')" class="px-3.5 py-2 corner-cut-6 bg-[var(--color-accent-glow)] hover:brightness-110 text-xs text-[var(--color-accent-light)] font-semibold border border-[var(--border-accent)] transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="แก้ไขข้อมูลศิลปิน">
+                <span>✏️ แก้ไขข้อมูล</span>
+              </button>
+
+              <button onclick="deleteArtistByName('${encodeURIComponent(name)}')" class="px-3 py-2 corner-cut-6 bg-rose-950/40 hover:bg-rose-900/60 text-xs text-rose-400 hover:text-rose-200 font-semibold border border-rose-800/40 transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="ลบศิลปินท่านนี้พร้อมผลงานทั้งหมดออกจากระบบอย่างถาวร">
+                <span>🗑️ ลบศิลปิน</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function filterAdminArtists(query) {
+      const q = (query || "").trim().toLowerCase();
+      if (!q) {
+        renderAdminArtists(allAdminArtists);
+        return;
+      }
+      const filtered = allAdminArtists.filter(a => {
+        const name = (a.artist_name || "").toLowerCase();
+        const email = (a.artist_email || "").toLowerCase();
+        const phone = (a.artist_phone || "").toLowerCase();
+        const nation = (a.nationality || "").toLowerCase();
+        const bio = (a.artist_bio || "").toLowerCase();
+        return name.includes(q) || email.includes(q) || phone.includes(q) || nation.includes(q) || bio.includes(q);
+      });
+      renderAdminArtists(filtered);
+    }
+
+    function viewArtistArtworks(encodedName) {
+      const name = decodeURIComponent(encodedName);
+      switchAdminSection("artworks");
+      switchTab(""); // all tabs
+      // Filter submissions
+      const filtered = allLoadedSubmissions.filter(s => s.artist_name === name || s.artist_name_th === name || s.artist_name_en === name);
+      renderSubmissions(filtered);
+      showToast(`กรองแสดงผลงานของ "${name}" (${filtered.length} รายการ)`, "info");
+    }
+
+    let editingArtistData = null;
+
+    function openEditArtistAdminModal(encodedName) {
+      const name = decodeURIComponent(encodedName);
+      const artist = allAdminArtists.find(a => a.artist_name === name);
+      if (!artist) {
+        alert("ไม่พบข้อมูลศิลปิน: " + name);
+        return;
+      }
+
+      editingArtistData = artist;
+      pendingAdminAvatarFile = null;
+
+      document.getElementById("edit-artist-old-name").value = artist.artist_name;
+      document.getElementById("edit-artist-modal-sub").textContent = `ศิลปิน: ${artist.artist_name} (${artist.artworks_count || 0} ผลงาน)`;
+
+      document.getElementById("admin-artist-name-th").value = artist.artist_name || "";
+      document.getElementById("admin-artist-name-en").value = artist.artist_name_en || artist.artist_name || "";
+      document.getElementById("admin-artist-academic-th").value = artist.academic_title_th || artist.academic_title || "";
+      document.getElementById("admin-artist-academic-en").value = artist.academic_title_en || "";
+      document.getElementById("admin-artist-nationality").value = artist.nationality || "Thailand";
+      document.getElementById("admin-artist-email").value = artist.artist_email || "";
+      document.getElementById("admin-artist-phone").value = artist.artist_phone || "";
+      document.getElementById("admin-artist-bio").value = artist.artist_bio || "";
+      document.getElementById("admin-artist-avatar-url").value = artist.artist_avatar_url || "";
+
+      const preview = document.getElementById("admin-artist-avatar-preview");
+      if (artist.artist_avatar_url && !artist.artist_avatar_url.includes("unsplash.com")) {
+        preview.src = artist.artist_avatar_url;
+      } else {
+        preview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.artist_name)}&background=1c150c&color=C5A059&bold=true`;
+      }
+
+      document.getElementById("admin-artist-avatar-prog-wrap").classList.add("hidden");
+      document.getElementById("admin-artist-avatar-status").textContent = "";
+
+      document.getElementById("edit-artist-admin-modal").classList.remove("hidden");
+    }
+
+    function closeEditArtistAdminModal() {
+      document.getElementById("edit-artist-admin-modal").classList.add("hidden");
+      editingArtistData = null;
+      pendingAdminAvatarFile = null;
+    }
+
+    function handleAdminArtistAvatarChange(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      pendingAdminAvatarFile = file;
+      const preview = document.getElementById("admin-artist-avatar-preview");
+      preview.src = URL.createObjectURL(file);
+      document.getElementById("admin-artist-avatar-status").textContent = `เลือกรูป: ${file.name}`;
+    }
+
+    function clearAdminArtistAvatar() {
+      pendingAdminAvatarFile = null;
+      document.getElementById("admin-artist-avatar-url").value = "";
+      document.getElementById("admin-artist-avatar-preview").src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
+      document.getElementById("admin-artist-avatar-status").textContent = "ลบรูปโปรไฟล์แล้ว";
+    }
+
+    async function saveAdminArtistEdit() {
+      if (!editingArtistData) return;
+      const oldName = document.getElementById("edit-artist-old-name").value.trim();
+      const newNameTh = document.getElementById("admin-artist-name-th").value.trim();
+      const newNameEn = document.getElementById("admin-artist-name-en").value.trim();
+
+      if (!newNameTh) {
+        alert("กรุณาระบุชื่อศิลปิน");
+        return;
+      }
+
+      const btnSave = document.getElementById("btn-save-admin-artist");
+      btnSave.disabled = true;
+      btnSave.textContent = "กำลังบันทึก...";
+
+      try {
+        let finalAvatarUrl = document.getElementById("admin-artist-avatar-url").value;
+
+        // Upload avatar to Cloudinary if new file selected
+        if (pendingAdminAvatarFile && window.CloudinaryUploader) {
+          const progWrap = document.getElementById("admin-artist-avatar-prog-wrap");
+          const progBar = document.getElementById("admin-artist-avatar-prog-bar");
+          const progPct = document.getElementById("admin-artist-avatar-prog-pct");
+          progWrap.classList.remove("hidden");
+
+          const upRes = await window.CloudinaryUploader.uploadImage(pendingAdminAvatarFile, {
+            folder: "art_exhibition/avatars",
+            onProgress: (p) => {
+              progBar.style.width = p + "%";
+              progPct.textContent = p + "%";
+            }
+          });
+          finalAvatarUrl = upRes.secure_url || upRes.url;
+        }
+
+        const payload = {
+          old_artist_name: oldName,
+          artist_name: newNameTh,
+          artist_name_th: newNameTh,
+          artist_name_en: newNameEn,
+          academic_title: document.getElementById("admin-artist-academic-th").value.trim(),
+          academic_title_th: document.getElementById("admin-artist-academic-th").value.trim(),
+          academic_title_en: document.getElementById("admin-artist-academic-en").value.trim(),
+          nationality: document.getElementById("admin-artist-nationality").value.trim(),
+          artist_email: document.getElementById("admin-artist-email").value.trim(),
+          artist_phone: document.getElementById("admin-artist-phone").value.trim(),
+          artist_bio: document.getElementById("admin-artist-bio").value.trim(),
+          artist_avatar_url: finalAvatarUrl
+        };
+
+        const res = await EventAPI.updateArtist(oldName, payload, getAdminKey());
+        if (res.success) {
+          showToast(`บันทึกข้อมูลศิลปิน "${newNameTh}" สำเร็จ`, "success");
+          closeEditArtistAdminModal();
+          loadAdminArtists();
+          loadDashboardSubmissions();
+        } else {
+          alert("ไม่สามารถบันทึกได้: " + (res.error || "เกิดข้อผิดพลาด"));
+        }
+      } catch (err) {
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      } finally {
+        btnSave.disabled = false;
+        btnSave.innerHTML = "<span>💾 บันทึกข้อมูลศิลปิน</span>";
+      }
     }
 
     function switchTab(tab) {
@@ -767,6 +1226,8 @@
         document.getElementById("badge-count-pending").textContent = pendingCount;
         document.getElementById("badge-count-approved").textContent = approvedCount;
         document.getElementById("badge-count-rejected").textContent = rejectedCount;
+        const totalArtworksEl = document.getElementById("badge-total-artworks");
+        if (totalArtworksEl) totalArtworksEl.textContent = allLoadedSubmissions.length;
 
         renderSubmissions();
       } catch (err) {
@@ -778,19 +1239,20 @@
       }
     }
 
-    function renderSubmissions() {
+    function renderSubmissions(customList = null) {
       const listContainer = document.getElementById("submissions-list");
       listContainer.innerHTML = "";
 
-      const filtered = allLoadedSubmissions.filter(s => {
+      const filtered = customList !== null ? customList : allLoadedSubmissions.filter(s => {
         if (!currentTab) return true;
         return s.status === currentTab;
       });
 
       if (filtered.length === 0) {
         listContainer.innerHTML = `
-          <div class="gallery-surface corner-cut-20 p-12 text-center text-[var(--text-subtle)] border border-[var(--border-subtle)]">
-            ${window.i18n.getLang() === 'th' ? 'ไม่มีผลงานในสถานะนี้' : 'No artworks in this status'} (${currentTab || (window.i18n.getLang() === 'th' ? 'ทั้งหมด' : 'All')})
+          <div class="gallery-surface corner-cut-20 p-12 text-center text-[var(--text-subtle)] border border-[var(--border-subtle)] space-y-2">
+            <p class="text-base font-semibold text-[var(--text-muted)]">${window.i18n.getLang() === 'th' ? 'ไม่มีผลงานในสถานะนี้' : 'No artworks in this status'}</p>
+            <button onclick="switchTab('')" class="text-xs text-[var(--color-accent-gold)] hover:underline">${window.i18n.getLang() === 'th' ? 'แสดงผลงานทั้งหมด' : 'Show all artworks'}</button>
           </div>
         `;
         return;
@@ -1370,6 +1832,7 @@
         if (res.success) {
           showToast(`${window.t('toast_deleted_artwork') || 'ลบผลงานสำเร็จ'} (#${id})`, "info");
           loadDashboardSubmissions();
+          loadAdminArtists();
         } else {
           alert(`${window.t('app_error')} ${res.error || 'Failed to delete artwork'}`);
         }
@@ -1391,6 +1854,7 @@
         if (res.success) {
           showToast(`${window.t('toast_deleted_artist') || 'ลบศิลปินสำเร็จ'}: "${artistName}" (${res.deletedCount || count} ผลงาน)`, "info");
           loadDashboardSubmissions();
+          loadAdminArtists();
         } else {
           alert(`${window.t('app_error')} ${res.error || 'Failed to delete artist'}`);
         }

@@ -523,21 +523,24 @@
         const artistName = window.getArtistFullName(artist);
         const bio = window.getField(artist, 'artist_bio');
         const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes('unsplash.com'));
-        const bioSnippet = bio ? `"${bio.slice(0, 110)}..."` : (window.i18n.getLang() === 'th' ? 'ศิลปินร่วมจัดแสดงในนิทรรศการ' : 'Exhibiting artist');
+        const cleanBio = bio && bio.trim() !== '-' ? bio.trim() : '';
+        const bioSnippet = cleanBio ? `"${cleanBio.slice(0, 110)}..."` : (window.i18n.getLang() === 'th' ? 'ศิลปินร่วมจัดแสดงในนิทรรศการ' : 'Exhibiting artist');
         
-        // Render artwork thumbnails (up to 3) with signature cut
-        const artThumbs = (artist.artworks || []).slice(0, 3).map(art => {
+        // Render artwork thumbnails (up to 3) with signature cut - filter out empty image URLs
+        const validArtworks = (artist.artworks || []).filter(art => Boolean((art.thumbnail_url || art.image_url || '').trim()));
+        const artThumbs = validArtworks.slice(0, 3).map(art => {
           const artTitle = window.getField(art, 'title');
+          const imgSrc = art.thumbnail_url || art.image_url;
           return `
             <a href="/artwork.html?id=${art.id}" class="relative aspect-square corner-cut-8 overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] group/art block" title="${artTitle}">
-              <img src="${art.thumbnail_url || art.image_url}" alt="${artTitle}" class="w-full h-full object-cover group-hover/art:scale-110 transition-transform duration-300">
+              <img src="${imgSrc}" alt="${artTitle}" class="w-full h-full object-cover group-hover/art:scale-110 transition-transform duration-300" onerror="this.parentElement.style.display='none';">
             </a>
           `;
         }).join('');
 
-        const extraCount = (artist.artworks || []).length > 3 ? `
+        const extraCount = validArtworks.length > 3 ? `
           <div class="relative aspect-square corner-cut-8 border border-dashed border-[var(--border-accent)] bg-[var(--color-accent-glow)] flex items-center justify-center text-[10px] font-bold text-[var(--color-accent-light)]">
-            +${artist.artworks.length - 3}
+            +${validArtworks.length - 3}
           </div>
         ` : '';
 
@@ -566,13 +569,15 @@
                 </span>
               </div>
 
-              <!-- Artwork Preview Strip -->
-              <div class="p-2.5 corner-cut-12 bg-[var(--mat-bg)] border border-[var(--border-subtle)]">
-                <div class="grid grid-cols-4 gap-2">
-                  ${artThumbs}
-                  ${extraCount}
+              <!-- Artwork Preview Strip (Only if artist has valid images) -->
+              ${artThumbs ? `
+                <div class="p-2.5 corner-cut-12 bg-[var(--mat-bg)] border border-[var(--border-subtle)]">
+                  <div class="grid grid-cols-4 gap-2">
+                    ${artThumbs}
+                    ${extraCount}
+                  </div>
                 </div>
-              </div>
+              ` : ''}
 
               <!-- Bio Snippet -->
               <p class="text-xs text-[var(--text-subtle)] italic leading-relaxed line-clamp-2">
