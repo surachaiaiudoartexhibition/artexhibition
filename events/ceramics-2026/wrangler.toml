@@ -8,14 +8,14 @@ pages_build_output_dir = "public"
 # Isolated D1 Database for this Event
 [[d1_databases]]
 binding = "DB"
-database_name = "d1-ceramics-2026"
-database_id = "d1-id-ceramics-2026-demo"
+database_name = "art_event_1"
+database_id = "e483980b-c034-448f-a1a3-9b61d392a13f"
 
 [vars]
 EVENT_ID = "ceramics-2026"
 EVENT_TITLE = "Contemporary Ceramic Art Biennial 2026"
 ADMIN_EMAIL = "{{ADMIN_EMAIL}}"
-MASTER_PORTAL_URL = "http://localhost:8788"
+MASTER_PORTAL_URL = "https://artexhibition.pages.dev"
 SHARED_SECRET_TOKEN = "sec_test_ceramics_abc123"
 ADMIN_KEY = "admin123"
 EVENT_PAGE_BASE_URL = "https://ceramics-2026.pages.dev"
