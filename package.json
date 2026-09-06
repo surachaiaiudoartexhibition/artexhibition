@@ -1,0 +1,28 @@
+{
+  "name": "virtual-exhibition-system",
+  "version": "1.0.0",
+  "description": "Multi-Tenant Virtual Exhibition System with Zero-Budget Architecture",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "dev:local": "node scripts/dev-server.js",
+    "dev:event": "npm --prefix apps/event-webapp run dev",
+    "dev:master": "npm --prefix apps/master-portal run dev",
+    "create-event": "node scripts/create-event.js",
+    "sync-events": "node scripts/sync-template.js",
+    "test:sync": "node scripts/test-sync-flow.js"
+  },
+  "keywords": [
+    "cloudflare-pages",
+    "cloudflare-d1",
+    "cloudinary",
+    "zero-budget",
+    "multi-tenant",
+    "virtual-exhibition"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,14 @@
+{
+  "eventId": "digital-art-2026",
+  "eventTitle": "International Digital Art Biennial 2026",
+  "portalUrl": "https://digital-art-2026.pages.dev",
+  "secretToken": "sec_00a08eb50326e3a843dba8072f45885e",
+  "adminEmail": "artorg+digital2026@gmail.com",
+  "cloudinaryCloudName": "art-digital-2026",
+  "cloudinaryUploadPreset": "digital_art_submissions",
+  "cloudflareAccountId": "cf_acc_demo_882910",
+  "d1Name": "d1-digital-art-2026",
+  "d1Id": "d1-uuid-cba7bcf77c568469",
+  "githubRepo": "myorg/digital-art-2026",
+  "createdAt": "2026-09-05T03:12:19.209Z"
+}

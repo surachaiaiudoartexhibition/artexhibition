@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-[#090a0d] text-stone-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายละเอียดผลงานศิลปะ | Artwork Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+    .gallery-surface {
+      background: rgba(16, 17, 22, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #F9E7C4 0%, #D4AF37 50%, #A88126 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+  <script src="/js/i18n.js"></script>
+  <link rel="stylesheet" href="/css/themes.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body class="min-h-full flex flex-col selection:bg-[#c5a059] selection:text-black bg-[#090a0d]">
+  
+      <!-- Master Navigation Bar -->
+  <header class="master-navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Brand Lockup -->
+      <a href="/" class="flex items-center space-x-3 group shrink-0">
+        <div class="master-brand-badge">พ.ช.</div>
+        <div class="min-w-0">
+          <span id="nav-event-title" class="text-sm font-serif-luxury tracking-wider text-[var(--text-main)] block font-semibold truncate leading-tight" data-i18n="nav_event_default">Printmaking Exhibition</span>
+          <span class="text-[10px] text-[var(--color-accent-gold)] font-mono tracking-widest uppercase block leading-none mt-0.5" data-i18n="nav_sub_brand">Fine Art Exhibition</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links & Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <nav class="flex items-center space-x-1 sm:space-x-1.5 text-xs sm:text-sm font-normal">
+          <a href="/" class="master-nav-link "  data-i18n="nav_home">หน้าแรก</a>
+          <a href="/gallery.html" class="master-nav-link active" aria-current="page" data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="master-nav-link "  data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="master-nav-link "  data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/submit.html" class="master-nav-cta  ml-1 sm:ml-2"  data-i18n="nav_submit">ส่งผลงาน</a>
+        </nav>
+
+        <div class="h-4 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Admin Curator Desk Entrance -->
+          <a href="/admin.html" class="master-admin-btn" title="Curator Desk (เข้าสู่ระบบผู้ดูแล)" data-i18n-title="nav_admin">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span class="text-[11px] font-semibold hidden md:inline">Desk</span>
+          </a>
+
+          <!-- Language Switcher -->
+          <div id="lang-switcher"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
+    
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-24 text-stone-400 font-light">
+      <div class="animate-spin w-8 h-8 border-2 border-[#c5a059] border-t-transparent rounded-full mx-auto mb-4"></div>
+      <span data-i18n="loading_artworks">กำลังโหลดข้อมูลผลงานและประวัติศิลปิน...</span>
+    </div>
+
+    <!-- Error View -->
+    <div id="error-view" class="hidden text-center py-20 gallery-surface rounded-sm p-8 space-y-4">
+      <svg class="w-10 h-10 text-stone-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      <h3 class="text-rose-300 font-serif-luxury text-xl" data-i18n="art_not_found_title">ไม่พบผลงานที่ต้องการ</h3>
+      <p class="text-xs text-stone-400 font-light" data-i18n="art_not_found_desc">ผลงานอาจยังอยู่ระหว่างการตรวจสอบ หรือไม่มีอยู่ในระบบ</p>
+      <a href="/gallery.html" class="inline-block mt-2 px-5 py-2 rounded-sm bg-[#c5a059] text-stone-950 font-medium text-xs tracking-wider uppercase" data-i18n="nav_back_gallery">&larr; กลับไปยังนิทรรศการ</a>
+    </div>
+
+    <!-- Main Content Container -->
+    <div id="artwork-container" class="hidden space-y-8">
+      
+      <!-- Breadcrumb & Action Bar -->
+      <div class="flex items-center justify-between text-xs text-stone-400 pb-3 border-b border-white/[0.08]">
+        <div class="flex items-center gap-2">
+          <a href="/" class="hover:text-white transition" data-i18n="artwork_breadcrumb_home">หน้าแรก</a>
+          <span class="text-stone-600">/</span>
+          <a href="/gallery.html" class="hover:text-white transition" data-i18n="artwork_breadcrumb_gallery">ห้องนิทรรศการ</a>
+          <span class="text-stone-600">/</span>
+          <span id="breadcrumb-title" class="text-[#e2c792] font-normal truncate max-w-xs"></span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a href="/catalog.html" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-white/[0.04] border border-[#c5a059]/30 text-[#f5e6c8] hover:bg-[#c5a059]/15 text-xs tracking-wider uppercase transition">
+            <svg class="w-3.5 h-3.5 text-[#c5a059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+            <span data-i18n="btn_open_catalog_a4">สูจิบัตรดิจิทัล</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Gallery Wall & Plaque Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        
+        <!-- Artwork Focus Wall Stage (Col 7) -->
+        <div class="lg:col-span-7 gallery-surface rounded-sm p-3 overflow-hidden space-y-3">
+          <div class="relative bg-[#050608] min-h-[460px] flex items-center justify-center p-4">
+            <img id="artwork-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Artwork Exhibition Piece" class="max-h-[75vh] w-auto max-w-full object-contain">
+          </div>
+          <div class="flex items-center justify-between px-2 pt-1 text-xs text-stone-400">
+            <span id="artwork-zone-tag" class="font-mono text-[11px] tracking-wider text-[#c5a059]"></span>
+            <a id="artwork-raw-link" href="#" target="_blank" class="text-[#d4af37] hover:text-white transition flex items-center gap-1 font-light">
+              <span data-i18n="view_raw_image">เปิดดูไฟล์ภาพต้นฉบับ</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Museum Plaque & Artist Specifications (Col 5) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Museum Label Plaque -->
+          <div class="gallery-surface rounded-sm p-6 sm:p-8 space-y-6">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-mono tracking-widest text-[#c5a059] uppercase" data-i18n="approved_badge">
+                  Curated Exhibition Piece
+                </span>
+                <span id="artwork-id-badge" class="text-[11px] font-mono text-stone-500"></span>
+              </div>
+              <h1 id="artwork-title" class="font-serif-luxury text-2xl sm:text-3xl font-normal text-white leading-snug"></h1>
+            </div>
+
+            <!-- Specs Metrology -->
+            <div class="space-y-2.5 text-xs pt-4 border-t border-white/[0.08]">
+              <div class="flex justify-between py-1.5 border-b border-white/[0.04]">
+                <span class="text-stone-400 font-light" data-i18n="spec_technique_lbl">เทคนิค / วัสดุ:</span>
+                <span id="spec-technique" class="font-normal text-stone-200 text-right"></span>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-white/[0.04]">
+                <span class="text-stone-400 font-light" data-i18n="spec_dimensions_lbl">ขนาดผลงาน:</span>
+                <span id="spec-dimensions" class="font-normal text-stone-200 text-right"></span>
+              </div>
+              <div class="flex justify-between py-1.5 border-b border-white/[0.04]">
+                <span class="text-stone-400 font-light" data-i18n="spec_year_lbl">ปีที่สร้างสรรค์:</span>
+                <span id="spec-year" class="font-normal text-stone-200 text-right"></span>
+              </div>
+              <div id="spec-price-row" class="flex justify-between py-1.5 text-[#d4af37] font-medium">
+                <span data-i18n="spec_price_lbl">ราคา:</span>
+                <span id="spec-price" class="font-mono text-sm"></span>
+              </div>
+            </div>
+
+            <!-- Statement / Concept -->
+            <div class="pt-4 border-t border-white/[0.08]">
+              <h3 class="text-[11px] font-mono uppercase tracking-widest text-[#c5a059] mb-3" data-i18n="concept_title">แนวคิดผลงาน (Artist Statement)</h3>
+              <p id="artwork-description" class="text-xs sm:text-sm text-stone-300 leading-relaxed font-light whitespace-pre-line pl-4 border-l-2 border-[#c5a059]/40"></p>
+            </div>
+          </div>
+
+          <!-- Artist Curatorial Profile -->
+          <div class="gallery-surface rounded-sm p-6 sm:p-7 space-y-4">
+            <div class="flex items-center gap-4">
+              <img id="artist-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Artist Profile" class="w-14 h-14 rounded-full object-cover border border-[#c5a059]/40 shrink-0">
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-[#c5a059] block" data-i18n="artist_tag_label">ศิลปินผู้สร้างสรรค์</span>
+                <h2 id="artwork-artist-name" class="font-serif-luxury text-xl font-normal text-white"></h2>
+                <div id="artist-nationality-tag" class="mt-1"></div>
+              </div>
+            </div>
+
+            <p id="artist-bio-text" class="text-xs text-stone-300/90 leading-relaxed font-light line-clamp-4">
+            </p>
+
+            <div class="pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs">
+              <a href="/artists.html" class="inline-flex items-center gap-1.5 text-[#d4af37] hover:text-white transition tracking-wider uppercase text-[11px]">
+                <span data-i18n="view_in_artists_dir">ดูข้อมูลในทำเนียบศิลปิน</span>
+                <span>&rarr;</span>
+              </a>
+              <button onclick="navigator.clipboard.writeText(window.location.href); alert(window.t('link_copied'));" class="p-1.5 text-stone-400 hover:text-white transition cursor-pointer" title="แชร์ผลงาน" data-i18n-title="btn_share_artwork">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+      <!-- Institutional Colophon Footer -->
+  <footer class="border-t border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] py-10 text-[var(--text-subtle)] font-light mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div class="space-y-1 text-center sm:text-left">
+          <p class="text-[var(--text-main)] font-serif-luxury tracking-wide text-sm font-semibold" data-i18n="footer_title">วิทยาลัยเพาะช่าง มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์</p>
+          <p class="text-[var(--text-subtle)] text-[11px]" data-i18n="footer_sub">Poh-Chang Academy of Arts • RMUTR &bull; Bangkok, Thailand</p>
+        </div>
+        <div class="flex items-center gap-6 text-[11px] text-[var(--text-muted)]">
+          <a href="/gallery.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/admin.html" class="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition" title="Curator Entrance" data-i18n="nav_curator_desk">Curator Desk</a>
+        </div>
+      </div>
+      <div class="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <p class="text-[11px] text-[var(--text-subtle)]">© 2026 Poh-Chang International Art Exhibition Platform. All artworks copyright of their respective artists.</p>
+        <span class="text-[11px] text-[var(--text-subtle)] font-mono">Curatorial Fine Art Salon System</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let currentArt = null;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      window.i18n.renderSwitcher('lang-switcher');
+      window.addEventListener('languageChanged', () => { 
+        window.i18n.apply(); 
+        renderArtworkDetails();
+      });
+      try {
+        const config = await EventAPI.getConfig();
+        if (config.eventTitle) {
+          document.getElementById("nav-event-title").textContent = config.eventTitle;
+        }
+      } catch (e) {
+        console.warn("Config load error");
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get("id");
+
+      if (!id) {
+        showError();
+        return;
+      }
+
+      try {
+        const res = await EventAPI.getArtwork(id);
+        if (!res.success || !res.submission) {
+          showError();
+          return;
+        }
+
+        currentArt = res.submission;
+        renderArtworkDetails();
+
+        document.getElementById("loading").classList.add("hidden");
+        document.getElementById("artwork-container").classList.remove("hidden");
+      } catch (err) {
+        console.error(err);
+        showError();
+      }
+    });
+
+    function renderArtworkDetails() {
+      if (!currentArt) return;
+      const art = currentArt;
+      const isTh = window.i18n.getLang() === 'th';
+      const title = window.getField(art, 'title');
+      const artistName = window.getArtistFullName(art);
+      const technique = window.getField(art, 'technique') || (isTh ? "ภาพพิมพ์ร่วมสมัย" : "Contemporary Printmaking");
+      const description = window.getField(art, 'description') || window.t('no_artwork_desc');
+      const bio = window.getField(art, 'artist_bio') || window.t('no_artist_bio');
+
+      document.title = `${title} | ${artistName} - Virtual Exhibition`;
+      document.getElementById("breadcrumb-title").textContent = title;
+      document.getElementById("artwork-title").textContent = title;
+      document.getElementById("artwork-id-badge").textContent = `#${art.id}`;
+      document.getElementById("artwork-description").textContent = description;
+
+      // Specs
+      document.getElementById("spec-technique").textContent = technique;
+      document.getElementById("spec-dimensions").textContent = window.formatDimensions(art.dimensions);
+      document.getElementById("spec-year").textContent = art.year_created || "2026";
+
+      if (art.price) {
+        document.getElementById("spec-price").textContent = window.formatPrice(art.price);
+        document.getElementById("spec-price-row").classList.remove("hidden");
+      } else {
+        document.getElementById("spec-price-row").classList.add("hidden");
+      }
+
+      // Images
+      const img = document.getElementById("artwork-image");
+      img.src = art.image_url;
+      img.alt = title;
+      document.getElementById("artwork-raw-link").href = art.image_url;
+
+      // Artist Info
+      document.getElementById("artwork-artist-name").textContent = artistName;
+      document.getElementById("artist-nationality-tag").innerHTML = window.getCountryFlagBadge(art.nationality || 'Thailand', { size: 'sm', showName: true });
+      document.getElementById("artist-bio-text").textContent = bio;
+
+      const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=1c1e26&color=D4AF37&bold=true`;
+      document.getElementById("artist-avatar").src = avatar;
+    }
+
+    function showError() {
+      document.getElementById("loading").classList.add("hidden");
+      document.getElementById("error-view").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>

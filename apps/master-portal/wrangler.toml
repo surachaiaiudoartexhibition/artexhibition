@@ -1,0 +1,13 @@
+name = "master-portal"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "master-db"
+database_id = "local-master-db"
+
+[vars]
+MASTER_ADMIN_KEY = "master_admin_secret_999"
+# Default master fallback secret token if not event-specific:
+GLOBAL_SYNC_SECRET = "sec_demo_event_2026_xyz"

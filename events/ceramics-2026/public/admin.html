@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curator Dashboard | ระบบจัดการผลงานและคัดเลือกนิทรรศการ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Sarabun', sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <script src="/js/i18n.js"></script>
+  <link rel="stylesheet" href="/css/themes.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body class="min-h-full flex flex-col bg-[var(--bg-base)] text-[var(--text-main)]">
+
+  <!-- Master Navbar (Admin Curator Desk) -->
+  <header class="master-navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center space-x-3 group shrink-0">
+        <div class="master-brand-badge">พ.ช.</div>
+        <div class="min-w-0">
+          <span id="nav-event-title" class="text-sm font-serif-luxury tracking-wider text-[var(--text-main)] block font-semibold truncate leading-tight" data-i18n="nav_event_default">Event Moderation</span>
+          <span class="text-[10px] text-[var(--color-accent-gold)] font-mono tracking-widest uppercase block leading-none mt-0.5" data-i18n="nav_sub_admin">Curator & Moderation Desk</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Admin Key Input -->
+        <div class="flex items-center gap-2 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-1.5 corner-cut-6 text-xs shadow-inner">
+          <span class="text-[var(--text-subtle)] font-medium" data-i18n="admin_key_label">Admin Key:</span>
+          <input type="password" id="admin-key-input" value="admin123" class="bg-transparent border-none text-[var(--text-main)] focus:outline-none w-20 font-mono text-xs">
+        </div>
+
+        <!-- Quick Links -->
+        <a href="/gallery.html" class="master-nav-link" data-i18n="nav_gallery">ชมนิทรรศการ</a>
+        <a href="/catalog.html?admin=true" target="_blank" class="master-nav-link" data-i18n="nav_catalog_layout">📖 จัดหน้าสูจิบัตร</a>
+        <a href="/catalog-designer.html" target="_blank" onclick="this.href='/catalog-designer.html?adminKey=' + encodeURIComponent(document.getElementById('admin-key-input').value)" class="master-nav-cta hidden sm:inline-flex">
+          <span>🎨</span> <span>สตูดิโอเต็มจอ</span>
+        </a>
+
+        <div class="h-4 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
+
+        <!-- Language Switcher -->
+        <div id="lang-switcher"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+    <!-- Header with Stats -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold font-serif-luxury text-[var(--text-main)]" data-i18n="admin_title">ตรวจสอบและตรวจรับผลงาน (Curator Moderation)</h1>
+        <p class="text-[var(--text-muted)] text-xs sm:text-sm mt-1" data-i18n="admin_desc">
+          เมื่อกดอนุมัติ (Approve) ระบบจะอัปเดตสถานะใน D1 ประจำงาน และส่ง Webhook ข้อมูลไปยัง Master Portal อัตโนมัติ
+        </p>
+      </div>
+      <button onclick="loadDashboardSubmissions()" class="self-start md:self-auto px-4 py-2 corner-cut-8 gallery-surface hover:brightness-110 border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-xs font-semibold text-[var(--text-main)] transition flex items-center gap-2 cursor-pointer shadow-sm">
+        <svg class="w-3.5 h-3.5 text-[var(--color-accent-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span data-i18n="btn_refresh">รีเฟรชข้อมูล</span>
+      </button>
+    </div>
+
+    <!-- Master Exhibition Theme Selector Card (Admin Only) -->
+    <div class="p-5 sm:p-6 gallery-surface border border-[var(--border-subtle)] hover:border-[var(--border-accent)] corner-cut-20 shadow-xl transition-all">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-sm font-semibold text-[var(--text-main)] flex items-center gap-2">
+            <span>🎨 กำหนดธีมหลักของงานนิทรรศการ (Master Exhibition Theme)</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 corner-cut-6 bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] font-semibold">สิทธิ์เฉพาะ Admin</span>
+          </h3>
+          <p class="text-xs text-[var(--text-muted)] mt-1">
+            เลือกสไตล์และบรรยากาศการจัดแสดงหลักสำหรับผู้ชมทุกคนในอีเวนต์นี้: 🏛️ เพาะช่าง เฮอริเทจ, ⬛ สวิส โมเดิร์น, ⬜ ไวท์คิวบ์ มินิมอล, 🍵 เบนโตะ คราฟต์
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="theme-picker-mount"></div>
+          <a href="/" target="_blank" class="px-3 py-1.5 corner-cut-6 border border-[var(--border-subtle)] hover:border-[var(--border-accent)] bg-[var(--bg-surface-elevated)] text-xs text-[var(--text-main)] transition flex items-center gap-1.5 shadow-sm">
+            <span>👁️ เปิดดูหน้าเว็บผู้ชม</span>
+          </a>
+        </div>
+      </div>
+      <div id="admin-theme-notice" class="mt-4 text-xs text-[var(--color-accent-light)] font-mono flex items-center gap-2 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] p-2.5 corner-cut-8">
+        <span>✓</span> <span>ธีมปัจจุบันจะมีผลกับทุกหน้าที่ผู้ชมเข้าชม (หน้าแรก, แกลเลอรี, ทำเนียบศิลปิน, สูจิบัตร)</span>
+      </div>
+    </div>
+
+    <!-- Quick Action Banner: Freeform Catalog Designer Studio -->
+    <div class="p-4 sm:p-5 gallery-surface border border-[var(--border-subtle)] hover:border-[var(--border-accent)] corner-cut-16 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 corner-cut-10 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-gold)] flex items-center justify-center text-xl shrink-0 shadow-inner">
+          🎨
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
+            <span>สตูดิโอจัดหน้าสูจิบัตรอิสระ (Catalog Designer Studio)</span>
+            <span class="text-[9px] uppercase font-mono px-2 py-0.5 corner-cut-6 bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)]">Admin Feature</span>
+          </h3>
+          <p class="text-xs text-[var(--text-muted)] mt-0.5">
+            จัดวางตำแหน่งภาพและข้อความแบบอิสระบน Grid A4, ย่อขยายขนาด 8 ทิศทาง, เลือกลบ/เพิ่มฟิลด์ และจัดเลย์เอาต์เฉพาะหน้าได้
+          </p>
+        </div>
+      </div>
+      <a href="/catalog-designer.html" target="_blank" onclick="this.href='/catalog-designer.html?adminKey=' + encodeURIComponent(document.getElementById('admin-key-input').value)" class="master-nav-cta shrink-0 cursor-pointer">
+        <span>🚀 เปิดสตูดิโอจัดหน้าเต็มจอ</span>
+      </a>
+    </div>
+
+    <!-- Status Tabs -->
+    <div class="flex border-b border-[var(--border-subtle)] gap-2 sm:gap-6 text-sm">
+      <button onclick="switchTab('pending')" id="tab-pending" class="pb-3 font-semibold border-b-2 border-[var(--color-accent)] text-[var(--color-accent-light)] flex items-center gap-2 cursor-pointer transition-colors">
+        <span data-i18n="tab_pending">รอการตรวจสอบ (Pending)</span>
+        <span id="badge-count-pending" class="px-2 py-0.5 corner-cut-6 text-xs bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] font-mono">0</span>
+      </button>
+      <button onclick="switchTab('approved')" id="tab-approved" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-colors">
+        <span data-i18n="tab_approved">อนุมัติแล้ว (Approved)</span>
+        <span id="badge-count-approved" class="px-2 py-0.5 corner-cut-6 text-xs bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono">0</span>
+      </button>
+      <button onclick="switchTab('rejected')" id="tab-rejected" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-colors">
+        <span data-i18n="tab_rejected">ปฏิเสธ (Rejected)</span>
+        <span id="badge-count-rejected" class="px-2 py-0.5 corner-cut-6 text-xs bg-rose-500/15 text-rose-400 border border-rose-500/30 font-mono">0</span>
+      </button>
+      <button onclick="switchTab('')" id="tab-all" class="pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] cursor-pointer transition-colors" data-i18n="tab_all">
+        ทั้งหมด
+      </button>
+    </div>
+
+    <!-- Toast / Notification container -->
+    <div id="toast-container" class="hidden"></div>
+
+    <!-- Submissions List -->
+    <div id="submissions-list" class="space-y-4">
+      <div class="gallery-surface corner-cut-20 p-8 text-center text-[var(--text-subtle)] border border-[var(--border-subtle)]">
+        กำลังโหลดรายการผลงาน...
+      </div>
+    </div>
+
+    <!-- Edit Translation Modal -->
+    <div id="edit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+      <div class="gallery-surface max-w-2xl w-full corner-cut-20 p-6 sm:p-8 space-y-5 border border-[var(--border-accent)] shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+          <h3 class="font-serif-luxury text-lg font-bold text-[var(--text-main)] flex items-center gap-2">
+            <span>✏️</span>
+            <span data-i18n="refine_translation_title">ปรับปรุง / เกลาคำแปล (Refine Bilingual Translation)</span>
+          </h3>
+          <button onclick="closeEditModal()" class="text-[var(--text-subtle)] hover:text-[var(--text-main)] text-xl cursor-pointer">&times;</button>
+        </div>
+
+        <input type="hidden" id="edit-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Title TH & EN -->
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_title_th">ชื่อผลงาน (ไทย / TH)</label>
+            <input type="text" id="edit-title-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_title_en">Artwork Title (EN)</label>
+            <input type="text" id="edit-title-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Academic Title TH & EN -->
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_academic_th">ตำแหน่งทางวิชาการ/ราชการ (ไทย / TH)</label>
+            <input type="text" id="edit-academic-th" placeholder="เช่น ศ.ดร., รศ., ผศ., อาจารย์" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_academic_en">Academic Title (EN)</label>
+            <input type="text" id="edit-academic-en" placeholder="e.g. Prof. Dr., Assoc. Prof., Asst. Prof." class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Artist TH & EN -->
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_name_th">ชื่อศิลปิน (ไทย / TH)</label>
+            <input type="text" id="edit-artist-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_name_en">Artist Name (EN)</label>
+            <input type="text" id="edit-artist-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Technique TH & EN -->
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_technique_th">เทคนิค (ไทย / TH)</label>
+            <input type="text" id="edit-technique-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_technique_en">Technique (EN)</label>
+            <input type="text" id="edit-technique-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Description TH & EN -->
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_desc_th">แนวคิดผลงาน (ไทย / TH)</label>
+            <textarea id="edit-desc-th" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_desc_en">Artist Statement / Concept (EN)</label>
+            <textarea id="edit-desc-en" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+          </div>
+        </div>
+
+        <!-- Bio TH & EN -->
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_bio_th">ประวัติศิลปิน (ไทย / TH)</label>
+            <textarea id="edit-bio-th" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_bio_en">Artist Bio (EN)</label>
+            <textarea id="edit-bio-en" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border-subtle)]">
+          <button onclick="closeEditModal()" class="px-4 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] text-xs font-semibold transition border border-[var(--border-subtle)] cursor-pointer" data-i18n="btn_cancel">ยกเลิก</button>
+          <button onclick="saveArtworkEdits()" class="px-5 py-2 corner-cut-8 bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:brightness-110 text-xs font-bold transition shadow-md cursor-pointer" data-i18n="btn_save_edits">บันทึกการแก้ไข</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Crop & Rotate Modal -->
+    <div id="crop-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md hidden">
+      <div class="gallery-surface max-w-4xl w-full corner-cut-20 p-5 sm:p-6 space-y-4 border border-[var(--border-accent)] shadow-2xl flex flex-col max-h-[92vh]">
+        <div class="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+          <div>
+            <h3 class="font-serif-luxury text-base sm:text-lg font-bold text-[var(--text-main)] flex items-center gap-2">
+              <span>🖼️</span>
+              <span data-i18n="modal_crop_title">เครื่องมือตกแต่งและตัดขอบรูปภาพผลงาน (Crop & Rotate)</span>
+            </h3>
+            <p id="crop-modal-subtitle" class="text-xs text-[var(--text-subtle)] mt-0.5 font-mono"></p>
+          </div>
+          <button onclick="closeCropModal()" class="text-[var(--text-subtle)] hover:text-[var(--text-main)] text-2xl leading-none cursor-pointer">&times;</button>
+        </div>
+
+        <!-- Cropper Workspace Area -->
+        <div class="flex-1 bg-[var(--mat-bg)] corner-cut-12 overflow-hidden border border-[var(--border-subtle)] flex items-center justify-center min-h-[340px] max-h-[55vh] relative p-2">
+          <img id="crop-image-target" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Crop Target" class="max-h-full max-w-full block">
+        </div>
+
+        <!-- Toolbar Controls -->
+        <div class="space-y-3">
+          <!-- Row 1: Free Rotate & Straighten Controls -->
+          <div class="bg-[var(--bg-surface-elevated)] p-3 corner-cut-10 border border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-xs">
+            <!-- Coarse 90-degree Buttons -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[var(--color-accent-gold)] font-semibold flex items-center gap-1" data-i18n="label_rotation_free">
+                หมุนภาพอิสระ (Straighten):
+              </span>
+              <button type="button" onclick="rotateCropBy(-90)" class="px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--color-accent-light)] border border-[var(--border-subtle)] font-medium transition cursor-pointer flex items-center gap-1" title="หมุนซ้าย 90°">
+                <span>↺</span> -90°
+              </button>
+              <button type="button" onclick="rotateCropBy(90)" class="px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--color-accent-light)] border border-[var(--border-subtle)] font-medium transition cursor-pointer flex items-center gap-1" title="หมุนขวา 90°">
+                <span>↻</span> +90°
+              </button>
+            </div>
+
+            <!-- Fine Angle Adjustment Slider & Input -->
+            <div class="flex items-center gap-2 flex-1 min-w-[240px] max-w-md">
+              <button type="button" onclick="rotateCropBy(-1)" class="px-2 py-1 corner-cut-4 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-main)] border border-[var(--border-subtle)] text-[11px] font-mono transition cursor-pointer" title="ปรับเอียงซ้าย -1°">-1°</button>
+              <input type="range" id="crop-angle-slider" min="-180" max="180" step="0.5" value="0" oninput="onAngleSliderChange(this.value)" class="flex-1 accent-[var(--color-accent)] h-1.5 bg-[var(--mat-bg)] rounded-sm cursor-pointer">
+              <button type="button" onclick="rotateCropBy(1)" class="px-2 py-1 corner-cut-4 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-main)] border border-[var(--border-subtle)] text-[11px] font-mono transition cursor-pointer" title="ปรับเอียงขวา +1°">+1°</button>
+              
+              <div class="flex items-center bg-[var(--mat-bg)] px-2 py-0.5 corner-cut-4 border border-[var(--border-subtle)]">
+                <input type="number" id="crop-angle-number" min="-180" max="180" step="0.5" value="0" onchange="onAngleSliderChange(this.value)" class="w-12 bg-transparent text-center text-[var(--color-accent-gold)] font-mono text-xs focus:outline-none">
+                <span class="text-[var(--text-subtle)] text-[11px]">°</span>
+              </div>
+              
+              <button type="button" onclick="onAngleSliderChange(0)" class="px-2 py-1 corner-cut-4 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-subtle)] hover:text-[var(--text-main)] text-[11px] border border-[var(--border-subtle)] transition cursor-pointer" title="คืนค่าเป็น 0°">0°</button>
+            </div>
+
+            <!-- Flip Controls -->
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="flipCrop('x')" class="px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-muted)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] font-medium transition cursor-pointer" title="กลับด้านแนวนอน">
+                ↔ Flip X
+              </button>
+              <button type="button" onclick="flipCrop('y')" class="px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-muted)] hover:text-[var(--text-main)] border border-[var(--border-subtle)] font-medium transition cursor-pointer" title="กลับด้านแนวตั้ง">
+                ↕ Flip Y
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 2: Aspect Ratio & Actions -->
+          <div class="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
+            <!-- Aspect Ratio Presets -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[var(--text-subtle)] text-[11px] mr-1" data-i18n="aspect_ratio_label">สัดส่วน:</span>
+              <button type="button" onclick="setCropRatio(NaN, this)" class="crop-ratio-btn px-2.5 py-1.5 corner-cut-6 bg-[var(--color-accent)] text-[var(--color-accent-contrast)] font-bold transition cursor-pointer shadow-sm" data-i18n="ratio_free">อิสระ (Free)</button>
+              <button type="button" onclick="setCropRatio(1, this)" class="crop-ratio-btn px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-muted)] border border-[var(--border-subtle)] transition cursor-pointer">1:1</button>
+              <button type="button" onclick="setCropRatio(4/3, this)" class="crop-ratio-btn px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-muted)] border border-[var(--border-subtle)] transition cursor-pointer">4:3</button>
+              <button type="button" onclick="setCropRatio(3/2, this)" class="crop-ratio-btn px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-muted)] border border-[var(--border-subtle)] transition cursor-pointer">3:2</button>
+              <button type="button" onclick="setCropRatio(16/9, this)" class="crop-ratio-btn px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-muted)] border border-[var(--border-subtle)] transition cursor-pointer">16:9</button>
+            </div>
+
+            <!-- Output Dimensions & Reset -->
+            <div class="flex items-center gap-3">
+              <span class="text-[var(--text-subtle)]"><span data-i18n="lbl_crop_size">ขนาดตัดภาพ:</span> <strong id="crop-dimensions" class="font-mono text-[var(--color-accent-gold)]">-</strong> px</span>
+              <button type="button" onclick="resetCrop()" class="text-[var(--text-subtle)] hover:text-[var(--text-main)] underline text-[11px] cursor-pointer" data-i18n="btn_reset_crop">รีเซ็ตทั้งหมด (Reset)</button>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="closeCropModal()" class="px-4 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] text-xs font-semibold border border-[var(--border-subtle)] transition cursor-pointer" data-i18n="btn_cancel">ยกเลิก</button>
+              <button type="button" id="btn-save-crop" onclick="saveCroppedImage()" class="px-5 py-2 corner-cut-8 bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:brightness-110 text-xs font-bold transition shadow-md cursor-pointer flex items-center gap-1.5">
+                <span>💾</span>
+                <span data-i18n="btn_save_cropped">บันทึกรูปภาพที่แก้ไข</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Institutional Colophon Footer -->
+  <footer class="border-t border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] py-10 text-[var(--text-subtle)] font-light mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div class="space-y-1 text-center sm:text-left">
+          <p class="text-[var(--text-main)] font-serif-luxury tracking-wide text-sm font-semibold" data-i18n="footer_title">วิทยาลัยเพาะช่าง มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์</p>
+          <p class="text-[var(--text-subtle)] text-[11px]" data-i18n="footer_sub">Poh-Chang Academy of Arts • RMUTR &bull; Bangkok, Thailand</p>
+        </div>
+        <div class="flex items-center gap-6 text-[11px] text-[var(--text-muted)]">
+          <a href="/gallery.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/admin.html" class="text-[var(--color-accent-gold)] font-medium transition" title="Curator Entrance" data-i18n="nav_curator_desk">Curator Desk</a>
+        </div>
+      </div>
+      <div class="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <p class="text-[11px] text-[var(--text-subtle)]">© 2026 Poh-Chang International Art Exhibition Platform. All artworks copyright of their respective artists.</p>
+        <span class="text-[11px] text-[var(--text-subtle)] font-mono">Curatorial Fine Art Salon System</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script>
+    let currentTab = "pending";
+    let allLoadedSubmissions = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      window.i18n.renderSwitcher('lang-switcher');
+      window.addEventListener('languageChanged', () => {
+        window.i18n.apply();
+        renderSubmissions();
+      });
+
+      try {
+        const config = await EventAPI.getConfig();
+        if (config.eventTitle) {
+          document.getElementById("nav-event-title").textContent = config.eventTitle;
+        }
+      } catch (e) {}
+
+      loadDashboardSubmissions();
+    });
+
+    function getAdminKey() {
+      return document.getElementById("admin-key-input").value.trim();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      ["pending", "approved", "rejected", ""].forEach(t => {
+        const btn = document.getElementById(`tab-${t || "all"}`);
+        if (!btn) return;
+        if (t === tab) {
+          btn.className = "pb-3 font-semibold border-b-2 border-[var(--color-accent)] text-[var(--color-accent-light)] flex items-center gap-2 cursor-pointer transition-colors";
+        } else {
+          btn.className = "pb-3 font-medium border-b-2 border-transparent text-[var(--text-subtle)] hover:text-[var(--text-main)] flex items-center gap-2 cursor-pointer transition-colors";
+        }
+      });
+      renderSubmissions();
+    }
+
+    async function loadDashboardSubmissions() {
+      const listContainer = document.getElementById("submissions-list");
+      listContainer.innerHTML = `<div class="gallery-surface corner-cut-20 p-8 text-center text-[var(--text-subtle)] animate-pulse border border-[var(--border-subtle)]">${window.t('loading_submissions')}</div>`;
+
+      try {
+        const res = await EventAPI.getSubmissions("", getAdminKey());
+        allLoadedSubmissions = res.submissions || [];
+
+        // Update counts
+        const pendingCount = allLoadedSubmissions.filter(s => s.status === "pending").length;
+        const approvedCount = allLoadedSubmissions.filter(s => s.status === "approved").length;
+        const rejectedCount = allLoadedSubmissions.filter(s => s.status === "rejected").length;
+
+        document.getElementById("badge-count-pending").textContent = pendingCount;
+        document.getElementById("badge-count-approved").textContent = approvedCount;
+        document.getElementById("badge-count-rejected").textContent = rejectedCount;
+
+        renderSubmissions();
+      } catch (err) {
+        listContainer.innerHTML = `
+          <div class="gallery-surface corner-cut-20 p-8 text-center text-rose-400 border border-[var(--border-subtle)]">
+            ${window.t('app_error')} ${err.message}
+          </div>
+        `;
+      }
+    }
+
+    function renderSubmissions() {
+      const listContainer = document.getElementById("submissions-list");
+      listContainer.innerHTML = "";
+
+      const filtered = allLoadedSubmissions.filter(s => {
+        if (!currentTab) return true;
+        return s.status === currentTab;
+      });
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="gallery-surface corner-cut-20 p-12 text-center text-[var(--text-subtle)] border border-[var(--border-subtle)]">
+            ${window.i18n.getLang() === 'th' ? 'ไม่มีผลงานในสถานะนี้' : 'No artworks in this status'} (${currentTab || (window.i18n.getLang() === 'th' ? 'ทั้งหมด' : 'All')})
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(sub => {
+        const item = document.createElement("div");
+        item.className = "gallery-surface corner-cut-20 p-5 sm:p-6 flex flex-col md:flex-row gap-6 items-start border border-[var(--border-subtle)] hover:border-[var(--border-accent)] transition-all shadow-xl";
+        
+        let statusBadge = "";
+        if (sub.status === "pending") {
+          statusBadge = `<span class="px-2.5 py-0.5 corner-cut-6 text-xs font-semibold bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)]">${window.i18n.getLang() === 'th' ? 'รอการตรวจสอบ' : 'Pending'}</span>`;
+        } else if (sub.status === "approved") {
+          statusBadge = `<span class="px-2.5 py-0.5 corner-cut-6 text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">${window.i18n.getLang() === 'th' ? 'อนุมัติแล้ว' : 'Approved'}</span>`;
+        } else {
+          statusBadge = `<span class="px-2.5 py-0.5 corner-cut-6 text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">${window.i18n.getLang() === 'th' ? 'ปฏิเสธ' : 'Rejected'}</span>`;
+        }
+
+        const avatar = sub.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sub.artist_name)}&background=D4AF37&color=000&bold=true`;
+        item.innerHTML = `
+          <div class="w-full md:w-48 h-48 flex-shrink-0 bg-[var(--mat-bg)] corner-cut-12 overflow-hidden relative border border-[var(--border-subtle)] p-1.5 flex items-center justify-center">
+            <img src="${sub.thumbnail_url || sub.image_url}" alt="${sub.title}" class="max-w-full max-h-full object-contain">
+            <span class="absolute bottom-2 left-2 bg-black/80 backdrop-blur-md px-2 py-0.5 corner-cut-6 text-[11px] font-mono text-[var(--color-accent-light)] border border-[var(--border-accent)]">#${sub.id}</span>
+          </div>
+
+          <div class="flex-1 space-y-3 min-w-0">
+            <div class="flex items-center gap-3">
+              ${statusBadge}
+              <span class="text-xs text-[var(--text-subtle)] font-mono">${sub.created_at ? new Date(sub.created_at).toLocaleString(window.i18n.getLang() === 'th' ? "th-TH" : "en-US") : ""}</span>
+            </div>
+            
+            <h3 class="text-base sm:text-lg font-bold font-serif-luxury text-[var(--text-main)] flex items-baseline gap-2 flex-wrap">
+              <span>${sub.title_th || sub.title}</span>
+              <span class="text-xs sm:text-sm text-[var(--color-accent-gold)] font-normal font-sans">/ ${sub.title_en || sub.title}</span>
+            </h3>
+            
+            <!-- Artist Row with Avatar, Academic Title & Bilingual Name -->
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <img src="${avatar}" alt="" class="w-7 h-7 corner-cut-6 object-cover border border-[var(--border-accent)] shrink-0 bg-[var(--mat-bg)]">
+              ${(sub.academic_title_th || sub.academic_title) ? `<span class="px-2 py-0.5 corner-cut-6 bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] text-[11px] font-semibold">${sub.academic_title_th || sub.academic_title}</span>` : ''}
+              <span class="text-sm font-semibold text-[var(--text-main)]">${sub.artist_name_th || sub.artist_name}</span>
+              <span class="text-xs text-[var(--text-muted)] font-sans">(${(sub.academic_title_en ? sub.academic_title_en + ' ' : '')}${sub.artist_name_en || sub.artist_name})</span>
+              <span>${window.getCountryFlagBadge(sub.nationality || 'Thailand', { size: 'sm', showName: true })}</span>
+              ${sub.artist_email ? `<span class="text-xs text-[var(--text-subtle)] font-mono">• ✉️ ${sub.artist_email}</span>` : ''}
+            </div>
+
+            <!-- Specs Grid with Bilingual Technique -->
+            <div class="flex flex-wrap gap-2 text-[11px] text-[var(--text-muted)] pt-1">
+              <span class="bg-[var(--bg-surface-elevated)] px-2.5 py-1 corner-cut-6 border border-[var(--border-subtle)]">
+                ${window.t('spec_technique_lbl')} <strong class="text-[var(--text-main)]">${sub.technique_th || sub.technique || 'ภาพพิมพ์'}</strong> <span class="text-[var(--text-subtle)]">(${sub.technique_en || sub.technique || 'Printmaking'})</span>
+              </span>
+              <span class="bg-[var(--bg-surface-elevated)] px-2.5 py-1 corner-cut-6 border border-[var(--border-subtle)]">${window.t('spec_dimensions_lbl')} <strong class="text-[var(--text-main)]">${window.formatDimensions(sub.dimensions)}</strong></span>
+              <span class="bg-[var(--bg-surface-elevated)] px-2.5 py-1 corner-cut-6 border border-[var(--border-subtle)]">${window.t('spec_year_lbl')} <strong class="text-[var(--text-main)]">${sub.year_created || '2026'}</strong></span>
+              ${sub.price ? `<span class="bg-[var(--bg-surface-elevated)] px-2.5 py-1 corner-cut-6 border border-[var(--border-subtle)] text-[var(--color-accent-gold)]">${window.t('spec_price_lbl')} <strong>${window.formatPrice(sub.price)}</strong></span>` : ''}
+            </div>
+
+            <!-- Bilingual Concept Statement -->
+            <div class="space-y-1.5 text-xs bg-[var(--bg-surface-elevated)] p-3.5 corner-cut-10 border border-[var(--border-subtle)]">
+              <p class="text-[var(--text-muted)] italic"><span class="text-[10px] font-bold text-[var(--color-accent-gold)] font-mono uppercase mr-1">TH:</span> "${sub.description_th || sub.description || '-'}"</p>
+              <p class="text-[var(--text-subtle)] italic"><span class="text-[10px] font-bold text-[var(--color-accent-light)] font-mono uppercase mr-1">EN:</span> "${sub.description_en || sub.description || '-'}"</p>
+            </div>
+          </div>
+
+          <div class="w-full md:w-auto flex md:flex-col gap-2.5 justify-end shrink-0">
+            <button onclick="openCropModal(${sub.id})" class="px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] text-xs font-semibold border border-[var(--border-accent)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm" title="ปรับหมุนและตัดขอบรูปภาพ">
+              <span>🖼️</span>
+              <span>${window.t('btn_crop_rotate')}</span>
+            </button>
+
+            <button onclick="openEditModal(${sub.id})" class="px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:border-[var(--color-accent)] text-[var(--text-main)] text-xs font-semibold border border-[var(--border-subtle)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm" title="ปรับปรุงคำแปล">
+              <span>✏️</span>
+              <span>${window.t('btn_edit_translation')}</span>
+            </button>
+
+            ${sub.status !== "approved" ? `
+              <button onclick="approveArtwork(${sub.id})" class="flex-1 md:flex-initial px-4 py-2 corner-cut-6 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>${window.t('btn_approve')}</span>
+              </button>
+            ` : `
+              <a href="/artwork.html?id=${sub.id}" target="_blank" class="px-4 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] border border-[var(--border-subtle)] text-[var(--text-main)] text-xs font-medium text-center transition">
+                <span>${window.t('btn_view_live')}</span>
+              </a>
+            `}
+
+            ${sub.status !== "rejected" ? `
+              <button onclick="rejectArtwork(${sub.id})" class="flex-1 md:flex-initial px-4 py-2 corner-cut-6 bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span>${window.t('btn_reject')}</span>
+              </button>
+            ` : ""}
+          </div>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+
+    // Modal Edit Translation logic
+    let editingArtwork = null;
+
+    function openEditModal(id) {
+      const art = allLoadedSubmissions.find(s => s.id === id);
+      if (!art) return;
+      editingArtwork = art;
+
+      document.getElementById('edit-id').value = art.id;
+      document.getElementById('edit-title-th').value = art.title_th || art.title || '';
+      document.getElementById('edit-title-en').value = art.title_en || art.title || '';
+      document.getElementById('edit-academic-th').value = art.academic_title_th || art.academic_title || '';
+      document.getElementById('edit-academic-en').value = art.academic_title_en || art.academic_title || '';
+      document.getElementById('edit-artist-th').value = art.artist_name_th || art.artist_name || '';
+      document.getElementById('edit-artist-en').value = art.artist_name_en || art.artist_name || '';
+      document.getElementById('edit-technique-th').value = art.technique_th || art.technique || '';
+      document.getElementById('edit-technique-en').value = art.technique_en || art.technique || '';
+      document.getElementById('edit-desc-th').value = art.description_th || art.description || '';
+      document.getElementById('edit-desc-en').value = art.description_en || art.description || '';
+      document.getElementById('edit-bio-th').value = art.artist_bio_th || art.artist_bio || '';
+      document.getElementById('edit-bio-en').value = art.artist_bio_en || art.artist_bio || '';
+
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+      editingArtwork = null;
+    }
+
+    async function saveArtworkEdits() {
+      if (!editingArtwork) return;
+      const id = editingArtwork.id;
+      const academicTh = document.getElementById('edit-academic-th').value.trim();
+      const academicEn = document.getElementById('edit-academic-en').value.trim();
+      const payload = {
+        title_th: document.getElementById('edit-title-th').value.trim(),
+        title_en: document.getElementById('edit-title-en').value.trim(),
+        academic_title: academicTh || academicEn,
+        academic_title_th: academicTh,
+        academic_title_en: academicEn,
+        artist_name_th: document.getElementById('edit-artist-th').value.trim(),
+        artist_name_en: document.getElementById('edit-artist-en').value.trim(),
+        technique_th: document.getElementById('edit-technique-th').value.trim(),
+        technique_en: document.getElementById('edit-technique-en').value.trim(),
+        description_th: document.getElementById('edit-desc-th').value.trim(),
+        description_en: document.getElementById('edit-desc-en').value.trim(),
+        artist_bio_th: document.getElementById('edit-bio-th').value.trim(),
+        artist_bio_en: document.getElementById('edit-bio-en').value.trim()
+      };
+
+      try {
+        const res = await EventAPI.updateArtwork(id, payload, getAdminKey());
+        if (res.success) {
+          showToast(window.i18n.getLang() === 'th' ? 'บันทึกการปรับปรุงคำแปลเรียบร้อยแล้ว' : 'Bilingual translation updated successfully', 'success');
+          closeEditModal();
+          loadDashboardSubmissions();
+        } else {
+          alert((window.t('app_error') || 'เกิดข้อผิดพลาดในการบันทึก: ') + ' ' + (res.error || ''));
+        }
+      } catch (err) {
+        alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + err.message);
+      }
+    }
+
+    // ==========================================
+    // Image Crop & Rotate Logic (Cropper.js)
+    // ==========================================
+    let cropperInstance = null;
+    let croppingArtwork = null;
+    let currentScaleX = 1;
+    let currentScaleY = 1;
+    let currentRotationAngle = 0;
+
+    function updateRotationUI() {
+      const slider = document.getElementById('crop-angle-slider');
+      const numInput = document.getElementById('crop-angle-number');
+      if (slider) slider.value = currentRotationAngle;
+      if (numInput) numInput.value = currentRotationAngle;
+    }
+
+    function onAngleSliderChange(val) {
+      currentRotationAngle = Math.round(parseFloat(val || 0) * 10) / 10;
+      updateRotationUI();
+      if (cropperInstance) {
+        cropperInstance.rotateTo(currentRotationAngle);
+      }
+    }
+
+    function rotateCropBy(delta) {
+      currentRotationAngle = Math.round((currentRotationAngle + delta) * 10) / 10;
+      if (currentRotationAngle > 180) currentRotationAngle -= 360;
+      if (currentRotationAngle < -180) currentRotationAngle += 360;
+      updateRotationUI();
+      if (cropperInstance) {
+        cropperInstance.rotateTo(currentRotationAngle);
+      }
+    }
+
+    function rotateCrop(deg) {
+      rotateCropBy(deg);
+    }
+
+    function openCropModal(id) {
+      const art = allLoadedSubmissions.find(s => s.id === id);
+      if (!art) return;
+      croppingArtwork = art;
+      currentScaleX = 1;
+      currentScaleY = 1;
+      currentRotationAngle = 0;
+      updateRotationUI();
+
+      document.getElementById('crop-modal-subtitle').textContent = `#${art.id} • ${window.getField(art, 'title')} (${window.getField(art, 'artist_name')})`;
+      const targetImg = document.getElementById('crop-image-target');
+
+      // Destroy previous instance
+      if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+      }
+
+      targetImg.src = art.image_url;
+      document.getElementById('crop-modal').classList.remove('hidden');
+
+      targetImg.onload = () => {
+        if (cropperInstance) {
+          cropperInstance.destroy();
+        }
+        cropperInstance = new Cropper(targetImg, {
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 0.95,
+          responsive: true,
+          restore: false,
+          checkCrossOrigin: false,
+          ready() {
+            updateCropDimensions();
+          },
+          crop() {
+            updateCropDimensions();
+          }
+        });
+      };
+
+      if (targetImg.complete && targetImg.naturalWidth > 0) {
+        targetImg.onload();
+      }
+    }
+
+    function closeCropModal() {
+      if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+      }
+      document.getElementById('crop-modal').classList.add('hidden');
+      croppingArtwork = null;
+    }
+
+    function flipCrop(axis) {
+      if (!cropperInstance) return;
+      if (axis === 'x') {
+        currentScaleX = -currentScaleX;
+        cropperInstance.scaleX(currentScaleX);
+      } else {
+        currentScaleY = -currentScaleY;
+        cropperInstance.scaleY(currentScaleY);
+      }
+    }
+
+    function setCropRatio(ratio, btn) {
+      if (!cropperInstance) return;
+      cropperInstance.setAspectRatio(ratio);
+      document.querySelectorAll('.crop-ratio-btn').forEach(b => {
+        b.className = 'crop-ratio-btn px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface)] hover:border-[var(--border-accent)] text-[var(--text-muted)] border border-[var(--border-subtle)] transition cursor-pointer';
+      });
+      btn.className = 'crop-ratio-btn px-2.5 py-1.5 corner-cut-6 bg-[var(--color-accent)] text-[var(--color-accent-contrast)] font-bold transition cursor-pointer shadow-sm';
+    }
+
+    function resetCrop() {
+      if (!cropperInstance) return;
+      currentScaleX = 1;
+      currentScaleY = 1;
+      currentRotationAngle = 0;
+      updateRotationUI();
+      cropperInstance.reset();
+      const firstRatioBtn = document.querySelector('.crop-ratio-btn');
+      if (firstRatioBtn) {
+        setCropRatio(NaN, firstRatioBtn);
+      }
+    }
+
+    function updateCropDimensions() {
+      if (!cropperInstance) return;
+      const data = cropperInstance.getData();
+      const display = document.getElementById('crop-dimensions');
+      if (display) {
+        display.textContent = `${Math.round(data.width)} × ${Math.round(data.height)}`;
+      }
+    }
+
+    async function saveCroppedImage() {
+      if (!cropperInstance || !croppingArtwork) return;
+      const btn = document.getElementById('btn-save-crop');
+      const origHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳ ${window.t('status_saving_image') || 'กำลังบันทึกภาพ...'}</span>`;
+
+      try {
+        const canvas = cropperInstance.getCroppedCanvas({
+          maxWidth: 2400,
+          maxHeight: 2400,
+          imageSmoothingQuality: 'high'
+        });
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const res = await EventAPI.updateArtworkImage(croppingArtwork.id, dataUrl, getAdminKey());
+
+        if (res.success) {
+          showToast(window.t('toast_crop_saved'), 'success');
+          closeCropModal();
+          loadDashboardSubmissions();
+        } else {
+          alert((window.t('app_error') || 'เกิดข้อผิดพลาดในการบันทึกรูปภาพ: ') + ' ' + (res.error || ''));
+        }
+      } catch (err) {
+        alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
+    }
+
+    async function approveArtwork(id) {
+      const confirmMsg = `${window.t('confirm_approve') || 'ยืนยันการอนุมัติผลงานหรือไม่?'} (#${id})`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const res = await EventAPI.approveArtwork(id, getAdminKey());
+        if (res.success) {
+          const webhook = res.webhook;
+          let webhookMsg = "";
+          if (webhook.syncResult.attempted) {
+            if (webhook.syncResult.success) {
+              webhookMsg = window.i18n.getLang() === 'th'
+                ? ` | Webhook ส่งไปยังเว็บท่าสำเร็จ (Status ${webhook.syncResult.status})`
+                : ` | Webhook synced to Master Portal (Status ${webhook.syncResult.status})`;
+            } else {
+              webhookMsg = window.i18n.getLang() === 'th'
+                ? ` | Webhook ล้มเหลว (${webhook.syncResult.error || "Status " + webhook.syncResult.status})`
+                : ` | Webhook failed (${webhook.syncResult.error || "Status " + webhook.syncResult.status})`;
+            }
+          } else {
+            webhookMsg = window.i18n.getLang() === 'th'
+              ? ` (ยังไม่ได้กำหนด MASTER_PORTAL_URL หรือ SHARED_SECRET_TOKEN)`
+              : ` (MASTER_PORTAL_URL or SHARED_SECRET_TOKEN not configured)`;
+          }
+
+          showToast(`${window.t('toast_approved')} #${id}${webhookMsg}`, "success");
+          loadDashboardSubmissions();
+        } else {
+          alert(`${window.t('app_error')} ${res.error}`);
+        }
+      } catch (err) {
+        alert(`${window.t('app_error')} ${err.message}`);
+      }
+    }
+
+    async function rejectArtwork(id) {
+      const confirmMsg = `${window.t('confirm_reject') || 'ต้องการปฏิเสธผลงานใช่หรือไม่?'} (#${id})`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const res = await EventAPI.rejectArtwork(id, getAdminKey());
+        if (res.success) {
+          showToast(`${window.t('toast_rejected')} #${id}`, "info");
+          loadDashboardSubmissions();
+        } else {
+          alert(`${window.t('app_error')} ${res.error}`);
+        }
+      } catch (err) {
+        alert(`${window.t('app_error')} ${err.message}`);
+      }
+    }
+
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast-container");
+      toast.classList.remove("hidden");
+      const bg = type === "success" 
+        ? "bg-emerald-950/80 border-emerald-500/40 text-emerald-300" 
+        : "bg-[var(--bg-surface-elevated)] border-[var(--border-accent)] text-[var(--color-accent-light)]";
+      toast.innerHTML = `
+        <div class="p-4 corner-cut-8 border ${bg} text-sm flex items-center justify-between shadow-xl">
+          <span>${message}</span>
+          <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-xs opacity-70 hover:opacity-100 cursor-pointer">&times;</button>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

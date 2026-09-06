@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายละเอียดผลงานศิลปะ | Artwork Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', 'Sarabun', sans-serif; }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col selection:bg-indigo-500 selection:text-white">
+  <!-- Navbar -->
+  <header class="sticky top-0 z-50 glass-card border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">
+          VE
+        </div>
+        <div>
+          <span id="nav-event-title" class="text-sm font-semibold tracking-wide text-white block">Printmaking Exhibition</span>
+          <span class="text-[11px] text-indigo-400 font-mono">Artwork Showcase</span>
+        </div>
+      </a>
+      <nav class="flex items-center space-x-4 text-sm font-medium">
+        <a href="/gallery.html" class="text-slate-300 hover:text-white transition flex items-center gap-1">
+          <span>&larr;</span>
+          <span>กลับไปยังนิทรรศการ</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div id="loading" class="text-center py-20 text-slate-400">
+      <div class="animate-spin w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+      กำลังโหลดข้อมูลผลงานศิลปะ...
+    </div>
+
+    <div id="error-view" class="hidden text-center py-20 glass-card rounded-2xl">
+      <p class="text-rose-400 font-medium text-lg">ไม่พบผลงานที่ต้องการ</p>
+      <a href="/gallery.html" class="inline-block mt-4 text-sm text-indigo-400 hover:underline">&larr; กลับไปหน้านิทรรศการ</a>
+    </div>
+
+    <div id="artwork-container" class="hidden">
+      <!-- Back Navigation & Breadcrumb -->
+      <div class="mb-6 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <a href="/" class="hover:text-white">หน้าแรก</a>
+          <span>/</span>
+          <a href="/gallery.html" class="hover:text-white">ห้องนิทรรศการ</a>
+          <span>/</span>
+          <span id="breadcrumb-title" class="text-slate-200 truncate max-w-xs">ผลงาน</span>
+        </div>
+        
+        <div id="master-portal-link-box" class="hidden">
+          <a id="master-portal-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 border border-indigo-500/30 px-3 py-1 rounded-full bg-indigo-500/10">
+            <span>ชมเว็บท่าหลัก (Master Portal)</span>
+            <span>&nearr;</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Image display column -->
+        <div class="lg:col-span-7 glass-card rounded-3xl p-4 overflow-hidden">
+          <div class="relative rounded-2xl overflow-hidden bg-slate-900 aspect-auto min-h-[400px] flex items-center justify-center">
+            <img id="artwork-image" src="" alt="" class="w-full h-auto max-h-[75vh] object-contain rounded-xl shadow-2xl">
+          </div>
+          <div class="mt-3 flex items-center justify-between px-2 text-xs text-slate-500">
+            <span id="artwork-dimensions" class="font-mono">High Resolution Display</span>
+            <a id="artwork-raw-link" href="#" target="_blank" class="hover:text-indigo-400 transition">เปิดดูภาพขนาดเต็ม &nearr;</a>
+          </div>
+        </div>
+
+        <!-- Details column -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="glass-card rounded-3xl p-6 sm:p-8 space-y-5">
+            <div>
+              <span id="badge-status" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-3">
+                จัดแสดงในนิทรรศการ
+              </span>
+              <h1 id="artwork-title" class="text-2xl sm:text-3xl font-extrabold text-white leading-tight"></h1>
+              <p class="text-base text-indigo-300 font-medium mt-1">โดย <span id="artwork-artist" class="text-white font-semibold"></span></p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800">
+              <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">แนวคิด / คำอธิบายผลงาน</h3>
+              <p id="artwork-description" class="text-sm text-slate-300 leading-relaxed whitespace-pre-line"></p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <span class="text-slate-500 block">รหัสผลงาน</span>
+                <span id="artwork-id" class="text-slate-300 font-mono font-medium"></span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">วันที่จัดแสดง</span>
+                <span id="artwork-date" class="text-slate-300 font-mono"></span>
+              </div>
+            </div>
+
+            <div class="pt-4 flex gap-3">
+              <button onclick="navigator.clipboard.writeText(window.location.href); alert('คัดลอกลิงก์ผลงานแล้ว!');" 
+                class="flex-1 py-2.5 rounded-xl glass-card hover:bg-slate-800 text-xs font-semibold text-slate-200 transition text-center flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                แชร์ผลงาน
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-900 bg-slate-950 py-8 text-center text-xs text-slate-500">
+    <p>Multi-Tenant Virtual Exhibition System &bull; Zero-Budget Architecture</p>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const config = await EventAPI.getConfig();
+      if (config.eventTitle) {
+        document.getElementById("nav-event-title").textContent = config.eventTitle;
+      }
+      if (config.masterPortalUrl) {
+        const portalBox = document.getElementById("master-portal-link-box");
+        portalBox.classList.remove("hidden");
+        document.getElementById("master-portal-link").href = config.masterPortalUrl;
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get("id");
+
+      if (!id) {
+        showError();
+        return;
+      }
+
+      try {
+        const res = await EventAPI.getArtwork(id);
+        if (!res.success || !res.submission) {
+          showError();
+          return;
+        }
+
+        const art = res.submission;
+        document.getElementById("breadcrumb-title").textContent = art.title;
+        document.title = `${art.title} | ${art.artist_name} - Virtual Exhibition`;
+        document.getElementById("artwork-title").textContent = art.title;
+        document.getElementById("artwork-artist").textContent = art.artist_name;
+        document.getElementById("artwork-description").textContent = art.description || "ไม่มีคำอธิบายเพิ่มเติม";
+        document.getElementById("artwork-id").textContent = `#${art.id}`;
+        document.getElementById("artwork-date").textContent = art.created_at ? new Date(art.created_at).toLocaleDateString("th-TH") : "-";
+
+        const img = document.getElementById("artwork-image");
+        img.src = art.image_url;
+        img.alt = art.title;
+
+        document.getElementById("artwork-raw-link").href = art.image_url;
+
+        document.getElementById("loading").classList.add("hidden");
+        document.getElementById("artwork-container").classList.remove("hidden");
+      } catch (err) {
+        console.error(err);
+        showError();
+      }
+    });
+
+    function showError() {
+      document.getElementById("loading").classList.add("hidden");
+      document.getElementById("error-view").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>

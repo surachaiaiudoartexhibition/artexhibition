@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-[#FBF9F4] text-[#171C1A]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Portal Admin | ศูนย์ควบคุมและสร้าง Web Event อัตโนมัติ</title>
+  <script src="/js/i18n.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', 'Sarabun', sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .gallery-surface {
+      background: #FFFFFF;
+      border: 1px solid #E8E0D2;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #FBF9F4;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #C8DBD2;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col selection:bg-[#C5A059] selection:text-[#1A2822] bg-[#FBF9F4] text-[#171C1A]">
+  <!-- Navbar (Deep Celadon Lacquer with Fine Gold Accents) -->
+  <header class="sticky top-0 z-50 bg-[#1A2822]/95 backdrop-blur-md border-b border-[#355246]/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center space-x-3 group">
+        <div class="w-9 h-9 rounded-xl bg-[#14201B] border border-[#C5A059]/70 flex items-center justify-center font-serif-luxury font-bold text-[#E8C87A] shadow-md group-hover:scale-105 transition">
+          MP
+        </div>
+        <div>
+          <span class="text-sm font-semibold tracking-wide text-white block font-serif-luxury" data-i18n="nav_brand_title">Master Exhibition Portal</span>
+          <span class="text-[10px] text-[#C5A059] font-mono tracking-wider" data-i18n="nav_brand_sub">Multi-Tenant Provisioning Hub</span>
+        </div>
+      </a>
+
+      <nav class="flex items-center space-x-2.5 sm:space-x-4 text-sm font-medium">
+        <a href="/" class="text-[#C8DBD2] hover:text-white transition" data-i18n="nav_home">เลือกชมนิทรรศการ</a>
+        <a href="/gallery-3d.html" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#B38F46] text-[#141E19] font-bold transition flex items-center gap-1.5 shadow-sm shadow-[#C5A059]/20">
+          <span class="w-2 h-2 rounded-full bg-[#141E19]"></span>
+          <svg class="w-4 h-4 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+          </svg>
+          <span data-i18n="nav_3d_gallery">ห้องนิทรรศการ 3D</span>
+        </a>
+        <a href="/events.html" class="text-[#C8DBD2] hover:text-white transition" data-i18n="nav_events">ทำเนียบนิทรรศการ</a>
+        <a href="/admin.html" class="text-xs text-[#E8C87A] font-semibold border-b-2 border-[#C5A059] pb-0.5 transition" data-i18n="nav_admin">จัดการอีเวนต์</a>
+        <div class="hidden lg:flex items-center gap-2 bg-[#243830] border border-[#355246] px-3 py-1.5 rounded-xl text-xs ml-1">
+          <span class="text-[#C8DBD2] font-mono">Master Key:</span>
+          <input type="password" id="master-admin-key" value="master_admin_secret_999" class="bg-transparent border-none text-[#E8C87A] focus:outline-none w-28 font-mono text-xs">
+        </div>
+        <!-- Bilingual Language Switcher -->
+        <div id="lang-switcher" class="ml-1 sm:ml-2 shrink-0"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
+    
+    <!-- Hero Header & Architecture Overview (Deep Celadon Lacquer with Fine Gold Details) -->
+    <div class="rounded-3xl p-6 sm:p-8 relative overflow-hidden border border-[#355246] bg-[#1A2822] text-white shadow-lg">
+      <div class="relative z-10">
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#243830] text-[#A3D9C9] border border-[#355246]">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Zero-Budget Multi-Tenant Engine
+          </span>
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-mono bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/40">
+            Account Isolation Mode
+          </span>
+        </div>
+
+        <h1 class="text-2xl sm:text-4xl font-normal text-white tracking-tight font-serif-luxury">
+          ระบบควบคุมและสร้าง Web Event อัตโนมัติ
+        </h1>
+        <p class="text-[#C8DBD2] text-sm sm:text-base mt-2 max-w-3xl leading-relaxed font-light">
+          สร้างนิทรรศการใหม่แบบแยกบัญชีคลาวด์ 100% ฟรีตลอดชีพ (0 บาท) เพียงป้อนข้อมูลอีเมล sub-address, โทเค็น Cloudflare, Cloudinary และ GitHub ทาง Master Portal จะดำเนินการสร้างระบบฐานข้อมูล D1, ติดตั้งโค้ดโปรเจกต์ และเชื่อมต่อเข้าสู่หอศิลป์ 3D ทันที
+        </p>
+
+        <!-- Process Flow Steps Indicator -->
+        <div class="mt-6 pt-6 border-t border-[#355246] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-3.5 rounded-2xl bg-[#243830] border border-[#355246] flex items-start gap-3">
+            <div class="w-7 h-7 rounded-xl bg-[#C5A059]/20 text-[#E8C87A] flex items-center justify-center font-bold text-xs shrink-0">1</div>
+            <div>
+              <div class="text-xs font-semibold text-white">Email Sub-addressing</div>
+              <div class="text-[11px] text-[#C8DBD2] mt-0.5">ใช้ mail+event@gmail.com สมัครบัญชีฟรีแยกงาน</div>
+            </div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-[#243830] border border-[#355246] flex items-start gap-3">
+            <div class="w-7 h-7 rounded-xl bg-[#C5A059]/20 text-[#E8C87A] flex items-center justify-center font-bold text-xs shrink-0">2</div>
+            <div>
+              <div class="text-xs font-semibold text-white">Cloudflare & Cloudinary</div>
+              <div class="text-[11px] text-[#C8DBD2] mt-0.5">รับ Account ID, Token และ Preset ฟรี</div>
+            </div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-[#243830] border border-[#355246] flex items-start gap-3">
+            <div class="w-7 h-7 rounded-xl bg-[#C5A059]/20 text-[#E8C87A] flex items-center justify-center font-bold text-xs shrink-0">3</div>
+            <div>
+              <div class="text-xs font-semibold text-white">1-Click Auto Provisioning</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">กดปุ่มสร้าง Portal สั่งการ D1 และเขียนโค้ดเว็บ</div>
+            </div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800 flex items-start gap-3">
+            <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">4</div>
+            <div>
+              <div class="text-xs font-semibold text-white">Ready for 3D Virtual Hall</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">ผลงานซิงค์อัตโนมัติ พร้อมจัดแสดงในห้อง 3D</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-[#E8E0D2] space-x-1 sm:space-x-3 overflow-x-auto pb-1 text-xs sm:text-sm font-semibold">
+      <button onclick="switchTab('tab-provision')" id="tab-btn-provision" class="px-4 py-2.5 rounded-t-xl bg-[#FAF3E3] text-[#8C6D2D] border-b-2 border-[#C5A059] flex items-center gap-2 transition shrink-0 cursor-pointer">
+        <svg class="w-4 h-4 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <span>สร้าง Web Event อัตโนมัติ (Wizard)</span>
+      </button>
+
+      <button onclick="switchTab('tab-sync')" id="tab-btn-sync" class="px-4 py-2.5 rounded-t-xl text-[#64736C] hover:text-[#171C1A] flex items-center gap-2 transition shrink-0 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>ศูนย์ดึงข้อมูลผลงาน (Active Pull)</span>
+      </button>
+
+      <button onclick="switchTab('tab-registry')" id="tab-btn-registry" class="px-4 py-2.5 rounded-t-xl text-[#64736C] hover:text-[#171C1A] flex items-center gap-2 transition shrink-0 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <span>ทำเนียบนิทรรศการที่ลงทะเบียนแล้ว</span>
+      </button>
+
+      <button onclick="switchTab('tab-manual')" id="tab-btn-manual" class="px-4 py-2.5 rounded-t-xl text-[#64736C] hover:text-[#171C1A] flex items-center gap-2 transition shrink-0 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>ลงทะเบียนด้วย Token (Manual)</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: AUTO PROVISIONING WIZARD -->
+    <section id="tab-provision" class="space-y-6">
+      <div class="gallery-surface rounded-3xl p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E8E0D2]">
+          <div>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-[#FAF3E3] text-[#9A7833] flex items-center justify-center font-bold text-sm border border-[#C5A059]/30">
+                <svg class="w-4 h-4 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-[#171C1A] tracking-tight font-serif-luxury">
+                ฟอร์มสร้าง Web Event และ Provisioning คลาวด์อัตโนมัติ
+              </h2>
+            </div>
+            <p class="text-xs sm:text-sm text-[#64736C] mt-1">
+              กรอกข้อมูลบัญชีที่ลงทะเบียนแยกไว้ ระบบจะสร้าง D1 Database, เจนเนอเรตโค้ดใน <code class="text-[#9A7833] font-mono bg-[#FAF3E3] px-1 py-0.5 rounded">events/{event_id}</code> และเชื่อมต่ออัตโนมัติ
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="fillDemoProvisionForm('digital-art')" class="min-h-[44px] px-3.5 py-2 rounded-xl bg-[#FAF3E3] hover:bg-[#F4EFE6] text-[#8C6D2D] border border-[#C5A059]/40 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              <span>เติมข้อมูลตัวอย่าง (Digital Art 2026)</span>
+            </button>
+            <button type="button" onclick="fillDemoProvisionForm('fashion-design')" class="min-h-[44px] px-3.5 py-2 rounded-xl bg-[#EBF2EE] hover:bg-[#DEEBE4] text-[#243830] border border-[#355246]/30 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-[#243830]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              <span>แฟชั่นดีไซน์</span>
+            </button>
+          </div>
+        </div>
+
+        <form id="provision-event-form" class="space-y-6 mt-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Section 1: Event Identity -->
+            <div class="p-5 rounded-2xl bg-[#FBF9F4] border border-[#E8E0D2] space-y-4">
+              <div class="flex items-center gap-2 text-[#9A7833] text-xs font-bold uppercase tracking-wider">
+                <span class="w-2 h-2 rounded-full bg-[#C5A059]"></span>
+                <span>ส่วนที่ 1: ข้อมูลนิทรรศการและอีเมลแยกบัญชี</span>
+              </div>
+
+              <div>
+                <label for="prov_event_id" class="block text-xs font-semibold text-[#171C1A] mb-1">
+                  รหัสเฉพาะของงาน (Event ID / Slug) <span class="text-rose-500">*</span>
+                </label>
+                <input type="text" id="prov_event_id" required placeholder="เช่น digital-art-2026"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                <p class="text-[11px] text-[#64736C] mt-1">ใช้ตัวพิมพ์เล็ก ขีดกลาง เช่น <code class="text-[#9A7833]">digital-art-2026</code> (ใช้ตั้งชื่อโฟลเดอร์และ URL)</p>
+              </div>
+
+              <div>
+                <label for="prov_event_title" class="block text-xs font-semibold text-[#171C1A] mb-1">
+                  ชื่อนิทรรศการ (Event Title) <span class="text-rose-500">*</span>
+                </label>
+                <input type="text" id="prov_event_title" required placeholder="เช่น International Digital Art Biennial 2026"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+              </div>
+
+              <div>
+                <label for="prov_admin_email" class="block text-xs font-semibold text-[#171C1A] mb-1 flex items-center justify-between">
+                  <span>อีเมลแยกบัญชี (Sub-addressing) <span class="text-[#9A7833]">*</span></span>
+                  <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">กลยุทธ์ 0 บาทตลอดชีพ</span>
+                </label>
+                <input type="email" id="prov_admin_email" required placeholder="เช่น artorg+digital2026@gmail.com"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                <p class="text-[11px] text-[#64736C] mt-1 leading-relaxed">
+                  💡 ใช้เมลหลักของคุณเติมเครื่องหมาย <code class="text-[#9A7833] font-mono bg-[#FAF3E3] px-1 py-0.5 rounded">+ชื่อนิทรรศการ</code> ไม่ต้องเปิดกล่องจดหมายใหม่ ได้รับจดหมายยืนยันตัวตนใน inbox เดิมทันที
+                </p>
+              </div>
+
+              <div>
+                <label for="prov_theme" class="block text-xs font-semibold text-[#171C1A] mb-1">
+                  ธีมการแสดงผลของ Web Event (Design Theme)
+                </label>
+                <select id="prov_theme" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                  <option value="heritage">Heritage Luxury (หรูหรา วิจิตรศิลป์ ครีมงาช้าง ขลิบทองคำ)</option>
+                  <option value="modern-cyber">Modern Cyber (นีออน ดิจิทัลอาร์ต ไซเบอร์สเปซ)</option>
+                  <option value="minimal-monochrome">Minimal Monochrome (มินิมอล โมโนโครม คอนเทมโพรารี)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Section 2: Cloud Infrastructure & Repos -->
+            <div class="p-5 rounded-2xl bg-[#FBF9F4] border border-[#E8E0D2] space-y-4">
+              <div class="flex items-center gap-2 text-[#243830] text-xs font-bold uppercase tracking-wider">
+                <span class="w-2 h-2 rounded-full bg-[#243830]"></span>
+                <span>ส่วนที่ 2: ค่า Config จาก Cloudflare, Cloudinary และ GitHub</span>
+              </div>
+
+              <!-- GitHub Section -->
+              <div>
+                <label for="prov_github_repo" class="block text-xs font-semibold text-[#171C1A] mb-1">
+                  GitHub Repository (Repo ที่สร้างขึ้นสำหรับงานนี้)
+                </label>
+                <input type="text" id="prov_github_repo" placeholder="เช่น myartorg/digital-art-2026"
+                  class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                <p class="text-[11px] text-[#64736C] mt-1">ผูกกับ GitHub Actions หรือ Cloudflare Pages Git Integration เพื่อ Auto Deploy</p>
+              </div>
+
+              <!-- Cloudflare Section -->
+              <div class="pt-2 border-t border-[#E8E0D2] space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-[#171C1A]">Cloudflare Account & API</span>
+                  <span class="text-[10px] text-[#64736C] font-mono">(Pages & D1 SQL)</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="prov_cf_account_id" class="block text-[11px] text-[#64736C] mb-1">Account ID</label>
+                    <input type="text" id="prov_cf_account_id" placeholder="เช่น 9f8a3c4..."
+                      class="w-full px-3 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                  </div>
+                  <div>
+                    <label for="prov_cf_api_token" class="block text-[11px] text-[#64736C] mb-1">API Token (สิทธิ์ D1 Edit)</label>
+                    <input type="password" id="prov_cf_api_token" placeholder="ใส่ Token หรือปล่อยว่างโหมด Local"
+                      class="w-full px-3 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cloudinary Section -->
+              <div class="pt-2 border-t border-[#E8E0D2] space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-[#171C1A]">Cloudinary (คลังรูปภาพและเอกสาร)</span>
+                  <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">ฟรี 25GB ตลอดชีพ</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="prov_cloud_name" class="block text-[11px] text-[#64736C] mb-1">Cloud Name</label>
+                    <input type="text" id="prov_cloud_name" placeholder="เช่น art-digital-2026"
+                      class="w-full px-3 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                  </div>
+                  <div>
+                    <label for="prov_upload_preset" class="block text-[11px] text-[#64736C] mb-1">Upload Preset (Unsigned)</label>
+                    <input type="text" id="prov_upload_preset" placeholder="เช่น art_submissions"
+                      class="w-full px-3 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Submit Button & Options -->
+          <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#E8E0D2]">
+            <div class="flex items-center gap-2 text-xs text-[#64736C]">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span>ระบบจะสร้าง Shared Token, เตรียม Migration SQL และสร้างโฟลเดอร์โครงการอัตโนมัติ</span>
+            </div>
+
+            <button type="submit" id="btn-submit-provision" class="w-full sm:w-auto px-8 py-3 rounded-2xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:brightness-110 text-[#141E19] font-bold text-sm shadow-lg shadow-[#C5A059]/25 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span id="btn-submit-provision-text">เริ่มต้นสร้าง Web Event อัตโนมัติ (Run Auto-Provision)</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Live Terminal & Output Display Box -->
+        <div id="provision-terminal-card" class="mt-8 hidden rounded-2xl bg-[#101713] border border-[#355246] overflow-hidden shadow-2xl">
+          <!-- Terminal Header -->
+          <div class="px-5 py-3.5 bg-[#1A2822] border-b border-[#355246] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+              <span class="ml-2 text-xs font-mono text-[#A3B8AF]">provision-pipeline.sh &bull; Automated Deployment Engine</span>
+            </div>
+            <div id="terminal-badge" class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/30">
+              RUNNING
+            </div>
+          </div>
+
+          <!-- Terminal Body -->
+          <div class="p-5 font-mono text-xs text-[#EBF2EE] space-y-3 custom-scrollbar max-h-80 overflow-y-auto" id="provision-logs">
+            <!-- Dynamic logs will appear here -->
+          </div>
+
+          <!-- Quick Action Success Box -->
+          <div id="provision-success-actions" class="hidden p-5 bg-[#1A2822] border-t border-[#355246] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-base shrink-0">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <div class="text-sm font-bold text-white font-serif-luxury" id="success-event-title">สร้าง Web Event สำเร็จแล้ว!</div>
+                <div class="text-xs text-[#C8DBD2]" id="success-event-detail">ระบบเชื่อมต่อคลังผลงานและห้อง 3D เรียบร้อย</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <a id="btn-view-3d" href="#" target="_blank" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:brightness-110 text-[#141E19] font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-md shadow-[#C5A059]/20 cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                </svg>
+                <span>เข้าชมห้อง 3D ทันที</span>
+              </a>
+              <a id="btn-view-event" href="#" target="_blank" class="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-[#243830] hover:bg-[#324f43] text-white font-medium text-xs transition flex items-center justify-center gap-1.5 border border-[#355246] cursor-pointer">
+                <span>เปิดเว็บ Event</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: ACTIVE PULL SYNC CENTER -->
+    <section id="tab-sync" class="space-y-6 hidden">
+      <div class="gallery-surface rounded-3xl p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#FAF3E3] text-[#8C6D2D] border border-[#C5A059]/40 mb-2 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#C5A059]"></span>
+              Active Pull Engine
+            </div>
+            <h2 class="text-xl font-bold text-[#171C1A] font-serif-luxury flex items-center gap-2">
+              ศูนย์ดึงข้อมูลผลงานศิลปะ (Active Pull Ingestion)
+            </h2>
+            <p class="text-xs sm:text-sm text-[#64736C] mt-1 max-w-2xl">
+              ระบบดึงข้อมูลผลงานศิลปะที่ผ่านการอนุมัติ (Approved) จาก Web Event ต่างๆ เข้ามายัง Master Portal เพื่อจัดแสดงในคลังรวมและจำลองในหอศิลป์เสมือนจริง 3D
+            </p>
+          </div>
+
+          <button id="btn-pull-all" onclick="pullAllArtworks()" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:brightness-110 text-[#141E19] font-bold text-xs shadow-lg shadow-[#C5A059]/20 transition flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span id="btn-pull-all-text">ดึงข้อมูลจากทุก Event ทันที (Pull All)</span>
+          </button>
+        </div>
+
+        <!-- Live Sync Status Banner -->
+        <div id="pull-status-banner" class="hidden mt-6 p-5 rounded-2xl border text-xs font-mono"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: REGISTERED EVENTS TABLE -->
+    <section id="tab-registry" class="space-y-6 hidden">
+      <div class="gallery-surface rounded-3xl p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-[#171C1A] font-serif-luxury">ทำเนียบนิทรรศการที่ลงทะเบียนแล้ว</h2>
+            <p class="text-xs text-[#64736C] mt-1">รายชื่อ Event ทั้งหมดที่เชื่อมต่อกับ Master Portal และสถานะคลังผลงาน</p>
+          </div>
+          <button onclick="loadEventsTable()" class="px-4 py-2 rounded-xl bg-[#FAF3E3] hover:bg-[#F4EFE6] text-[#8C6D2D] border border-[#C5A059]/40 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>รีเฟรชข้อมูล</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-[#E8E0D2] bg-[#FAF3E3]/60 text-[#8C6D2D] uppercase tracking-wider font-mono">
+                <th class="py-3.5 px-4">Event ID</th>
+                <th class="py-3.5 px-4">ชื่อนิทรรศการ</th>
+                <th class="py-3.5 px-4">URL เว็บไซต์</th>
+                <th class="py-3.5 px-4 text-center">จำนวนผลงาน</th>
+                <th class="py-3.5 px-4">สถานะ</th>
+                <th class="py-3.5 px-4 text-right">การจัดการ & 3D</th>
+              </tr>
+            </thead>
+            <tbody id="events-table-body" class="divide-y divide-[#E8E0D2]">
+              <tr>
+                <td colspan="6" class="py-8 text-center text-[#64736C]">กำลังโหลดรายชื่อนิทรรศการ...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: MANUAL TOKEN REGISTRATION -->
+    <section id="tab-manual" class="space-y-6 hidden">
+      <div class="gallery-surface rounded-3xl p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-[#171C1A] font-serif-luxury mb-2">ลงทะเบียนด้วย Secret Token (Manual Setup)</h2>
+        <p class="text-xs text-[#64736C] mb-6">สำหรับกรณีที่สร้าง Web Event และ Cloudflare Pages ไว้แล้วภายนอก และต้องการนำ URL กับ Shared Token มาผูกกับ Master Portal</p>
+
+        <form id="register-event-form" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="event_id" class="block text-xs font-semibold text-[#171C1A] mb-1">
+                รหัส Event (event_id) <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="event_id" required placeholder="เช่น printmaking-2026"
+                class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+            </div>
+
+            <div>
+              <label for="event_title" class="block text-xs font-semibold text-[#171C1A] mb-1">
+                ชื่อนิทรรศการ (Event Title) <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="event_title" required placeholder="เช่น International Contemporary Printmaking 2026"
+                class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label for="portal_url" class="block text-xs font-semibold text-[#171C1A] mb-1">
+              URL หน้าเว็บของ Event (portal_url) <span class="text-rose-500">*</span>
+            </label>
+            <input type="url" id="portal_url" required placeholder="https://printmaking-2026.pages.dev"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+          </div>
+
+          <div>
+            <label for="secret_token" class="block text-xs font-semibold text-[#171C1A] mb-1">
+              Shared Secret Token (Bearer Auth Webhook) <span class="text-rose-500">*</span>
+            </label>
+            <div class="flex gap-2">
+              <input type="text" id="secret_token" required placeholder="sec_demo_..."
+                class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+              <button type="button" onclick="generateRandomToken()" class="px-3 py-2 bg-[#FAF3E3] hover:bg-[#F4EFE6] text-xs rounded-xl text-[#8C6D2D] border border-[#C5A059]/40 font-medium cursor-pointer">
+                สุ่ม Token
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-4 flex justify-end">
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:brightness-110 text-[#141E19] text-xs font-bold transition cursor-pointer">
+              บันทึกการลงทะเบียน
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Institutional Footer -->
+  <footer class="border-t border-[#243830] bg-[#141E19] py-8 text-center text-xs text-[#8A9890] mt-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+        <span class="font-medium text-[#C8DBD2]">Master Exhibition Portal</span>
+        <span class="text-[#355246]">|</span>
+        <span>Poh-Chang Fine Art Multi-Tenant Hub</span>
+      </div>
+      <p>© 2026 Art Exhibition Portal Ecosystem. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/portal.js"></script>
+  <script>
+    // Tab Switching Logic
+    function switchTab(tabId) {
+      ['tab-provision', 'tab-sync', 'tab-registry', 'tab-manual'].forEach(id => {
+        const el = document.getElementById(id);
+        const btn = document.getElementById(`tab-btn-${id.replace('tab-', '')}`);
+        if (id === tabId) {
+          el.classList.remove('hidden');
+          btn.className = "px-4 py-2.5 rounded-t-xl bg-[#FAF3E3] text-[#8C6D2D] border-b-2 border-[#C5A059] flex items-center gap-2 transition shrink-0 font-semibold cursor-pointer";
+        } else {
+          el.classList.add('hidden');
+          btn.className = "px-4 py-2.5 rounded-t-xl text-[#64736C] hover:text-[#171C1A] flex items-center gap-2 transition shrink-0 cursor-pointer";
+        }
+      });
+
+      if (tabId === 'tab-registry') {
+        loadEventsTable();
+      }
+    }
+
+    // Fill Demo Data for Quick Testing
+    function fillDemoProvisionForm(type) {
+      if (type === 'digital-art') {
+        document.getElementById('prov_event_id').value = 'digital-art-2026';
+        document.getElementById('prov_event_title').value = 'International Digital Art Biennial 2026';
+        document.getElementById('prov_admin_email').value = 'artgallery+digital2026@gmail.com';
+        document.getElementById('prov_theme').value = 'modern-cyber';
+        document.getElementById('prov_github_repo').value = 'myartgallery/digital-art-2026';
+        document.getElementById('prov_cf_account_id').value = 'cf_acc_demo_882910';
+        document.getElementById('prov_cf_api_token').value = 'demo_token_preview_xyz';
+        document.getElementById('prov_cloud_name').value = 'art-digital-2026';
+        document.getElementById('prov_upload_preset').value = 'digital_art_submissions';
+      } else if (type === 'fashion-design') {
+        document.getElementById('prov_event_id').value = 'fashion-design-2026';
+        document.getElementById('prov_event_title').value = 'Contemporary Textile & Fashion Showcase 2026';
+        document.getElementById('prov_admin_email').value = 'artgallery+fashion2026@gmail.com';
+        document.getElementById('prov_theme').value = 'heritage';
+        document.getElementById('prov_github_repo').value = 'myartgallery/fashion-design-2026';
+        document.getElementById('prov_cf_account_id').value = 'cf_acc_demo_882910';
+        document.getElementById('prov_cf_api_token').value = 'demo_token_preview_xyz';
+        document.getElementById('prov_cloud_name').value = 'fashion-2026-cloud';
+        document.getElementById('prov_upload_preset').value = 'fashion_submissions';
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.i18n) {
+        window.i18n.renderSwitcher("lang-switcher");
+      }
+
+      window.addEventListener("languageChanged", () => {
+        loadEventsTable();
+      });
+
+      loadEventsTable();
+
+      // Handle Automated Provisioning Form Submission
+      document.getElementById("provision-event-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const adminKey = document.getElementById("master-admin-key").value.trim();
+        const submitBtn = document.getElementById("btn-submit-provision");
+        const submitBtnText = document.getElementById("btn-submit-provision-text");
+        const terminalCard = document.getElementById("provision-terminal-card");
+        const terminalLogs = document.getElementById("provision-logs");
+        const terminalBadge = document.getElementById("terminal-badge");
+        const successActions = document.getElementById("provision-success-actions");
+
+        const payload = {
+          event_id: document.getElementById("prov_event_id").value.trim(),
+          event_title: document.getElementById("prov_event_title").value.trim(),
+          admin_email: document.getElementById("prov_admin_email").value.trim(),
+          theme: document.getElementById("prov_theme").value,
+          github_repo: document.getElementById("prov_github_repo").value.trim(),
+          cloudflare_account_id: document.getElementById("prov_cf_account_id").value.trim(),
+          cloudflare_api_token: document.getElementById("prov_cf_api_token").value.trim(),
+          cloudinary_cloud_name: document.getElementById("prov_cloud_name").value.trim(),
+          cloudinary_upload_preset: document.getElementById("prov_upload_preset").value.trim(),
+          portal_url: `http://localhost:8787` // In dev mode, point to local event port
+        };
+
+        // UI Loading state
+        submitBtn.disabled = true;
+        submitBtnText.textContent = "กำลังดำเนินการ Provisioning...";
+        terminalCard.classList.remove("hidden");
+        successActions.classList.add("hidden");
+        terminalBadge.textContent = "PROVISIONING IN PROGRESS";
+        terminalBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/20 text-cyan-300 animate-pulse";
+
+        terminalLogs.innerHTML = `
+          <div class="text-slate-400">[$] Initializing provisioning workflow for event: <span class="text-white font-bold">${payload.event_id}</span></div>
+          <div class="text-slate-400">[$] Isolated Admin Email: <span class="text-cyan-300">${payload.admin_email}</span></div>
+          <div class="text-slate-500">------------------------------------------------------------</div>
+        `;
+
+        try {
+          const res = await MasterPortalAPI.provisionEvent(payload, adminKey);
+
+          if (res.success) {
+            terminalBadge.textContent = "SUCCESS (0 ERROR)";
+            terminalBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300";
+
+            // Render each step from server
+            (res.steps || []).forEach(step => {
+              const stepDiv = document.createElement("div");
+              stepDiv.className = "flex items-start gap-2 py-1";
+              stepDiv.innerHTML = `
+                <span class="text-emerald-400 font-bold">[STEP ${step.step}/5 ✓]</span>
+                <div>
+                  <span class="text-white font-semibold">${step.name}:</span>
+                  <span class="text-slate-300 ml-1">${step.detail}</span>
+                </div>
+              `;
+              terminalLogs.appendChild(stepDiv);
+            });
+
+            terminalLogs.innerHTML += `
+              <div class="text-slate-500 mt-2">------------------------------------------------------------</div>
+              <div class="text-emerald-300 font-bold">✨ [OK] Event '${payload.event_id}' has been fully provisioned and linked to Master Portal!</div>
+            `;
+
+            // Configure Quick Action Buttons
+            document.getElementById("success-event-title").textContent = `Web Event: ${payload.event_title}`;
+            document.getElementById("success-event-detail").textContent = `สร้างโฟลเดอร์โครงการที่ ${res.event.folder} และเปิดใช้งานในห้อง 3D เรียบร้อย`;
+            document.getElementById("btn-view-3d").href = `/gallery-3d.html?event_id=${payload.event_id}`;
+            document.getElementById("btn-view-event").href = `http://localhost:8787`;
+
+            successActions.classList.remove("hidden");
+            loadEventsTable();
+          } else {
+            terminalBadge.textContent = "FAILED";
+            terminalBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-300";
+            terminalLogs.innerHTML += `<div class="text-rose-400 font-bold mt-2">❌ Error: ${res.error || 'Provisioning failed'}</div>`;
+          }
+        } catch (err) {
+          terminalBadge.textContent = "ERROR";
+          terminalBadge.className = "px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-300";
+          terminalLogs.innerHTML += `<div class="text-rose-400 font-bold mt-2">❌ Connection Error: ${err.message}</div>`;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtnText.textContent = "🚀 เริ่มต้นสร้าง Web Event อัตโนมัติ (Run Auto-Provision)";
+        }
+      });
+
+      // Handle Manual Registration Form
+      document.getElementById("register-event-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const adminKey = document.getElementById("master-admin-key").value.trim();
+        const payload = {
+          event_id: document.getElementById("event_id").value.trim(),
+          event_title: document.getElementById("event_title").value.trim(),
+          portal_url: document.getElementById("portal_url").value.trim(),
+          secret_token: document.getElementById("secret_token").value.trim(),
+          status: "active"
+        };
+
+        try {
+          const res = await MasterPortalAPI.registerEvent(payload, adminKey);
+          if (res.success) {
+            alert(res.message || `ลงทะเบียน Event '${payload.event_id}' สำเร็จ!`);
+            document.getElementById("register-event-form").reset();
+            switchTab('tab-registry');
+          } else {
+            alert(`บันทึกไม่สำเร็จ: ${res.error}`);
+          }
+        } catch (err) {
+          alert(`เกิดข้อผิดพลาด: ${err.message}`);
+        }
+      });
+    });
+
+    function generateRandomToken() {
+      const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+      let token = "sec_";
+      for (let i = 0; i < 24; i++) {
+        token += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById("secret_token").value = token;
+    }
+
+    async function loadEventsTable() {
+      const tbody = document.getElementById("events-table-body");
+      try {
+        const res = await MasterPortalAPI.getEvents();
+        const list = res.events || [];
+
+        tbody.innerHTML = "";
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">ยังไม่มี Event ที่ลงทะเบียน</td></tr>`;
+          return;
+        }
+
+        list.forEach(ev => {
+          const title = window.getField(ev, 'event_title', ev.event_id);
+          const worksSuffix = window.t('event_artworks_count_suffix') || 'ชิ้น';
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-[#FAF3E3]/40 transition border-b border-[#E8E0D2]";
+          tr.innerHTML = `
+            <td class="py-3.5 px-4 font-mono font-semibold text-[#9A7833]">${ev.event_id}</td>
+            <td class="py-3.5 px-4 font-medium text-[#171C1A]">${title}</td>
+            <td class="py-3.5 px-4 text-[#64736C] font-mono text-[11px] truncate max-w-xs">
+              <a href="${ev.portal_url}" target="_blank" class="hover:text-[#9A7833] underline">${ev.portal_url}</a>
+            </td>
+            <td class="py-3.5 px-4 text-center font-mono text-[#171C1A] font-bold">${ev.artwork_count || 0} ${worksSuffix}</td>
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono ${ev.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-300' : 'bg-[#EBF2EE] text-[#64736C]'}">
+                ${ev.status}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <div class="flex items-center justify-end gap-2 flex-wrap">
+                <a href="${ev.catalog_url || ev.portal_url + '/catalog.html'}" target="_blank" rel="noopener"
+                  class="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#FAF3E3] hover:bg-[#F4EFE6] text-[#8C6D2D] hover:text-[#171C1A] border border-[#C5A059]/40 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                  title="เปิดดูสูจิบัตรดิจิทัลที่ออกแบบแล้วของ Event นี้">
+                  <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span>${window.t('modal_btn_catalog')}</span>
+                </a>
+                <a href="/gallery-3d.html?event_id=${ev.event_id}" class="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#EBF2EE] hover:bg-[#DEEBE4] text-[#243830] hover:text-[#141E19] border border-[#355246]/30 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                  <svg class="w-3.5 h-3.5 text-[#243830]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                  </svg>
+                  <span>${window.t('nav_3d_gallery')}</span>
+                </a>
+                <button onclick="pullSingleEvent('${ev.event_id}', this)" class="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#FAF3E3] hover:bg-[#F4EFE6] text-[#8C6D2D] hover:text-[#171C1A] border border-[#C5A059]/40 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                  <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>ดึงข้อมูล</span>
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-rose-400">${err.message}</td></tr>`;
+      }
+    }
+
+    async function pullAllArtworks() {
+      const btn = document.getElementById("btn-pull-all");
+      const btnText = document.getElementById("btn-pull-all-text");
+      const banner = document.getElementById("pull-status-banner");
+
+      btn.disabled = true;
+      btn.classList.add("opacity-60", "cursor-not-allowed");
+      btnText.textContent = "กำลังดึงข้อมูลจากทุก Event...";
+      banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-cyan-950/40 border-cyan-500/30 text-cyan-300 block animate-pulse";
+      banner.innerHTML = `⏳ กำลังเชื่อมต่อไปยัง Event APIs เพื่อดึงผลงานที่ได้รับการอนุมัติ...`;
+
+      try {
+        const res = await MasterPortalAPI.pullArtworks(null);
+        if (res.success) {
+          banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-emerald-950/40 border-emerald-500/30 text-emerald-300 block";
+          let detailsHtml = (res.events || []).map(e => `
+            <div class="flex items-center justify-between py-1.5 border-b border-emerald-500/10">
+              <span class="font-bold text-white">${e.event_title || e.event_id}:</span>
+              <span>${e.status === 'success' ? `✅ ซิงค์สำเร็จ ${e.synced_count} ผลงาน` : `⚠️ ผิดพลาด: ${e.error}`}</span>
+            </div>
+          `).join('');
+
+          banner.innerHTML = `
+            <div class="font-bold text-sm mb-2 text-white">✨ ${res.message}</div>
+            <div class="space-y-1">${detailsHtml}</div>
+          `;
+          await loadEventsTable();
+        } else {
+          banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-rose-950/40 border-rose-500/30 text-rose-300 block";
+          banner.textContent = `❌ เกิดข้อผิดพลาด: ${res.message || res.error}`;
+        }
+      } catch (err) {
+        banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-rose-950/40 border-rose-500/30 text-rose-300 block";
+        banner.textContent = `❌ ล้มเหลวในการเชื่อมต่อ: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove("opacity-60", "cursor-not-allowed");
+        btnText.textContent = "ดึงข้อมูลจากทุก Event ทันที (Pull All)";
+      }
+    }
+
+    async function pullSingleEvent(eventId, btnEl) {
+      const origHtml = btnEl.innerHTML;
+      btnEl.disabled = true;
+      btnEl.innerHTML = `<span class="animate-spin">⏳</span> ดึง...`;
+
+      const banner = document.getElementById("pull-status-banner");
+      banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-cyan-950/40 border-cyan-500/30 text-cyan-300 block";
+      banner.textContent = `กำลังดึงข้อมูลสำหรับ Event: ${eventId}...`;
+
+      try {
+        const res = await MasterPortalAPI.pullArtworks(eventId);
+        if (res.success) {
+          banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-emerald-950/40 border-emerald-500/30 text-emerald-300 block";
+          banner.textContent = `✅ ${res.message}`;
+          await loadEventsTable();
+        } else {
+          banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-rose-950/40 border-rose-500/30 text-rose-300 block";
+          banner.textContent = `❌ ผิดพลาด: ${res.message || res.error}`;
+        }
+      } catch (err) {
+        banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-rose-950/40 border-rose-500/30 text-rose-300 block";
+        banner.textContent = `❌ ข้อผิดพลาด: ${err.message}`;
+      } finally {
+        btnEl.disabled = false;
+        btnEl.innerHTML = origHtml;
+      }
+    }
+  </script>
+</body>
+</html>

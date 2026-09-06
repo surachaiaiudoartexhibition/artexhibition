@@ -1,0 +1,26 @@
+# Cloudflare Pages Configuration for Event: {{EVENT_TITLE}}
+# Dedicated Account Email: {{ADMIN_EMAIL}}
+
+name = "{{EVENT_ID}}"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "public"
+
+# Isolated D1 Database for this Event
+[[d1_databases]]
+binding = "DB"
+database_name = "{{D1_DATABASE_NAME}}"
+database_id = "{{D1_DATABASE_ID}}"
+
+[vars]
+EVENT_ID = "{{EVENT_ID}}"
+EVENT_TITLE = "{{EVENT_TITLE}}"
+ADMIN_EMAIL = "{{ADMIN_EMAIL}}"
+MASTER_PORTAL_URL = "{{MASTER_PORTAL_URL}}"
+SHARED_SECRET_TOKEN = "{{SHARED_SECRET_TOKEN}}"
+ADMIN_KEY = "{{ADMIN_KEY}}"
+EVENT_PAGE_BASE_URL = "{{EVENT_PAGE_BASE_URL}}"
+EVENT_THEME = "heritage"
+
+# Dedicated Cloudinary Storage Account for this Event
+CLOUDINARY_CLOUD_NAME = "{{CLOUDINARY_CLOUD_NAME}}"
+CLOUDINARY_UPLOAD_PRESET = "{{CLOUDINARY_UPLOAD_PRESET}}"

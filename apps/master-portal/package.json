@@ -1,0 +1,13 @@
+{
+  "name": "master-portal",
+  "version": "1.0.0",
+  "description": "Master Portal for Multi-Tenant Virtual Exhibition System",
+  "scripts": {
+    "dev": "wrangler pages dev public --d1 DB=master-db --local",
+    "deploy": "wrangler pages deploy public"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^3.114.0"
+  }
+}

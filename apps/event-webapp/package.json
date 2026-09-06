@@ -1,0 +1,13 @@
+{
+  "name": "event-webapp",
+  "version": "1.0.0",
+  "description": "Event Virtual Exhibition Webapp with Cloudflare Pages and D1",
+  "scripts": {
+    "dev": "wrangler pages dev public --d1 DB=event-db --local",
+    "deploy": "wrangler pages deploy public"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^3.114.0"
+  }
+}

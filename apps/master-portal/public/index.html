@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-[#FBF9F4] text-[#171C1A]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Exhibition Portal | ศูนย์รวมนิทรรศการศิลปะเสมือนจริง</title>
+  <script src="/js/i18n.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pc-ivory-bg: #FBF9F4;
+      --pc-ivory-surface: #FFFFFF;
+      --pc-ivory-subtle: #F4EFE6;
+      --pc-border: #E8E0D2;
+      --pc-celadon-deep: #1A2822;
+      --pc-celadon-dark: #243830;
+      --pc-celadon-glaze: #EBF2EE;
+      --pc-gold: #C5A059;
+      --pc-gold-deep: #9A7833;
+      --pc-gold-light: #FAF3E3;
+      --pc-text-primary: #171C1A;
+      --pc-text-body: #323F38;
+      --pc-text-muted: #64736C;
+      --pc-mat: #141A17;
+    }
+    body { font-family: 'Plus Jakarta Sans', 'Sarabun', sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    .gallery-surface {
+      background: #FFFFFF;
+      border: 1px solid #E8E0D2;
+    }
+    .gallery-card {
+      background: #FFFFFF;
+      border: 1px solid #E8E0D2;
+    }
+    .event-card {
+      background: #FFFFFF;
+      border: 1px solid #E8E0D2;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .event-card:hover {
+      border-color: rgba(197, 160, 89, 0.7);
+      box-shadow: 0 16px 36px -10px rgba(26, 40, 34, 0.12);
+      transform: translateY(-2px);
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col selection:bg-[#C5A059] selection:text-[#1A2822] bg-[#FBF9F4] text-[#171C1A]">
+
+  <!-- Navbar (Deep Celadon Lacquer with Fine Gold Accents) -->
+  <header class="sticky top-0 z-50 bg-[#1A2822]/95 backdrop-blur-md border-b border-[#355246]/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/" class="flex items-center space-x-3 group">
+          <div class="w-9 h-9 rounded-xl bg-[#14201B] border border-[#C5A059]/70 flex items-center justify-center font-serif-luxury font-bold text-[#E8C87A] shadow-md group-hover:scale-105 transition">
+            MP
+          </div>
+          <div>
+            <span class="text-sm font-semibold tracking-wide text-white block font-serif-luxury" data-i18n="nav_brand_title">Master Exhibition Portal</span>
+            <span class="text-[10px] text-[#C5A059] font-mono tracking-wider" data-i18n="nav_brand_sub">Poh-Chang Fine Art Pavilion</span>
+          </div>
+        </a>
+      </div>
+      <nav class="flex items-center space-x-2.5 sm:space-x-4 text-sm font-medium">
+        <a href="/" class="text-[#E8C87A] font-semibold flex items-center gap-1.5 border-b-2 border-[#C5A059] pb-0.5">
+          <span data-i18n="nav_home">เลือกชมนิทรรศการ</span>
+        </a>
+        <a href="/gallery-3d.html" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#B38F46] text-[#141E19] font-bold transition flex items-center gap-1.5 shadow-sm shadow-[#C5A059]/20">
+          <span class="w-2 h-2 rounded-full bg-[#141E19]"></span>
+          <svg class="w-4 h-4 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+          </svg>
+          <span data-i18n="nav_3d_gallery">ห้องนิทรรศการ 3D</span>
+        </a>
+        <a href="/events.html" class="text-[#C8DBD2] hover:text-white transition" data-i18n="nav_events">ทำเนียบนิทรรศการ</a>
+        <a href="/admin.html" class="text-xs text-[#C8DBD2] hover:text-[#E8C87A] border border-[#355246] hover:border-[#C5A059]/50 px-2.5 py-1.5 rounded-xl transition" data-i18n="nav_admin">จัดการอีเวนต์</a>
+        <!-- Bilingual Language Switcher -->
+        <div id="lang-switcher" class="ml-1 sm:ml-2 shrink-0"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 pb-16">
+    <!-- ==========================================
+         VIEW 1: EVENT SELECTION VIEW (หน้าเลือกนิทรรศการ)
+         ========================================== -->
+    <div id="view-events-selector" class="block">
+      <!-- Hero Section (Warm Ivory with Ambient Heritage Gold Glow) -->
+      <section class="relative py-14 sm:py-20 overflow-hidden border-b border-[#E8E0D2] text-center bg-gradient-to-b from-[#F4EFE6]/70 via-[#FBF9F4] to-[#FBF9F4]">
+        <!-- Soft Amber/Gold Ambient Bloom -->
+        <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-[700px] h-[320px] bg-gradient-to-b from-[#C5A059]/12 via-[#E8C87A]/8 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#EBF2EE] text-[#1F3128] border border-[#C8DBD2] mb-5 shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-[#3B5749]"></span>
+            <span data-i18n="hero_badge">POH-CHANG VIRTUAL ART PORTAL</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-[#171C1A] leading-tight mb-4 font-serif-luxury">
+            <span data-i18n="hero_title_1">ศูนย์กลางนิทรรศการและ</span> <br class="hidden sm:inline">
+            <span data-i18n="hero_title_2" class="text-[#9A7833] font-serif-luxury italic">
+              หอศิลปกรรมดิจิทัลเสมือนจริง
+            </span>
+          </h1>
+
+          <p data-i18n="hero_desc" class="text-sm sm:text-base text-[#4D5D55] max-w-2xl mx-auto mb-8 leading-relaxed font-light">
+            สัมผัสประสบการณ์สุนทรียะแห่งผลงานศิลปกรรมร่วมสมัยจากคณาจารย์ ศิษย์เก่า และศิลปินนานาชาติ ผ่านเทคโนโลยีเว็บ 3 มิติและระบบสูจิบัตรดิจิทัลมาตรฐานสากล
+          </p>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <a href="/gallery-3d.html" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs shadow-md shadow-[#C5A059]/25 transition flex items-center gap-2">
+              <svg class="w-4 h-4 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+              </svg>
+              <span data-i18n="btn_enter_gallery">ชมแกลเลอรี 3 มิติ (3D Gallery)</span>
+            </a>
+
+            <button id="quick-pull-btn" onclick="quickPullArtworks()" class="px-4 py-2.5 rounded-xl bg-white hover:bg-[#F4EFE6] text-[#323F38] text-xs font-medium border border-[#E8E0D2] shadow-xs transition flex items-center gap-2 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span id="quick-pull-text">ซิงค์ดึงข้อมูลผลงาน (Pull Sync)</span>
+            </button>
+          </div>
+
+          <!-- Toast Notification -->
+          <div id="quick-pull-toast" class="hidden mt-4 p-3 rounded-xl text-xs font-mono max-w-lg mx-auto border transition-all"></div>
+        </div>
+      </section>
+
+      <!-- Exhibition Events Grid -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-normal text-[#171C1A] flex items-center gap-2.5 font-serif-luxury">
+              <span data-i18n="highlights_title">นิทรรศการเด่นและกิจกรรมศิลป์</span>
+              <span id="events-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-[#EBF2EE] text-[#1F3128] border border-[#C8DBD2]">0</span>
+            </h2>
+            <p data-i18n="highlights_desc" class="text-xs text-[#64736C] mt-1 font-light">เลือกชมนิทรรศการศิลปกรรมเสมือนจริงที่กำลังจัดแสดงในปัจจุบันและคลังนิทรรศการย้อนหลัง</p>
+          </div>
+        </div>
+
+        <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Skeleton Loading -->
+          <div class="event-card rounded-3xl p-6 animate-pulse">
+            <div class="h-44 bg-[#F4EFE6] rounded-2xl mb-4"></div>
+            <div class="h-5 bg-[#F4EFE6] rounded w-3/4 mb-3"></div>
+            <div class="h-4 bg-[#F4EFE6] rounded w-1/2 mb-6"></div>
+            <div class="h-10 bg-[#F4EFE6] rounded-xl"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         VIEW 2: DEDICATED EVENT SHOWCASE (หน้าแสดงผลงานเฉพาะ Event)
+         ========================================== -->
+    <div id="view-single-event" class="hidden">
+      <!-- Event Header Banner (Deep Celadon Lacquer with Fine Gold Details) -->
+      <section class="relative py-10 sm:py-14 overflow-hidden border-b border-[#355246]/50 bg-gradient-to-b from-[#1A2822] via-[#20312A] to-[#141E19] text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <!-- Breadcrumb Back to Event List -->
+          <div class="mb-5">
+            <button onclick="showEventsSelectorView()" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-normal text-[#EBF2EE] hover:text-[#E8C87A] border border-white/20 transition group cursor-pointer shadow-xs">
+              <svg class="w-3.5 h-3.5 transform group-hover:-translate-x-1 transition text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span data-i18n="event_back_btn">กลับสู่ทำเนียบนิทรรศการ (All Exhibitions)</span>
+            </button>
+          </div>
+
+          <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div class="max-w-3xl space-y-3">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <span id="single-event-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/40">
+                  EVENT_ID
+                </span>
+                <span class="text-[11px] text-[#A3D9C9] flex items-center gap-1.5 font-light">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span data-i18n="event_status_ongoing">นิทรรศการเปิดให้เข้าชม</span>
+                </span>
+              </div>
+
+              <h1 id="single-event-title" class="text-3xl sm:text-4xl lg:text-5xl font-normal text-white tracking-tight leading-tight font-serif-luxury">
+                ชื่องานนิทรรศการ
+              </h1>
+
+              <p id="single-event-subtitle" class="text-sm text-[#C8DBD2] font-light max-w-2xl leading-relaxed">
+                ผลงานศิลปะสร้างสรรค์ที่ผ่านการคัดสรรจากคณะกรรมการและภัณฑารักษ์ประจำนิทรรศการนี้
+              </p>
+            </div>
+
+            <!-- Action Buttons for This Event -->
+            <div class="flex flex-wrap items-center gap-3 shrink-0">
+              <a id="btn-enter-event-3d" href="#" class="min-h-[44px] px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs shadow-md shadow-[#C5A059]/25 transition flex items-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                </svg>
+                <span data-i18n="event_btn_3d_walk">เข้าชมในห้อง 3D</span>
+              </a>
+
+              <button id="btn-single-event-catalog" onclick="switchEventViewMode('catalog')"
+                class="min-h-[44px] px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-[#E8C87A] font-medium text-xs border border-[#C5A059]/40 transition flex items-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4 text-[#E8C87A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <span data-i18n="modal_btn_catalog">สูจิบัตรดิจิทัล (E-Catalogue)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View Mode Switcher: Artworks Showcase vs Official Catalogue -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+        <div class="flex items-center justify-between border-b border-[#E8E0D2] pb-4">
+          <!-- Toggle Tabs -->
+          <div class="inline-flex p-1 rounded-xl bg-[#F4EFE6] border border-[#E8E0D2]">
+            <button id="tab-btn-artworks" onclick="switchEventViewMode('artworks')"
+              class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#1A2822] text-white shadow-xs cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+              <span data-i18n="filter_all_artworks">คลังผลงานศิลปะ (Artworks)</span>
+            </button>
+            <button id="tab-btn-catalog" onclick="switchEventViewMode('catalog')"
+              class="px-4 py-2 rounded-lg text-xs font-medium text-[#64736C] hover:text-[#171C1A] transition flex items-center gap-2 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <span data-i18n="modal_btn_catalog">สูจิบัตรดิจิทัลฉบับทางการ</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 1: Event Artworks Filter & Showcase -->
+      <section id="event-content-artworks" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Search & Info Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E8E0D2] mb-8">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-normal text-[#171C1A] flex items-center gap-2.5 font-serif-luxury">
+              <span data-i18n="event_artworks_title">ผลงานศิลปะในนิทรรศการนี้</span>
+              <span id="single-event-artworks-count" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-[#EBF2EE] text-[#1F3128] border border-[#C8DBD2]">0</span>
+            </h2>
+            <p data-i18n="event_artworks_desc" class="text-xs text-[#64736C] mt-0.5 font-light">ผลงานที่ผ่านการคัดเลือกและจัดแสดงอย่างเป็นทางการ</p>
+          </div>
+
+          <!-- Search within this event -->
+          <div class="relative w-full sm:w-80">
+            <input type="text" id="event-artworks-search" placeholder="ค้นหาชื่อผลงาน, ศิลปิน, หรือเทคนิค..." data-i18n-placeholder="search_artworks_ph"
+              class="w-full pl-10 pr-4 py-2 rounded-xl bg-white border border-[#E8E0D2] text-xs text-[#171C1A] placeholder-[#8A9890] focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] font-light shadow-xs">
+            <svg class="w-4 h-4 text-stone-500 absolute left-3.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Artworks Grid of this Event -->
+        <div id="single-event-artworks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- TAB 2: Embedded Companion E-Catalogue Section -->
+      <section id="event-content-catalog" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white rounded-3xl border border-[#E8E0D2] overflow-hidden shadow-xl">
+          <!-- Catalogue Toolbar (Deep Celadon Lacquer) -->
+          <div class="p-4 sm:p-5 bg-[#1A2822] text-white border-b border-[#355246] flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <span class="p-2 rounded-xl bg-[#243830] border border-[#355246] text-[#E8C87A]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </span>
+              <div>
+                <h3 id="companion-catalog-title" class="text-base sm:text-lg font-normal text-white font-serif-luxury">
+                  สูจิบัตรดิจิทัลฉบับทางการประจำนิทรรศการ
+                </h3>
+                <p class="text-[11px] text-[#C8DBD2] font-light">
+                  ออกแบบและจัดหน้าสำเร็จตามมาตรฐาน A4 จาก Web Event ต้นทาง
+                </p>
+              </div>
+            </div>
+
+            <!-- Toolbar Actions -->
+            <div class="flex items-center gap-2">
+              <button onclick="printCompanionCatalog()" class="px-3.5 py-2 rounded-xl bg-[#243830] hover:bg-[#2F473E] text-[#EBF2EE] text-xs font-medium border border-[#355246] transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+                <svg class="w-4 h-4 text-[#E8C87A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                <span>สั่งพิมพ์ / PDF</span>
+              </button>
+
+              <a id="btn-open-catalog-standalone" href="#" target="_blank" rel="noopener"
+                class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-[#C5A059]/20">
+                <span>เปิดเต็มหน้าต่างใหม่</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Embedded Iframe Container -->
+          <div class="relative w-full h-[85vh] bg-[#FBF9F4]">
+            <iframe id="companion-catalog-frame" src="about:blank" class="w-full h-full border-0" allowfullscreen></iframe>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Global Fullscreen E-Catalogue Companion Lightbox Modal -->
+  <div id="global-catalog-modal" role="dialog" aria-modal="true" aria-labelledby="global-catalog-title" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm transition-all">
+    <div class="relative w-full max-w-6xl h-[92vh] flex flex-col rounded-3xl bg-[#FCFAF7] border border-[#C5A059]/60 shadow-2xl overflow-hidden">
+      <!-- Modal Header (Deep Celadon Lacquer) -->
+      <div class="p-4 sm:px-6 py-4 bg-[#1A2822] text-white border-b border-[#355246] flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="p-2 rounded-xl bg-[#243830] border border-[#355246] text-[#E8C87A] shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </span>
+          <div class="truncate">
+            <h3 id="global-catalog-title" class="text-base sm:text-lg font-normal text-white font-serif-luxury truncate">
+              สูจิบัตรดิจิทัลประจำนิทรรศการ
+            </h3>
+            <p class="text-[11px] text-[#C8DBD2] font-light">
+              จัดแสดงประกบฉบับเต็ม ออกแบบและจัดพิมพ์ตามมาตรฐานวิจิตรศิลป์ A4 จาก Event
+            </p>
+          </div>
+        </div>
+
+        <!-- Modal Controls -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button onclick="printGlobalCatalog()" class="px-3.5 py-1.5 rounded-xl bg-[#243830] hover:bg-[#2F473E] text-[#EBF2EE] text-xs font-medium border border-[#355246] transition flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5 text-[#E8C87A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span class="hidden sm:inline">พิมพ์ / PDF</span>
+          </button>
+
+          <a id="btn-global-catalog-standalone" href="#" target="_blank" rel="noopener"
+            class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <span class="hidden sm:inline">เปิดแท็บใหม่</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+
+          <button onclick="closeGlobalCatalogModal()" class="p-1.5 rounded-xl bg-[#243830] hover:bg-rose-900/60 text-[#C8DBD2] hover:text-white border border-[#355246] transition cursor-pointer" title="ปิดหน้าต่าง (Esc)">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Iframe Container -->
+      <div class="w-full flex-1 bg-[#FBF9F4] relative">
+        <iframe id="global-catalog-frame" src="about:blank" class="w-full h-full border-0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Museum Artwork Detail In-Portal Lightbox Modal (ดึงข้อมูลมาแสดงโดยตรงในสไตล์หอศิลป์) -->
+  <div id="artwork-detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-art-title" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm transition-all" onclick="if(event.target === this) closeArtworkDetailModal()">
+    <div class="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-3xl bg-[#FCFAF7] border border-[#C5A059]/60 shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+      <!-- Modal Header (Deep Celadon Lacquer) -->
+      <div class="p-4 sm:px-6 py-3.5 bg-[#1A2822] text-white border-b border-[#355246] flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/40 shrink-0" data-i18n="modal_artwork_badge">
+            Curated Artwork Dossier
+          </span>
+          <span id="detail-art-zone-badge" class="px-2.5 py-1 rounded-full text-[10px] font-medium bg-[#243830] text-[#C8DBD2] border border-[#355246] truncate max-w-[220px] hidden sm:inline-block"></span>
+          <span id="detail-art-id-badge" class="text-[10px] font-mono text-[#8A9890] truncate hidden md:inline-block"></span>
+        </div>
+
+        <button onclick="closeArtworkDetailModal()" class="p-1.5 rounded-xl bg-[#243830] hover:bg-rose-900/60 text-[#C8DBD2] hover:text-white border border-[#355246] transition cursor-pointer" title="ปิดหน้าต่าง (Esc)">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-7 bg-[#FCFAF7]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <!-- Artwork Display Stage (Col 7) - Clean Light Curatorial Display -->
+          <div class="lg:col-span-7 space-y-3">
+            <div class="relative aspect-[4/3] bg-[#F7F4EC] rounded-2xl p-4 sm:p-6 flex items-center justify-center border border-[#E8E0D2] overflow-hidden">
+              <img id="detail-art-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3' fill='%23F7F4EC'/%3E" alt="Exhibition Artwork" 
+                   class="max-h-full max-w-full object-contain drop-shadow-[0_4px_20px_rgba(0,0,0,0.12)] rounded-lg transition duration-500" loading="lazy">
+            </div>
+
+            <div class="flex items-center justify-between px-1 text-xs">
+              <span id="detail-art-stage-dim" class="font-mono text-[#64736C] text-[11px]"></span>
+              <a id="detail-art-raw-link" href="#" target="_blank" rel="noopener"
+                 class="text-[#9A7833] hover:text-[#6D531F] transition flex items-center gap-1.5 font-medium text-[11px]">
+                <span data-i18n="modal_hi_res_hint">เปิดดูไฟล์ภาพต้นฉบับ Hi-Res</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Museum Plaque & Artist Dossier (Col 5) -->
+          <div class="lg:col-span-5 space-y-5">
+            <!-- Title & Info Plaque -->
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-widest text-[#9A7833] block mb-1" data-i18n="modal_artwork_badge">ผลงานในนิทรรศการ</span>
+              <h2 id="detail-art-title" class="font-serif-luxury text-2xl sm:text-3xl font-normal text-[#171C1A] leading-snug"></h2>
+            </div>
+
+            <!-- Specs Grid -->
+            <div class="bg-white rounded-2xl p-4 sm:p-5 space-y-2.5 border border-[#E8E0D2] text-xs shadow-xs">
+              <div class="flex justify-between py-1 border-b border-[#E8E0D2]/60">
+                <span class="text-[#64736C] font-light" data-i18n="lbl_technique">เทคนิค / สื่อ:</span>
+                <span id="detail-art-technique" class="font-medium text-[#171C1A] text-right"></span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-[#E8E0D2]/60">
+                <span class="text-[#64736C] font-light" data-i18n="lbl_dimensions">ขนาดผลงาน:</span>
+                <span id="detail-art-dimensions" class="font-mono text-[#171C1A] text-right"></span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-[#E8E0D2]/60">
+                <span class="text-[#64736C] font-light" data-i18n="lbl_year">ปีที่สร้างสรรค์:</span>
+                <span id="detail-art-year" class="font-mono text-[#171C1A] text-right"></span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-[#E8E0D2]/60">
+                <span class="text-[#64736C] font-light" data-i18n="nav_3d_gallery">โซน / พาวิลเลียน:</span>
+                <span id="detail-art-zone" class="font-medium text-[#9A7833] text-right truncate max-w-[200px]"></span>
+              </div>
+              <div class="flex justify-between py-1">
+                <span class="text-[#64736C] font-light" data-i18n="nav_events">นิทรรศการ:</span>
+                <span id="detail-art-event" class="font-medium text-[#1F3128] text-right truncate max-w-[200px]"></span>
+              </div>
+            </div>
+
+            <!-- Concept / Artist Statement -->
+            <div id="detail-art-desc-box" class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E8E0D2] space-y-2 shadow-xs">
+              <h3 class="text-[11px] font-mono uppercase tracking-widest text-[#9A7833]" data-i18n="modal_concept_title">แนวคิดผลงาน (Curatorial Statement)</h3>
+              <p id="detail-art-description" class="text-xs sm:text-sm text-[#323F38] leading-relaxed font-light whitespace-pre-line pl-3 border-l-2 border-[#C5A059] bg-[#FAF7F0] py-2 rounded-r-lg"></p>
+            </div>
+
+            <!-- Artist Profile Box -->
+            <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E8E0D2] flex items-center gap-3.5 shadow-xs">
+              <img id="detail-art-artist-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' fill='%23FAF7F0'/%3E" alt="Artist" class="w-12 h-12 rounded-full object-cover border border-[#C5A059]/50 shrink-0 shadow-xs">
+              <div class="min-w-0">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-[#9A7833] block" data-i18n="modal_title_artist">ศิลปินผู้สร้างสรรค์</span>
+                <h4 id="detail-art-artist-name" class="font-serif-luxury text-lg text-[#171C1A] font-normal truncate"></h4>
+                <p id="detail-art-artist-nationality" class="text-xs text-[#64736C] font-light truncate"></p>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 space-y-2">
+              <a id="detail-art-btn-3d" href="#"
+                 class="w-full min-h-[44px] py-3 px-4 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs shadow-md shadow-[#C5A059]/25 transition flex items-center justify-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1" />
+                </svg>
+                <span data-i18n="event_btn_3d_walk">เข้าชมในห้องนิทรรศการ 3D ของงานนี้</span>
+              </a>
+
+              <button onclick="closeArtworkDetailModal()"
+                class="w-full py-2.5 px-4 rounded-xl bg-[#F4EFE6] hover:bg-[#ECE5D8] text-[#323F38] text-xs font-medium border border-[#E8E0D2] transition cursor-pointer">
+                <span data-i18n="modal_btn_close">กลับสู่คลังผลงาน</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="border-t border-[#243830] bg-[#141E19] py-8 text-center text-xs text-[#8A9890]">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+        <span class="font-medium text-[#C8DBD2]" data-i18n="nav_brand_title">Master Exhibition Portal</span>
+        <span class="text-[#355246]">|</span>
+        <span data-i18n="nav_brand_sub">Poh-Chang Fine Art Virtual Pavilion</span>
+      </div>
+      <p data-i18n="footer_text">© 2026 Poh-Chang Academy of Arts, RMUTR. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/portal.js"></script>
+  <script>
+    let registeredEvents = [];
+    let currentEventId = null;
+    let currentEventArtworks = [];
+    let currentOpenArtId = null;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Initialize bilingual language switcher
+      if (window.i18n) {
+        window.i18n.renderSwitcher("lang-switcher");
+      }
+
+      // Re-render dynamically on language change
+      window.addEventListener("languageChanged", () => {
+        renderEventsGrid();
+        if (currentEventId) {
+          const ev = registeredEvents.find(e => e.event_id === currentEventId);
+          if (ev) {
+            document.getElementById("single-event-title").textContent = window.getField(ev, 'event_title');
+            document.getElementById("single-event-subtitle").textContent = window.getField(ev, 'description', window.t('event_artworks_desc'));
+            document.getElementById("companion-catalog-title").textContent = `${window.t('modal_btn_catalog')}: ${window.getField(ev, 'event_title')}`;
+          }
+          const searchInput = document.getElementById("event-artworks-search");
+          const q = searchInput ? searchInput.value.trim() : "";
+          filterSingleEventArtworks(q);
+        }
+        if (currentOpenArtId) {
+          openArtworkDetailModal(currentOpenArtId);
+        }
+      });
+
+      // Check if URL has ?event_id=... or ?artwork_id=...
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramEventId = urlParams.get("event_id");
+      const paramArtId = urlParams.get("artwork_id") || urlParams.get("art_id");
+
+      await loadRegisteredEvents();
+
+      if (paramEventId) {
+        await selectEvent(paramEventId);
+        if (paramArtId) {
+          openArtworkDetailModal(paramArtId);
+        }
+      } else {
+        showEventsSelectorView();
+      }
+
+      // Search input within single event view
+      const searchInput = document.getElementById("event-artworks-search");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          filterSingleEventArtworks(e.target.value.trim());
+        });
+      }
+
+      // Listen to Escape key to close any open modal
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeArtworkDetailModal();
+          closeGlobalCatalogModal();
+        }
+      });
+
+      // Listen to popstate (back/forward button)
+      window.addEventListener("popstate", (e) => {
+        closeArtworkDetailModal();
+        const params = new URLSearchParams(window.location.search);
+        const evId = params.get("event_id");
+        if (evId) {
+          selectEvent(evId, false);
+        } else {
+          showEventsSelectorView(false);
+        }
+      });
+    });
+
+    // 1. Load All Registered Events
+    async function loadRegisteredEvents() {
+      try {
+        const res = await MasterPortalAPI.getEvents();
+        registeredEvents = res.events || [];
+        document.getElementById("events-count-badge").textContent = registeredEvents.length;
+        renderEventsGrid();
+      } catch (err) {
+        console.error("Failed to load events:", err);
+      }
+    }
+
+    // 2. Render Events Grid with Rich Cards & Artwork Previews
+    async function renderEventsGrid() {
+      const container = document.getElementById("events-grid");
+      container.innerHTML = "";
+
+      if (registeredEvents.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-16 bg-white border border-[#E8E0D2] rounded-3xl shadow-xs">
+            <p class="text-[#64736C] font-medium">${window.t('empty_artworks_title') || 'ยังไม่มีนิทรรศการที่ลงทะเบียน'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Fetch sample artworks for preview collages
+      for (const ev of registeredEvents) {
+        const title = window.getField(ev, 'event_title', ev.event_id);
+        const desc = window.getField(ev, 'description', window.t('hero_desc'));
+        const worksCount = ev.artwork_count || 0;
+        const worksSuffix = window.t('event_artworks_count_suffix');
+
+        const card = document.createElement("div");
+        card.className = "event-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group shadow-xs";
+
+        card.innerHTML = `
+          <div>
+            <!-- Header badge & count -->
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold bg-[#FAF3E3] text-[#8C6D2D] border border-[#E5D5B2]">
+                ${ev.event_id}
+              </span>
+              <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#EBF2EE] text-[#1F3128] border border-[#C8DBD2]">
+                ${worksCount} ${worksSuffix}
+              </span>
+            </div>
+
+            <!-- Event Title -->
+            <h3 class="text-xl sm:text-2xl font-normal text-[#171C1A] font-serif-luxury group-hover:text-[#9A7833] transition leading-snug">
+              ${title}
+            </h3>
+
+            <p class="text-xs text-[#64736C] mt-2 font-light leading-relaxed line-clamp-2">
+              ${desc}
+            </p>
+
+            <!-- Preview Artwork Collage Container -->
+            <div id="preview-strip-${ev.event_id}" class="mt-5 grid grid-cols-3 gap-2.5 h-24 overflow-hidden rounded-xl bg-[#F4EFE6] border border-[#E8E0D2]">
+              <div class="bg-[#E8E0D2]/60 rounded-lg animate-pulse"></div>
+              <div class="bg-[#E8E0D2]/60 rounded-lg animate-pulse"></div>
+              <div class="bg-[#E8E0D2]/60 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="mt-6 pt-5 border-t border-[#E8E0D2] flex flex-col gap-2.5">
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="selectEvent('${ev.event_id}')"
+                class="min-h-[44px] py-2.5 px-3 rounded-xl bg-[#1A2822] hover:bg-[#273B32] text-white font-semibold text-xs text-center border border-[#1A2822] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+                <svg class="w-3.5 h-3.5 text-[#E8C87A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                <span>${window.t('btn_view_details')}</span>
+              </button>
+
+              <a href="/gallery-3d.html?event_id=${encodeURIComponent(ev.event_id)}"
+                class="min-h-[44px] py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs text-center shadow-md shadow-[#C5A059]/20 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <svg class="w-3.5 h-3.5 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                </svg>
+                <span>${window.t('nav_3d_gallery')}</span>
+              </a>
+            </div>
+
+            <!-- E-Catalogue Companion Action Button -->
+            <button onclick="openGlobalCatalogModal('${ev.catalog_url}', '${title.replace(/'/g, "\\'")}')"
+              class="w-full min-h-[44px] py-2.5 px-3 rounded-xl bg-[#FAF3E3] hover:bg-[#F5ECD5] text-[#8C6D2D] font-semibold text-xs border border-[#E5D5B2] transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <span>${window.t('modal_btn_catalog')}</span>
+            </button>
+
+            <a href="${ev.portal_url}" target="_blank" rel="noopener"
+              class="text-[11px] text-[#64736C] hover:text-[#9A7833] text-center transition flex items-center justify-center gap-1 py-0.5">
+              <span>${window.t('nav_event_webapp')}</span>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+        `;
+
+        container.appendChild(card);
+
+        // Load preview artworks for this event asynchronously
+        loadEventPreviewThumbnails(ev.event_id);
+      }
+    }
+
+    async function loadEventPreviewThumbnails(eventId) {
+      try {
+        const res = await MasterPortalAPI.getArtworks({ event_id: eventId, limit: 3 });
+        const arts = res.artworks || [];
+        const strip = document.getElementById(`preview-strip-${eventId}`);
+        if (!strip) return;
+
+        if (arts.length === 0) {
+          strip.innerHTML = `<div class="col-span-3 flex items-center justify-center text-[11px] text-slate-500">ไม่มีตัวอย่างภาพผลงาน</div>`;
+          return;
+        }
+
+        strip.innerHTML = "";
+        arts.slice(0, 3).forEach(art => {
+          const img = document.createElement("img");
+          img.src = art.thumbnail_url || art.image_url;
+          img.alt = art.title;
+          img.className = "w-full h-full object-cover rounded-lg";
+          img.loading = "lazy";
+          strip.appendChild(img);
+        });
+      } catch (err) {
+        // silent fallback
+      }
+    }
+
+    // 3. Select a Specific Event (Switch Views)
+    async function selectEvent(eventId, updateHistory = true) {
+      currentEventId = eventId;
+
+      if (updateHistory) {
+        window.history.pushState(null, '', `?event_id=${encodeURIComponent(eventId)}`);
+      }
+
+      const viewSelector = document.getElementById("view-events-selector");
+      const viewSingle = document.getElementById("view-single-event");
+
+      viewSelector.classList.add("hidden");
+      viewSingle.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Find event metadata
+      const ev = registeredEvents.find(e => e.event_id === eventId) || {
+        event_id: eventId,
+        event_title: eventId,
+        portal_url: '#',
+        catalog_url: '#'
+      };
+
+      document.getElementById("single-event-badge").textContent = ev.event_id;
+      document.getElementById("single-event-title").textContent = ev.event_title;
+      document.getElementById("btn-enter-event-3d").href = `/gallery-3d.html?event_id=${encodeURIComponent(eventId)}`;
+      const btnOfficial = document.getElementById("btn-event-official-site");
+      if (btnOfficial) btnOfficial.href = ev.portal_url || '#';
+
+      // Setup Companion E-Catalogue View (Pure Finished Booklet - Strictly No Editing/Designing UI)
+      const baseCatalogUrl = ev.catalog_url || (ev.portal_url ? `${ev.portal_url.replace(/\/+$/, '')}/catalog.html` : '#');
+      const readerUrl = baseCatalogUrl !== '#' ? `${baseCatalogUrl}${baseCatalogUrl.includes('?') ? '&' : '?'}mode=reader` : '#';
+      document.getElementById("companion-catalog-title").textContent = `รูปเล่มสูจิบัตร: ${ev.event_title}`;
+      document.getElementById("btn-open-catalog-standalone").href = readerUrl;
+      const companionFrame = document.getElementById("companion-catalog-frame");
+      if (companionFrame.getAttribute("data-loaded-for") !== eventId) {
+        companionFrame.src = readerUrl;
+        companionFrame.setAttribute("data-loaded-for", eventId);
+      }
+
+      // Default view to artworks
+      switchEventViewMode('artworks');
+
+      // Load artworks for this event
+      await loadSingleEventArtworks(eventId);
+    }
+
+    // Switch between Artworks Showcase and Companion E-Catalogue Tab
+    function switchEventViewMode(mode) {
+      const tabArtworks = document.getElementById("tab-btn-artworks");
+      const tabCatalog = document.getElementById("tab-btn-catalog");
+      const secArtworks = document.getElementById("event-content-artworks");
+      const secCatalog = document.getElementById("event-content-catalog");
+
+      if (mode === 'catalog') {
+        tabArtworks.className = "px-4 py-2 rounded-lg text-xs font-normal text-stone-400 hover:text-stone-200 transition flex items-center gap-2 cursor-pointer";
+        tabCatalog.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#c5a059] text-stone-950 shadow-sm cursor-pointer";
+        secArtworks.classList.add("hidden");
+        secCatalog.classList.remove("hidden");
+      } else {
+        tabArtworks.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#c5a059] text-stone-950 shadow-sm cursor-pointer";
+        tabCatalog.className = "px-4 py-2 rounded-lg text-xs font-normal text-stone-400 hover:text-stone-200 transition flex items-center gap-2 cursor-pointer";
+        secArtworks.classList.remove("hidden");
+        secCatalog.classList.add("hidden");
+      }
+    }
+
+    function printCompanionCatalog() {
+      const frame = document.getElementById("companion-catalog-frame");
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+      }
+    }
+
+    // Global Modal Functions
+    function openGlobalCatalogModal(url, title) {
+      const modal = document.getElementById("global-catalog-modal");
+      const frame = document.getElementById("global-catalog-frame");
+      const modalTitle = document.getElementById("global-catalog-title");
+      const btnStandalone = document.getElementById("btn-global-catalog-standalone");
+
+      const readerUrl = url ? `${url}${url.includes('?') ? '&' : '?'}mode=reader` : 'about:blank';
+      modalTitle.textContent = `รูปเล่มสูจิบัตร: ${title || 'Exhibition E-Catalogue'}`;
+      btnStandalone.href = readerUrl;
+      frame.src = readerUrl;
+      modal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeGlobalCatalogModal() {
+      const modal = document.getElementById("global-catalog-modal");
+      const frame = document.getElementById("global-catalog-frame");
+      modal.classList.add("hidden");
+      frame.src = "about:blank";
+      document.body.style.overflow = "";
+    }
+
+    function printGlobalCatalog() {
+      const frame = document.getElementById("global-catalog-frame");
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+      }
+    }
+
+    // 4. Return to Event Selector View
+    function showEventsSelectorView(updateHistory = true) {
+      currentEventId = null;
+      if (updateHistory) {
+        window.history.pushState(null, '', window.location.pathname);
+      }
+
+      document.getElementById("view-single-event").classList.add("hidden");
+      document.getElementById("view-events-selector").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 5. Load Artworks of Selected Event
+    async function loadSingleEventArtworks(eventId) {
+      const grid = document.getElementById("single-event-artworks-grid");
+      grid.innerHTML = `
+        <div class="gallery-card rounded-2xl p-4 animate-pulse">
+          <div class="aspect-[4/3] bg-slate-800 rounded-xl mb-3"></div>
+          <div class="h-4 bg-slate-800 rounded w-2/3 mb-2"></div>
+        </div>
+      `;
+
+      try {
+        const res = await MasterPortalAPI.getArtworks({ event_id: eventId });
+        currentEventArtworks = res.artworks || [];
+        document.getElementById("single-event-artworks-count").textContent = currentEventArtworks.length;
+
+        renderSingleEventArtworksGrid(currentEventArtworks);
+      } catch (err) {
+        grid.innerHTML = `<div class="col-span-full py-10 text-center text-rose-400">เกิดข้อผิดพลาด: ${err.message}</div>`;
+      }
+    }
+
+    function renderSingleEventArtworksGrid(artworksList) {
+      const grid = document.getElementById("single-event-artworks-grid");
+      grid.innerHTML = "";
+
+      if (artworksList.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-16 gallery-surface rounded-2xl">
+            <svg class="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p class="text-slate-400 font-medium">${window.t('empty_artworks_title') || 'ไม่พบผลงานที่ตรงกับเงื่อนไขในนิทรรศการนี้'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      artworksList.forEach(art => {
+        const title = window.getField(art, 'title', 'Untitled');
+        const artistName = window.getArtistFullName(art, 'Unknown Artist');
+        const technique = window.getField(art, 'technique', 'ภาพพิมพ์และสื่อผสมร่วมสมัย');
+        const dimensions = window.getField(art, 'dimensions', '');
+        const year = art.year_created || "";
+        const zone = art.zone || "";
+        const nationality = art.nationality || "";
+        const desc = window.getField(art, 'description', '');
+        const imageUrl = art.thumbnail_url || art.image_url;
+        const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=1c1e26&color=D4AF37&bold=true`;
+
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col cursor-pointer border border-[#E8E0D2] shadow-xs";
+        card.setAttribute("onclick", `openArtworkDetailModal('${art.global_id}')`);
+
+        card.innerHTML = `
+          <!-- Artwork Image Display (Clean, Light Curatorial Surface - No Dark Frame) -->
+          <div class="relative aspect-[4/3] bg-[#F7F4EC] p-3 flex items-center justify-center overflow-hidden border-b border-[#E8E0D2]">
+            <img src="${imageUrl}" alt="${title}" 
+                 class="max-h-full max-w-full object-contain rounded-xs drop-shadow-[0_2px_8px_rgba(0,0,0,0.08)] group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy">
+          </div>
+
+          <!-- Card Museum Plaque Content -->
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-3 bg-white">
+            <div>
+              <h3 class="font-serif-luxury text-lg text-[#171C1A] group-hover:text-[#9A7833] transition truncate leading-snug font-normal" title="${title}">
+                ${title}
+              </h3>
+              <p class="text-[11px] text-[#64736C] truncate mt-1 font-light" title="${technique}">
+                ${technique}${dimensions ? ` • ${dimensions}` : ''}
+              </p>
+            </div>
+
+            <!-- Artist Badge Row -->
+            <div class="pt-3 border-t border-[#E8E0D2] flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <img src="${avatar}" alt="${artistName}" 
+                     class="w-6 h-6 rounded-full object-cover border border-[#C5A059]/50 shrink-0 shadow-2xs"
+                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=FAF7F0&color=9A7833&bold=true'">
+                <div class="min-w-0">
+                  <span class="text-xs text-[#323F38] font-medium tracking-wide truncate block">${artistName}</span>
+                  ${nationality ? `<span class="text-[10px] text-[#64736C] font-light truncate block">${nationality}</span>` : ''}
+                </div>
+              </div>
+
+              <span class="text-[11px] text-[#9A7833] group-hover:text-[#6D531F] transition flex items-center gap-1 shrink-0 tracking-wider uppercase font-semibold">
+                <span>${window.t('btn_inspect') || 'ดูรายละเอียด'}</span>
+                <span aria-hidden="true">&rarr;</span>
+              </span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterSingleEventArtworks(query) {
+      if (!query) {
+        renderSingleEventArtworksGrid(currentEventArtworks);
+        return;
+      }
+      const q = query.toLowerCase();
+      const filtered = currentEventArtworks.filter(a => {
+        const title = (window.getField(a, 'title') || '').toLowerCase();
+        const artistName = (window.getArtistFullName(a) || '').toLowerCase();
+        const tech = (window.getField(a, 'technique') || '').toLowerCase();
+        const desc = (window.getField(a, 'description') || '').toLowerCase();
+        const zone = (a.zone || '').toLowerCase();
+        const nat = (a.nationality || '').toLowerCase();
+        return title.includes(q) || artistName.includes(q) || tech.includes(q) || desc.includes(q) || zone.includes(q) || nat.includes(q);
+      });
+      renderSingleEventArtworksGrid(filtered);
+    }
+
+    // In-Portal Artwork Detail Modal Functions (ดึงข้อมูลมาแสดงผลใน Master Portal โดยตรง)
+    function openArtworkDetailModal(globalId) {
+      currentOpenArtId = globalId;
+      const art = currentEventArtworks.find(a => a.global_id === globalId);
+      if (!art) return;
+
+      const modal = document.getElementById("artwork-detail-modal");
+      const title = window.getField(art, 'title', 'Untitled');
+      const artistName = window.getArtistFullName(art, 'Unknown Artist');
+      const technique = window.getField(art, 'technique', 'ภาพพิมพ์และสื่อผสมร่วมสมัย');
+      const dimensions = window.getField(art, 'dimensions', '-');
+      const year = art.year_created || "-";
+      const zone = art.zone || "Main Gallery";
+      const nationality = art.nationality || "";
+      const desc = window.getField(art, 'description', window.t('hero_desc'));
+      const imageUrl = art.image_url || art.thumbnail_url;
+      const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=1c1e26&color=D4AF37&bold=true`;
+
+      document.getElementById("detail-art-image").src = imageUrl;
+      document.getElementById("detail-art-raw-link").href = imageUrl;
+      document.getElementById("detail-art-stage-dim").textContent = dimensions !== "-" ? `${dimensions} • ${year}` : year;
+
+      document.getElementById("detail-art-title").textContent = title;
+      document.getElementById("detail-art-technique").textContent = technique;
+      document.getElementById("detail-art-dimensions").textContent = dimensions;
+      document.getElementById("detail-art-year").textContent = year;
+      document.getElementById("detail-art-zone").textContent = zone;
+      document.getElementById("detail-art-event").textContent = window.getField(art, 'event_title', currentEventId);
+
+      document.getElementById("detail-art-zone-badge").textContent = zone;
+      document.getElementById("detail-art-id-badge").textContent = `ID: ${art.global_id}`;
+
+      document.getElementById("detail-art-description").textContent = desc;
+      document.getElementById("detail-art-artist-avatar").src = avatar;
+      document.getElementById("detail-art-artist-name").textContent = artistName;
+      document.getElementById("detail-art-artist-nationality").textContent = nationality;
+
+      document.getElementById("detail-art-btn-3d").href = `/gallery-3d.html?event_id=${encodeURIComponent(currentEventId)}`;
+
+      modal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeArtworkDetailModal() {
+      currentOpenArtId = null;
+      const modal = document.getElementById("artwork-detail-modal");
+      if (modal) {
+        modal.classList.add("hidden");
+        document.body.style.overflow = "";
+      }
+    }
+
+    // 6. Quick Pull Handler
+    async function quickPullArtworks() {
+      const btn = document.getElementById("quick-pull-btn");
+      const text = document.getElementById("quick-pull-text");
+      const toast = document.getElementById("quick-pull-toast");
+
+      btn.disabled = true;
+      text.textContent = "กำลังดึงข้อมูล...";
+      toast.className = "mt-4 p-3 rounded-xl text-xs font-mono max-w-lg mx-auto border bg-cyan-950/40 border-cyan-500/30 text-cyan-300 block animate-pulse";
+      toast.textContent = "⏳ กำลังเชื่อมต่อเพื่อดึงผลงานจาก Web Event ทั้งหมด...";
+
+      try {
+        const res = await MasterPortalAPI.pullArtworks(null);
+        if (res.success) {
+          toast.className = "mt-4 p-3 rounded-xl text-xs font-mono max-w-lg mx-auto border bg-emerald-950/40 border-emerald-500/30 text-emerald-300 block";
+          toast.textContent = `✨ ${res.message}`;
+          await loadRegisteredEvents();
+          if (currentEventId) {
+            await loadSingleEventArtworks(currentEventId);
+          }
+        } else {
+          toast.className = "mt-4 p-3 rounded-xl text-xs font-mono max-w-lg mx-auto border bg-rose-950/40 border-rose-500/30 text-rose-300 block";
+          toast.textContent = `❌ ${res.message || res.error}`;
+        }
+      } catch (err) {
+        toast.className = "mt-4 p-3 rounded-xl text-xs font-mono max-w-lg mx-auto border bg-rose-950/40 border-rose-500/30 text-rose-300 block";
+        toast.textContent = `❌ เกิดข้อผิดพลาด: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        text.textContent = "ซิงค์ดึงข้อมูลผลงาน (Pull Sync)";
+        setTimeout(() => {
+          toast.classList.add("hidden");
+        }, 8000);
+      }
+    }
+
+    // Expose global methods
+    window.selectEvent = selectEvent;
+    window.showEventsSelectorView = showEventsSelectorView;
+    window.quickPullArtworks = quickPullArtworks;
+    window.switchEventViewMode = switchEventViewMode;
+    window.printCompanionCatalog = printCompanionCatalog;
+    window.openGlobalCatalogModal = openGlobalCatalogModal;
+    window.closeGlobalCatalogModal = closeGlobalCatalogModal;
+    window.printGlobalCatalog = printGlobalCatalog;
+    window.openArtworkDetailModal = openArtworkDetailModal;
+    window.closeArtworkDetailModal = closeArtworkDetailModal;
+  </script>
+</body>
+</html>

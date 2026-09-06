@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-[var(--bg-base)] text-[var(--text-main)]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ลงทะเบียนส่งผลงานศิลปะ | Artist & Artwork Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Sarabun', sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+  </style>
+  <script src="/js/i18n.js"></script>
+  <link rel="stylesheet" href="/css/themes.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body class="min-h-full flex flex-col selection:bg-[var(--selection-bg)] selection:text-[var(--selection-text)] bg-[var(--bg-base)] text-[var(--text-main)]">
+  
+  <!-- Master Navigation Bar -->
+  <header class="master-navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Brand Lockup -->
+      <a href="/" class="flex items-center space-x-3 group shrink-0">
+        <div class="master-brand-badge">พ.ช.</div>
+        <div class="min-w-0">
+          <span id="nav-event-title" class="text-sm font-serif-luxury tracking-wider text-[var(--text-main)] block font-semibold truncate leading-tight" data-i18n="nav_event_default">Fine Art Exhibition</span>
+          <span class="text-[10px] text-[var(--color-accent-gold)] font-mono tracking-widest uppercase block leading-none mt-0.5" data-i18n="nav_sub_brand">Poh-Chang Academy of Arts</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links & Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <nav class="flex items-center space-x-1 sm:space-x-1.5 text-xs sm:text-sm font-normal">
+          <a href="/" class="master-nav-link" data-i18n="nav_home">หน้าแรก</a>
+          <a href="/gallery.html" class="master-nav-link" data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="master-nav-link" data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="master-nav-link" data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/submit.html" class="master-nav-cta active ml-1 sm:ml-2" aria-current="page" data-i18n="nav_submit">ส่งผลงาน</a>
+        </nav>
+
+        <div class="h-4 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Admin Curator Desk Entrance -->
+          <a href="/admin.html" class="master-admin-btn" title="Curator Desk (เข้าสู่ระบบผู้ดูแล)" data-i18n-title="nav_admin">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span class="text-[11px] font-semibold hidden md:inline">Desk</span>
+          </a>
+
+          <!-- Language Switcher -->
+          <div id="lang-switcher"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-4xl mx-auto px-4 py-10 w-full space-y-8">
+    
+    <!-- Title Section -->
+    <div class="text-center space-y-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)] text-xs font-semibold uppercase tracking-wider">
+        <span data-i18n="submit_badge">ARTIST & ARTWORK INTAKE PORTAL</span>
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-serif-luxury font-bold text-[var(--text-main)] tracking-tight">
+        <span data-i18n="submit_title_1">แบบฟอร์มลงทะเบียนศิลปินและ</span><span class="text-[var(--color-accent-gold)]" data-i18n="submit_title_2">ส่งผลงานจัดแสดง</span>
+      </h1>
+      <p class="text-[var(--text-muted)] text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed" data-i18n="submit_desc">
+        กรอกข้อมูลประวัติศิลปินและรายละเอียดผลงานเพื่อใช้ประกอบการพิจารณาคัดกรอง จัดหน้าทำเนียบศิลปิน และจัดพิมพ์สูจิบัตรนิทรรศการดิจิทัล
+      </p>
+    </div>
+
+    <!-- Curatorial Guidelines Notice Card -->
+    <div class="p-4 sm:p-5 corner-cut-16 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--text-main)] text-xs flex items-start gap-3.5 shadow-md">
+      <div class="w-8 h-8 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-accent)] flex items-center justify-center text-base shrink-0">
+        🏛️
+      </div>
+      <div class="space-y-1">
+        <p class="font-bold text-[var(--color-accent-light)] font-serif-luxury text-sm" data-i18n="notice_title">ข้อแนะนำในการส่งผลงานจัดแสดง (Exhibition Curatorial Guidelines)</p>
+        <p class="text-[var(--text-muted)] leading-relaxed" data-i18n="notice_desc">
+          รูปถ่ายผลงานควรเป็นภาพความละเอียดสูง (Hi-Res sRGB) คมชัด สว่างสม่ำเสมอ เพื่อใช้สำหรับจัดพิมพ์สูจิบัตรดิจิทัล A4 และแสดงในแกลเลอรีเสมือนจริง โดยข้อมูลทั้งหมดจะเข้าสู่ขั้นตอนตรวจรับและคัดกรองโดยภัณฑารักษ์ (Curator Moderation) ก่อนจัดแสดงจริง
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Registration Form -->
+    <form id="submission-form" class="space-y-8">
+
+      <!-- SECTION 1: ข้อมูลศิลปิน -->
+      <div class="gallery-surface corner-cut-20 p-6 sm:p-8 space-y-6 shadow-xl border border-[var(--border-subtle)] hover:border-[var(--border-accent)] transition-all">
+        <div class="flex items-center gap-3 border-b border-[var(--border-subtle)] pb-4">
+          <div class="w-8 h-8 corner-cut-6 bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] flex items-center justify-center font-bold text-sm">1</div>
+          <div>
+            <h2 class="font-serif-luxury text-lg font-bold text-[var(--text-main)]" data-i18n="sec1_title">ข้อมูลศิลปิน (Artist Profile)</h2>
+            <p class="text-xs text-[var(--text-muted)]" data-i18n="sec1_desc">ข้อมูลนี้จะถูกนำไปจัดทำหน้าทำเนียบศิลปิน และหน้าสูจิบัตรดิจิทัล</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+          <!-- Artist Avatar Upload (Col 4) -->
+          <div class="md:col-span-4 flex flex-col items-center text-center space-y-3">
+            <label class="block text-xs font-semibold text-[var(--text-main)]" data-i18n="lbl_artist_portrait">รูปตัวศิลปิน (Artist Portrait)</label>
+            <div id="avatar-drop-zone" class="relative w-36 h-36 corner-cut-16 border-2 border-dashed border-[var(--border-accent)] hover:border-[var(--color-accent-gold)] p-1.5 flex items-center justify-center cursor-pointer transition bg-[var(--bg-surface-elevated)] overflow-hidden group shadow-inner">
+              <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+              
+              <div id="avatar-prompt" class="space-y-1 p-2">
+                <svg class="w-8 h-8 mx-auto text-[var(--color-accent-gold)] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <p class="text-[11px] text-[var(--text-main)] font-medium leading-tight" data-i18n="avatar_upload_prompt">คลิกเพื่ออัปโหลด<br>รูปศิลปิน</p>
+              </div>
+
+              <img id="avatar-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Avatar Preview" class="w-full h-full object-cover corner-cut-10 hidden">
+            </div>
+            <p class="text-[10px] text-[var(--text-subtle)]" data-i18n="avatar_ratio_hint">สัดส่วน 1:1 แนะนำหน้าตรง / สตูดิโอ</p>
+          </div>
+
+          <!-- Artist Text Details (Col 8) -->
+          <div class="md:col-span-8 space-y-4">
+            <!-- Row: Academic Title & Nationality -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="academic_title" class="block text-xs font-semibold text-[var(--text-main)] mb-1">
+                  <span data-i18n="lbl_academic_title">ตำแหน่งทางวิชาการ / ทางราชการ</span>
+                  <span class="text-[var(--text-subtle)] text-[10px] font-normal" data-i18n="hint_optional">(ถ้ามี / Optional)</span>
+                </label>
+                <input type="text" id="academic_title" list="academic-title-list"
+                  placeholder="เช่น ศ.ดร., รศ., ผศ., ดร., อาจารย์ หรือ ตำแหน่งทางราชการ"
+                  data-i18n-placeholder="academic_title_ph"
+                  class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+                <datalist id="academic-title-list">
+                  <option value="ศ.ดร.">ศาสตราจารย์ ดร. (Prof. Dr.)</option>
+                  <option value="รศ.ดร.">รองศาสตราจารย์ ดร. (Assoc. Prof. Dr.)</option>
+                  <option value="ผศ.ดร.">ผู้ช่วยศาสตราจารย์ ดร. (Asst. Prof. Dr.)</option>
+                  <option value="ศ.">ศาสตราจารย์ (Prof.)</option>
+                  <option value="รศ.">รองศาสตราจารย์ (Assoc. Prof.)</option>
+                  <option value="ผศ.">ผู้ช่วยศาสตราจารย์ (Asst. Prof.)</option>
+                  <option value="ดร.">ดร. (Dr.)</option>
+                  <option value="อ.">อาจารย์ (Lecturer)</option>
+                  <option value="ศิลปินแห่งชาติ">ศิลปินแห่งชาติ (National Artist)</option>
+                </datalist>
+              </div>
+
+              <div>
+                <label for="nationality" class="block text-xs font-semibold text-[var(--text-main)] mb-1" data-i18n="lbl_nationality">
+                  สัญชาติ / ประเทศ (Nationality)
+                </label>
+                <input type="text" id="nationality" value="Thailand" list="country-suggestions" placeholder="เช่น Thailand, Japan, France"
+                  class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+                <datalist id="country-suggestions">
+                  <option value="Thailand">🇹🇭 ไทย (Thailand)</option>
+                  <option value="Japan">🇯🇵 ญี่ปุ่น (Japan)</option>
+                  <option value="France">🇫🇷 ฝรั่งเศส (France)</option>
+                  <option value="Sweden">🇸🇪 สวีเดน (Sweden)</option>
+                  <option value="United States">🇺🇸 สหรัฐอเมริกา (USA)</option>
+                  <option value="United Kingdom">🇬🇧 สหราชอาณาจักร (UK)</option>
+                  <option value="Germany">🇩🇪 เยอรมนี (Germany)</option>
+                  <option value="Italy">🇮🇹 อิตาลี (Italy)</option>
+                  <option value="China">🇨🇳 จีน (China)</option>
+                  <option value="South Korea">🇰🇷 เกาหลีใต้ (South Korea)</option>
+                  <option value="Australia">🇦🇺 ออสเตรเลีย (Australia)</option>
+                  <option value="Singapore">🇸🇬 สิงคโปร์ (Singapore)</option>
+                  <option value="Vietnam">🇻🇳 เวียดนาม (Vietnam)</option>
+                  <option value="Malaysia">🇲🇾 มาเลเซีย (Malaysia)</option>
+                  <option value="Taiwan">🇹🇼 ไต้หวัน (Taiwan)</option>
+                  <option value="Netherlands">🇳🇱 เนเธอร์แลนด์ (Netherlands)</option>
+                  <option value="Spain">🇪🇸 สเปน (Spain)</option>
+                  <option value="Switzerland">🇨🇭 สวิตเซอร์แลนด์ (Switzerland)</option>
+                </datalist>
+              </div>
+            </div>
+
+            <!-- Row: Flexible Bilingual Artist Names -->
+            <div class="space-y-1.5 bg-[var(--bg-base)] p-3.5 corner-cut-10 border border-[var(--border-subtle)]">
+              <div>
+                <label class="block text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+                  <span data-i18n="lbl_artist_names">ชื่อศิลปิน / นามปากกา</span>
+                  <span class="text-rose-500">*</span>
+                </label>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label for="artist_name_th" class="block text-[11px] text-[var(--text-subtle)] mb-1" data-i18n="lbl_artist_name_th">
+                    ชื่อ-นามสกุล ภาษาไทย (Thai Name)
+                  </label>
+                  <input type="text" id="artist_name_th" placeholder="เช่น กานต์รวี สุวรรณเวช" data-i18n-placeholder="artist_name_th_ph"
+                    class="w-full px-3.5 py-2 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+                </div>
+                <div>
+                  <label for="artist_name_en" class="block text-[11px] text-[var(--text-subtle)] mb-1" data-i18n="lbl_artist_name_en">
+                    ชื่อ-นามสกุล ภาษาอังกฤษ (English Name)
+                  </label>
+                  <input type="text" id="artist_name_en" placeholder="e.g. Kanrawee Suwannawet" data-i18n-placeholder="artist_name_en_ph"
+                    class="w-full px-3.5 py-2 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="artist_email" class="block text-xs font-semibold text-[var(--text-main)] mb-1" data-i18n="lbl_email">
+                  อีเมลติดต่อ (Email)
+                </label>
+                <input type="email" id="artist_email" placeholder="artist@example.com"
+                  class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+              </div>
+
+              <div>
+                <label for="artist_phone" class="block text-xs font-semibold text-[var(--text-main)] mb-1" data-i18n="lbl_phone">
+                  เบอร์โทรศัพท์ (Phone)
+                </label>
+                <input type="tel" id="artist_phone" placeholder="08x-xxx-xxxx"
+                  class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+              </div>
+            </div>
+
+            <div>
+              <label for="artist_bio" class="block text-xs font-semibold text-[var(--text-main)] mb-1" data-i18n="lbl_bio">
+                ประวัติย่อศิลปิน (Artist Bio / Statement)
+              </label>
+              <textarea id="artist_bio" rows="3" placeholder="ประวัติการศึกษา รางวัล ประสบการณ์สร้างสรรค์ หรือความเชี่ยวชาญเฉพาะทาง..." data-i18n-placeholder="bio_ph"
+                class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs leading-relaxed transition"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: ข้อมูลผลงานศิลปะ -->
+      <div class="gallery-surface corner-cut-20 p-6 sm:p-8 space-y-6 shadow-xl border border-[var(--border-subtle)] hover:border-[var(--border-accent)] transition-all">
+        <div class="flex items-center gap-3 border-b border-[var(--border-subtle)] pb-4">
+          <div class="w-8 h-8 corner-cut-6 bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] flex items-center justify-center font-bold text-sm">2</div>
+          <div>
+            <h2 class="font-serif-luxury text-lg font-bold text-[var(--text-main)]" data-i18n="sec2_title">ข้อมูลผลงานศิลปะ (Artwork Specifications)</h2>
+            <p class="text-xs text-[var(--text-muted)]" data-i18n="sec2_desc">รูปภาพผลงานหลักและรายละเอียดสเปกสำหรับจัดแสดงและลงสูจิบัตร</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Artwork Title & Technique -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="title" class="block text-xs font-semibold text-[var(--text-main)] mb-1">
+                <span data-i18n="lbl_artwork_title">ชื่อผลงาน (Artwork Title)</span> <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="title" required placeholder="เช่น Silent Resonance #01" data-i18n-placeholder="artwork_title_ph"
+                class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+            </div>
+
+            <div>
+              <label for="technique" class="block text-xs font-semibold text-[var(--text-main)] mb-1">
+                <span data-i18n="lbl_technique">เทคนิค / วัสดุ (Technique / Medium)</span> <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="technique" required placeholder="เช่น ภาพพิมพ์โลหะร่องลึก (Intaglio Etching)" data-i18n-placeholder="technique_ph"
+                class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+            </div>
+          </div>
+
+          <!-- Dimensions, Year, Price -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label for="dimensions" class="block text-xs font-semibold text-[var(--text-main)] mb-1" data-i18n="lbl_dimensions">
+                ขนาดผลงาน (Dimensions)
+              </label>
+              <input type="text" id="dimensions" placeholder="เช่น 60 × 80 ซม." data-i18n-placeholder="dimensions_ph"
+                class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+            </div>
+
+            <div>
+              <label for="year_created" class="block text-xs font-semibold text-[var(--text-main)] mb-1" data-i18n="lbl_year">
+                ปีที่สร้างสรรค์ (Year)
+              </label>
+              <input type="text" id="year_created" value="2026" placeholder="2026"
+                class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+            </div>
+
+            <div>
+              <label for="price" class="block text-xs font-semibold text-[var(--text-main)] mb-1" data-i18n="lbl_price">
+                ราคาจัดจำหน่าย (Price)
+              </label>
+              <input type="text" id="price" placeholder="เช่น 35,000 บาท หรือ N/A" data-i18n-placeholder="price_ph"
+                class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs transition">
+            </div>
+          </div>
+
+          <!-- Description / Concept -->
+          <div>
+            <label for="description" class="block text-xs font-semibold text-[var(--text-main)] mb-1" data-i18n="lbl_concept">
+              แนวคิดผลงาน หรือ แรงบันดาลใจ (Concept / Description)
+            </label>
+            <textarea id="description" rows="3" placeholder="อธิบายแรงบันดาลใจ สัญลักษณ์ที่ใช้ หรือความหมายที่ต้องการสื่อสารผ่านผลงาน..." data-i18n-placeholder="concept_ph"
+              class="w-full px-3.5 py-2.5 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent-gold)] text-xs leading-relaxed transition"></textarea>
+          </div>
+
+          <!-- Artwork Image File Upload -->
+          <div>
+            <label class="block text-xs font-semibold text-[var(--text-main)] mb-2">
+              <span data-i18n="lbl_artwork_image">ไฟล์รูปภาพผลงานความละเอียดสูง (Hi-Res Artwork Image)</span> <span class="text-rose-500">*</span>
+            </label>
+            <div id="drop-zone" class="relative border-2 border-dashed border-[var(--border-accent)] hover:border-[var(--color-accent-gold)] corner-cut-16 p-8 text-center transition cursor-pointer bg-[var(--bg-surface-elevated)] shadow-inner">
+              <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+              
+              <div id="upload-prompt" class="space-y-2">
+                <svg class="w-10 h-10 mx-auto text-[var(--color-accent-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p class="text-xs sm:text-sm font-medium text-[var(--text-main)]" data-i18n="art_upload_prompt">ลากไฟล์รูปผลงานมาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</p>
+                <p class="text-[11px] text-[var(--text-subtle)]" data-i18n="art_upload_hint">รองรับไฟล์ JPG, PNG, WEBP (ภาพคมชัด เหมาะสำหรับจัดพิมพ์สูจิบัตร)</p>
+              </div>
+
+              <!-- Preview Container -->
+              <div id="upload-preview-container" class="hidden space-y-3">
+                <img id="image-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Artwork Preview" class="max-h-60 mx-auto corner-cut-10 shadow-lg object-contain">
+                <p id="file-name-label" class="text-xs text-[var(--text-muted)] font-mono truncate"></p>
+                
+                <div id="progress-wrapper" class="w-full bg-[var(--bg-base)] corner-cut-6 h-2 overflow-hidden hidden max-w-xs mx-auto border border-[var(--border-subtle)]">
+                  <div id="progress-bar" class="bg-[var(--color-accent-gold)] h-2 transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p id="status-label" class="text-xs text-[var(--color-accent-gold)] font-medium"></p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-2 flex items-center justify-end gap-4">
+        <a href="/" class="px-5 py-2.5 corner-cut-8 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] transition" data-i18n="btn_cancel">ยกเลิก</a>
+        <button type="submit" id="btn-submit" class="px-7 py-3 corner-cut-10 bg-[var(--color-accent-gold)] hover:brightness-110 text-[var(--selection-text)] font-bold text-xs sm:text-sm shadow-xl transition flex items-center gap-2 cursor-pointer active:scale-95">
+          <span data-i18n="btn_submit_artwork">บันทึกและส่งผลงาน (Submit)</span>
+          <svg id="submit-spinner" class="hidden animate-spin h-4 w-4 text-[var(--selection-text)]" viewBox="0 0 24 24" fill="none">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+      <div class="gallery-surface corner-cut-20 max-w-md w-full p-8 text-center space-y-4 border border-[var(--border-accent)] shadow-2xl">
+        <div class="w-16 h-16 bg-emerald-500/10 text-emerald-500 corner-cut-10 border border-emerald-500/30 mx-auto flex items-center justify-center">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-serif-luxury font-bold text-[var(--text-main)]" data-i18n="success_modal_title">ลงทะเบียนและส่งผลงานสำเร็จ!</h3>
+        <p class="text-xs text-[var(--text-muted)] leading-relaxed">
+          <span data-i18n="success_modal_desc">ข้อมูลศิลปินและผลงานของคุณถูกส่งเข้าระบบเรียบร้อยแล้ว</span> <br>
+          <span data-i18n="success_tracking">รหัสติดตามผลงาน:</span> <span id="created-submission-id" class="font-mono text-[var(--color-accent-gold)] font-bold text-sm"></span>
+        </p>
+        <p class="text-[11px] text-[var(--text-muted)] bg-[var(--bg-surface-elevated)] p-3 corner-cut-8 border border-[var(--border-subtle)]" data-i18n="success_notice">
+          ภัณฑารักษ์จะทำการตรวจสอบข้อมูล เมื่ออนุมัติ ผลงานจะปรากฏใน ห้องนิทรรศการ, ทำเนียบศิลปิน และ สูจิบัตรดิจิทัล ทันที
+        </p>
+        <div class="pt-3 flex flex-col sm:flex-row gap-2 justify-center">
+          <a href="/artists.html" class="px-4 py-2 corner-cut-8 bg-[var(--color-accent-gold)] hover:brightness-110 text-[var(--selection-text)] text-xs font-bold transition" data-i18n="btn_goto_artists">ไปที่ทำเนียบศิลปิน</a>
+          <a href="/gallery.html" class="px-4 py-2 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-[var(--text-main)] text-xs font-semibold transition" data-i18n="btn_goto_gallery">ชมห้องนิทรรศการ</a>
+          <button onclick="window.location.reload()" class="px-4 py-2 corner-cut-8 border border-[var(--border-subtle)] hover:border-[var(--border-accent)] bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-main)] text-xs font-medium transition cursor-pointer" data-i18n="btn_submit_another">ส่งอีกชิ้น</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/js/cloudinary-upload.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let selectedArtworkFile = null;
+    let selectedAvatarFile = null;
+    let eventConfig = {};
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      window.i18n.renderSwitcher('lang-switcher');
+
+      window.addEventListener("languageChanged", () => {
+        if (window.i18n) window.i18n.apply();
+      });
+
+      try {
+        eventConfig = await EventAPI.getConfig();
+        if (eventConfig.eventTitle) {
+          document.getElementById("nav-event-title").textContent = eventConfig.eventTitle;
+        }
+      } catch (e) {
+        console.warn("Using default event config");
+      }
+
+      // 1. Avatar input handling
+      const avatarInput = document.getElementById("avatar-input");
+      const avatarPreview = document.getElementById("avatar-preview");
+      const avatarPrompt = document.getElementById("avatar-prompt");
+
+      avatarInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+          selectedAvatarFile = e.target.files[0];
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            avatarPreview.src = ev.target.result;
+            avatarPreview.classList.remove("hidden");
+            avatarPrompt.classList.add("hidden");
+          };
+          reader.readAsDataURL(selectedAvatarFile);
+        }
+      });
+
+      // 2. Artwork image input handling
+      const fileInput = document.getElementById("file-input");
+      const uploadPrompt = document.getElementById("upload-prompt");
+      const previewContainer = document.getElementById("upload-preview-container");
+      const imagePreview = document.getElementById("image-preview");
+      const fileNameLabel = document.getElementById("file-name-label");
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+          selectedArtworkFile = e.target.files[0];
+          fileNameLabel.textContent = `${selectedArtworkFile.name} (${Math.round(selectedArtworkFile.size / 1024)} KB)`;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            imagePreview.src = ev.target.result;
+            uploadPrompt.classList.add("hidden");
+            previewContainer.classList.remove("hidden");
+          };
+          reader.readAsDataURL(selectedArtworkFile);
+        }
+      });
+
+      // 3. Form Submit handling
+      const form = document.getElementById("submission-form");
+      const btnSubmit = document.getElementById("btn-submit");
+      const submitSpinner = document.getElementById("submit-spinner");
+      const progressWrapper = document.getElementById("progress-wrapper");
+      const progressBar = document.getElementById("progress-bar");
+      const statusLabel = document.getElementById("status-label");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const nameTh = document.getElementById("artist_name_th").value.trim();
+        const nameEn = document.getElementById("artist_name_en").value.trim();
+        if (!nameTh && !nameEn) {
+          alert(window.t('err_artist_name_required') || "กรุณากรอกชื่อศิลปินอย่างน้อย 1 ภาษา (ไทย หรือ อังกฤษ)");
+          return;
+        }
+
+        if (!selectedArtworkFile) {
+          alert(window.t('err_artwork_file_required') || "กรุณาเลือกไฟล์รูปภาพผลงาน");
+          return;
+        }
+
+        btnSubmit.disabled = true;
+        submitSpinner.classList.remove("hidden");
+        progressWrapper.classList.remove("hidden");
+
+        try {
+          // Upload Avatar if provided
+          let avatarUrl = "";
+          if (selectedAvatarFile) {
+            statusLabel.textContent = window.t('status_uploading_avatar') || "กำลังอัปโหลดรูปภาพศิลปิน...";
+            const avatarUploadRes = await CloudinaryUploader.uploadDirect(selectedAvatarFile, {
+              cloudName: eventConfig.cloudinaryCloudName,
+              uploadPreset: eventConfig.cloudinaryUploadPreset
+            });
+            avatarUrl = avatarUploadRes.imageUrl;
+          }
+
+          // Upload Artwork Image
+          statusLabel.textContent = window.t('status_uploading_artwork') || "กำลังอัปโหลดรูปภาพผลงาน...";
+          const artUploadRes = await CloudinaryUploader.uploadDirect(selectedArtworkFile, {
+            cloudName: eventConfig.cloudinaryCloudName,
+            uploadPreset: eventConfig.cloudinaryUploadPreset,
+            onProgress: (percent) => {
+              progressBar.style.width = `${percent}%`;
+              statusLabel.textContent = `${window.t('status_uploading_artwork') || "กำลังอัปโหลดผลงาน..."} ${percent}%`;
+            }
+          });
+
+          statusLabel.textContent = window.t('status_saving') || "กำลังบันทึกข้อมูลเข้าสู่ระบบ...";
+
+          const academicTitle = document.getElementById("academic_title").value.trim();
+          const primaryName = nameTh || nameEn;
+
+          const payload = {
+            title: document.getElementById("title").value.trim(),
+            academic_title: academicTitle,
+            artist_name: primaryName,
+            artist_name_th: nameTh,
+            artist_name_en: nameEn,
+            artist_avatar_url: avatarUrl,
+            artist_bio: document.getElementById("artist_bio").value.trim(),
+            nationality: document.getElementById("nationality").value.trim() || "Thailand",
+            artist_email: document.getElementById("artist_email").value.trim(),
+            artist_phone: document.getElementById("artist_phone").value.trim(),
+            technique: document.getElementById("technique").value.trim(),
+            dimensions: document.getElementById("dimensions").value.trim(),
+            year_created: document.getElementById("year_created").value.trim() || "2026",
+            price: document.getElementById("price").value.trim(),
+            description: document.getElementById("description").value.trim(),
+            cloudinary_public_id: artUploadRes.publicId,
+            image_url: artUploadRes.imageUrl,
+            thumbnail_url: artUploadRes.thumbnailUrl
+          };
+
+          const submitRes = await EventAPI.createSubmission(payload);
+
+          if (submitRes.success) {
+            document.getElementById("created-submission-id").textContent = `#${submitRes.submission.id}`;
+            document.getElementById("success-modal").classList.remove("hidden");
+          } else {
+            throw new Error(submitRes.error || window.t('err_save_failed') || "เกิดข้อผิดพลาดในการบันทึก");
+          }
+        } catch (err) {
+          console.error("Submission error:", err);
+          alert((window.t('app_error') || "เกิดข้อผิดพลาด: ") + " " + err.message);
+        } finally {
+          btnSubmit.disabled = false;
+          submitSpinner.classList.add("hidden");
+        }
+      });
+    });
+  </script>
+  
+  <!-- Institutional Colophon Footer -->
+  <footer class="border-t border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] py-10 text-[var(--text-subtle)] font-light mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div class="space-y-1 text-center sm:text-left">
+          <p class="text-[var(--text-main)] font-serif-luxury tracking-wide text-sm font-semibold" data-i18n="footer_title">วิทยาลัยเพาะช่าง มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์</p>
+          <p class="text-[var(--text-subtle)] text-[11px]" data-i18n="footer_sub">Poh-Chang Academy of Arts • RMUTR &bull; Bangkok, Thailand</p>
+        </div>
+        <div class="flex items-center gap-6 text-[11px] text-[var(--text-muted)]">
+          <a href="/gallery.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/admin.html" class="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition" title="Curator Entrance" data-i18n="nav_curator_desk">Curator Desk</a>
+        </div>
+      </div>
+      <div class="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <p class="text-[11px] text-[var(--text-subtle)]">© 2026 Poh-Chang International Art Exhibition Platform. All artworks copyright of their respective artists.</p>
+        <span class="text-[11px] text-[var(--text-subtle)] font-mono">Curatorial Fine Art Salon System</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

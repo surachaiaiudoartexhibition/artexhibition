@@ -1,0 +1,25 @@
+# Cloudflare Pages Configuration for Event: International Digital Art Biennial 2026
+# Dedicated Account Email: artorg+digital2026@gmail.com
+
+name = "digital-art-2026"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "public"
+
+# Isolated D1 Database for this Event
+[[d1_databases]]
+binding = "DB"
+database_name = "d1-digital-art-2026"
+database_id = "d1-uuid-cba7bcf77c568469"
+
+[vars]
+EVENT_ID = "digital-art-2026"
+EVENT_TITLE = "International Digital Art Biennial 2026"
+ADMIN_EMAIL = "artorg+digital2026@gmail.com"
+MASTER_PORTAL_URL = "http://localhost:8788"
+SHARED_SECRET_TOKEN = "sec_00a08eb50326e3a843dba8072f45885e"
+ADMIN_KEY = "admin123"
+EVENT_PAGE_BASE_URL = "https://digital-art-2026.pages.dev"
+
+# Dedicated Cloudinary Storage Account for this Event
+CLOUDINARY_CLOUD_NAME = "art-digital-2026"
+CLOUDINARY_UPLOAD_PRESET = "digital_art_submissions"

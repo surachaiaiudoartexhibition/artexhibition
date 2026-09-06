@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-[#050608] text-stone-100 overflow-hidden">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ห้องจัดแสดงนิทรรศการ 3 มิติ | Master Portal 3D Virtual Gallery</title>
+  <script src="/js/i18n.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', 'Sarabun', sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    .hud-glass {
+      background: rgba(26, 40, 34, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(197, 160, 89, 0.25);
+    }
+    .hud-glass-gold {
+      background: rgba(26, 40, 34, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(197, 160, 89, 0.5);
+    }
+    /* Reticle crosshair */
+    #reticle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(232, 200, 122, 0.6);
+      border: 1px solid rgba(20, 30, 25, 0.8);
+      pointer-events: none;
+      transition: transform 0.2s, background 0.2s;
+      z-index: 20;
+    }
+    #reticle.active {
+      transform: translate(-50%, -50%) scale(2.2);
+      background: #C5A059;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+    }
+    /* Virtual Joystick for Touch */
+    .joystick-base {
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
+      width: 110px;
+      height: 110px;
+      background: rgba(26, 40, 34, 0.5);
+      border: 2px solid rgba(197, 160, 89, 0.3);
+      border-radius: 50%;
+      touch-action: none;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+    }
+    .joystick-thumb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 44px;
+      height: 44px;
+      background: radial-gradient(circle, #E8C87A 0%, #C5A059 100%);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="w-full h-full select-none bg-[#050608]">
+
+  <!-- 3D Canvas Viewport Container -->
+  <div id="canvas-container" class="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"></div>
+
+  <!-- Reticle -->
+  <div id="reticle"></div>
+
+  <!-- Top Navigation HUD -->
+  <header class="absolute top-0 inset-x-0 z-30 p-3 sm:p-5 pointer-events-none">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+      <!-- Brand & Back -->
+      <div class="flex items-center gap-3 pointer-events-auto">
+        <a href="/" class="hud-glass px-3.5 py-2 rounded-xl text-xs font-semibold text-[#EBF2EE] hover:text-[#E8C87A] hover:bg-[#243830]/60 transition flex items-center gap-2 shadow-lg">
+          <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span class="hidden sm:inline" data-i18n="nav_back_to_portal">กลับหน้าหลัก</span>
+          <span class="sm:hidden" data-i18n="btn_back">กลับ</span>
+        </a>
+
+        <div class="hud-glass px-4 py-2 rounded-xl hidden md:flex items-center gap-2.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span id="room-header-title" class="text-xs font-serif-luxury font-medium text-white tracking-wide truncate max-w-xs" data-i18n="gallery3d_title">3D Grand Exhibition Pavilion</span>
+          <span id="artwork-count-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/30">0 Artworks</span>
+          <span id="room-tier-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-[#243830] text-[#E8C87A] border border-[#C5A059]/30 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3L3 8h18l-9-5z" />
+            </svg>
+            <span>Grand Pavilion</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Controls & Actions -->
+      <div class="flex items-center gap-2 pointer-events-auto">
+        <!-- Event Filter Dropdown in 3D -->
+        <div class="hud-glass rounded-xl px-2 py-1 flex items-center">
+          <select id="room-event-filter" class="bg-transparent text-xs text-[#EBF2EE] focus:outline-none border-none cursor-pointer pr-2">
+            <option value="" class="bg-[#1A2822] text-white" data-i18n="filter_all">ทุกนิทรรศการ (All Events)</option>
+          </select>
+        </div>
+
+        <!-- Artwork Directory Drawer Toggle Button -->
+        <button id="btn-directory-toggle" onclick="toggleDirectoryDrawer()" title="เปิดสารบัญผลงานทั้งหมด (Artwork Directory)" aria-label="เปิดสารบัญผลงานทั้งหมด"
+          class="hud-glass px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-[#E8C87A] hover:text-white transition flex items-center gap-1.5 shadow-lg border border-[#C5A059]/30 cursor-pointer">
+          <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+          </svg>
+          <span class="hidden sm:inline" data-i18n="gallery3d_hud_directory">สารบัญผลงาน</span>
+          <span id="directory-btn-badge" class="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-[#C5A059]/30 text-[#FAF3E3]">0</span>
+        </button>
+
+        <!-- Exhibition E-Catalogue Toggle Button -->
+        <button id="btn-catalog-toggle" onclick="toggleCatalogDrawer()" title="เปิดอ่านสูจิบัตรประจำนิทรรศการ (กดปุ่ม C)" aria-label="เปิดอ่านสูจิบัตรประจำนิทรรศการ"
+          class="hud-glass px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-[#E8C87A] hover:text-white transition flex items-center gap-1.5 shadow-lg border border-[#C5A059]/40 cursor-pointer">
+          <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span class="hidden sm:inline" data-i18n="modal_btn_catalog">สูจิบัตร</span>
+          <span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/30">C</span>
+        </button>
+
+        <!-- Guided Tour Toggle Button -->
+        <button id="btn-guided-tour" onclick="toggleGuidedTour()" title="โหมดทัวร์อัตโนมัติ (Cinematic Tour)" aria-label="โหมดนำชมอัตโนมัติ"
+          class="hud-glass px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-medium text-slate-200 hover:text-[#E8C87A] transition flex items-center gap-1.5 shadow-lg cursor-pointer">
+          <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="hidden sm:inline" id="tour-label">นำชมอัตโนมัติ</span>
+        </button>
+
+        <!-- Graphics Quality Selector (FPS & Performance) -->
+        <div class="relative pointer-events-auto">
+          <button id="btn-quality-toggle" onclick="toggleQualityMenu()" title="ปรับระดับคุณภาพกราฟิก (Graphics Quality)" aria-label="ปรับระดับคุณภาพกราฟิก"
+            class="hud-glass px-3 py-2.5 min-h-[44px] rounded-xl text-xs text-slate-200 hover:text-[#E8C87A] transition flex items-center gap-1.5 shadow-lg border border-[#C5A059]/30 cursor-pointer">
+            <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span id="quality-mode-label" class="font-mono text-[11px] text-[#E8C87A]">Auto ⚖️</span>
+          </button>
+          <div id="quality-dropdown" class="hidden absolute top-full right-0 mt-2 w-52 hud-glass-gold rounded-xl p-1.5 shadow-2xl z-50 flex flex-col gap-1">
+            <div class="px-2.5 py-1 text-[10px] font-mono text-[#C5A059] uppercase tracking-wider border-b border-[#C5A059]/20">Graphics Quality</div>
+            <button onclick="setGraphicsQuality('perf')" class="quality-opt-btn px-2.5 py-2 rounded-lg text-left text-xs hover:bg-[#243830] transition flex items-center justify-between text-[#FAF3E3] cursor-pointer" data-mode="perf">
+              <div class="flex flex-col">
+                <span class="font-medium">⚡ ลื่นไหลสูงสุด</span>
+                <span class="text-[10px] text-emerald-400">เน้น 60+ FPS มือถือ/โน้ตบุ๊ก</span>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">Fast</span>
+            </button>
+            <button onclick="setGraphicsQuality('balanced')" class="quality-opt-btn px-2.5 py-2 rounded-lg text-left text-xs hover:bg-[#243830] transition flex items-center justify-between text-[#FAF3E3] cursor-pointer" data-mode="balanced">
+              <div class="flex flex-col">
+                <span class="font-medium">⚖️ สมดุล (แนะนำ)</span>
+                <span class="text-[10px] text-stone-400">ภาพคม ลื่นไหลกำลังดี</span>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#C5A059]/20 text-[#E8C87A] font-mono">Default</span>
+            </button>
+            <button onclick="setGraphicsQuality('high')" class="quality-opt-btn px-2.5 py-2 rounded-lg text-left text-xs hover:bg-[#243830] transition flex items-center justify-between text-[#FAF3E3] cursor-pointer" data-mode="high">
+              <div class="flex flex-col">
+                <span class="font-medium">✨ คมชัดสูง</span>
+                <span class="text-[10px] text-stone-400">จอ 4K / การ์ดจอแยก</span>
+              </div>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-mono">High</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ambient Sound Toggle -->
+        <button id="btn-sound-toggle" onclick="toggleAudio()" title="เปิด/ปิดเสียงบรรยากาศหอศิลป์" aria-label="เปิดหรือปิดเสียงบรรยากาศหอศิลป์"
+          class="hud-glass w-11 h-11 rounded-xl text-slate-300 hover:text-white transition shadow-lg flex items-center justify-center cursor-pointer">
+          <svg id="sound-icon-on" class="w-4 h-4 hidden text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+          <svg id="sound-icon-off" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+          </svg>
+        </button>
+
+        <!-- Help Modal Button -->
+        <button onclick="toggleHelpModal()" title="วิธีบังคับและควบคุม" aria-label="เปิดคู่มือการควบคุมห้องนิทรรศการ 3D"
+          class="hud-glass w-11 h-11 rounded-xl text-slate-300 hover:text-white transition shadow-lg flex items-center justify-center cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+
+        <!-- Fullscreen Toggle -->
+        <button onclick="toggleFullscreen()" title="โหมดเต็มหน้าจอ" aria-label="เปิดหรือปิดโหมดเต็มหน้าจอ"
+          class="hud-glass w-11 h-11 rounded-xl text-slate-300 hover:text-white transition shadow-lg flex items-center justify-center cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0 0l-5-5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+        </button>
+
+        <!-- Bilingual Language Switcher -->
+        <div id="lang-switcher" class="hud-glass rounded-xl p-0.5 flex items-center shrink-0"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Bottom Mini-Map & Radar HUD (Bottom Right) -->
+  <div class="absolute bottom-5 right-5 z-20 pointer-events-auto flex flex-col items-end gap-2">
+    <div class="hud-glass rounded-2xl p-2.5 shadow-2xl flex flex-col items-center">
+      <div class="flex items-center justify-between w-full px-1 mb-1.5 text-[10px] text-slate-400 font-mono">
+        <span>GALLERY RADAR</span>
+        <span class="text-[#C5A059]">● LIVE</span>
+      </div>
+      <canvas id="minimap-canvas" width="140" height="140" class="rounded-xl bg-[#090b10] border border-slate-800"></canvas>
+      <span class="text-[9px] text-slate-500 mt-1 font-mono">คลิกบนแผนที่เพื่อวาร์ป</span>
+    </div>
+  </div>
+
+  <!-- Bottom Interaction Prompt (Center) -->
+  <div id="interaction-prompt" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-300 opacity-0 transform translate-y-2">
+    <div class="hud-glass-gold px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 text-xs text-[#FAF3E3]">
+      <span class="w-5 h-5 rounded-full bg-[#C5A059] text-[#141E19] font-bold flex items-center justify-center text-[11px]">E</span>
+      <span class="font-medium">คลิกภาพ หรือกด [E] เพื่อเข้าสู่โหมดชื่นชมผลงาน</span>
+    </div>
+  </div>
+
+  <!-- Mobile Touch Virtual Joystick (Bottom Left) -->
+  <div id="touch-joystick" class="joystick-base hidden sm:hidden">
+    <div id="joystick-thumb" class="joystick-thumb"></div>
+  </div>
+
+  <!-- Initial Start / Click to Enter Overlay -->
+  <div id="start-overlay" class="absolute inset-0 z-40 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="max-w-md w-full hud-glass rounded-3xl p-8 text-center space-y-6 shadow-2xl border border-[#C5A059]/30 relative overflow-hidden">
+      <!-- Glow effect -->
+      <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#C5A059]/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#9A7833] via-[#C5A059] to-[#E8C87A] flex items-center justify-center font-bold text-2xl text-[#141E19] shadow-xl shadow-[#C5A059]/25 mx-auto font-serif-luxury">
+        3D
+      </div>
+
+      <div>
+        <span class="text-[11px] font-mono uppercase tracking-widest text-[#C5A059] block mb-1">Interactive Virtual Hall</span>
+        <h2 id="start-overlay-title" class="text-2xl sm:text-3xl font-serif-luxury font-normal text-white">ห้องจัดแสดงนิทรรศการเสมือนจริง</h2>
+        <p id="start-overlay-subtitle" class="text-xs text-[#C8DBD2] mt-2 leading-relaxed">
+          เดินชมผลงานศิลปะที่รวบรวมจากทุกนิทรรศการในรูปแบบ 3 มิติ พร้อมสัมผัสประสบการณ์เสมือนอยู่ในหอศิลป์จริง
+        </p>
+      </div>
+
+      <!-- Controls Guide Preview -->
+      <div class="grid grid-cols-2 gap-3 text-left p-3 rounded-2xl bg-[#141E19]/80 border border-[#355246] text-xs">
+        <div class="flex items-center gap-2 text-slate-300">
+          <kbd class="px-2 py-1 rounded bg-[#1A2822] text-[10px] font-mono text-[#E8C87A] border border-[#355246]">W A S D</kbd>
+          <span class="text-[11px]">เดินหน้า / ถอยหลัง</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-300">
+          <kbd class="px-2 py-1 rounded bg-[#1A2822] text-[10px] font-mono text-[#E8C87A] border border-[#355246]">เมาส์</kbd>
+          <span class="text-[11px]">หมุนมุมมองรอบทิศ</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-300">
+          <kbd class="px-2 py-1 rounded bg-[#1A2822] text-[10px] font-mono text-[#E8C87A] border border-[#355246]">คลิกที่ภาพ</kbd>
+          <span class="text-[11px]">ซูมชื่นชมผลงาน</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-300">
+          <kbd class="px-2 py-1 rounded bg-[#1A2822] text-[10px] font-mono text-[#E8C87A] border border-[#355246]">ESC</kbd>
+          <span class="text-[11px]">ปลดล็อกเมาส์</span>
+        </div>
+      </div>
+
+      <button id="btn-enter-gallery" onclick="enterGallery()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:brightness-110 text-[#141E19] font-bold text-sm shadow-xl shadow-[#C5A059]/25 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+        <span>คลิกเพื่อเริ่มเดินชมนิทรรศการ</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Artwork Inspection Modal (Focus Mode) -->
+  <div id="artwork-modal" role="dialog" aria-modal="true" aria-labelledby="modal-art-title"
+    class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8 hidden opacity-0 transition-opacity duration-300">
+    <div class="max-w-4xl w-full hud-glass rounded-3xl overflow-hidden shadow-2xl border border-[#C5A059]/40 flex flex-col md:flex-row max-h-[90vh]">
+      
+      <!-- Artwork Visual Section -->
+      <div class="md:w-3/5 bg-[#1F2D26]/90 p-6 flex flex-col items-center justify-center relative group min-h-[300px]">
+        <img id="modal-art-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E" alt="Artwork" class="max-h-[65vh] w-auto max-w-full object-contain rounded-lg shadow-xl transition duration-500">
+        
+        <!-- Navigation Prev / Next inside modal -->
+        <button onclick="inspectRelativeArtwork(-1)" aria-label="ชมผลงานก่อนหน้า" class="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full hud-glass text-[#E8C87A] flex items-center justify-center hover:bg-[#243830] transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button onclick="inspectRelativeArtwork(1)" aria-label="ชมผลงานถัดไป" class="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full hud-glass text-[#E8C87A] flex items-center justify-center hover:bg-[#243830] transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Artwork Metadata Section -->
+      <div class="md:w-2/5 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto bg-[#141E19]/90">
+        <div>
+          <!-- Close button -->
+          <div class="flex items-center justify-between mb-4">
+            <span id="modal-event-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/30 truncate max-w-[200px]">
+              Event Title
+            </span>
+            <button onclick="closeArtworkModal()" aria-label="ปิดหน้าต่างรายละเอียดผลงาน" class="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-[#C8DBD2] hover:text-white flex items-center justify-center transition cursor-pointer">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <h2 id="modal-art-title" class="text-xl sm:text-2xl font-serif-luxury font-bold text-white tracking-tight leading-snug mb-1">
+            ชื่องานศิลปะ
+          </h2>
+          <p id="modal-art-artist" class="text-xs text-[#E8C87A] font-medium mb-5">
+            โดย ศิลปิน
+          </p>
+
+          <!-- Specifications Table -->
+          <div class="space-y-2 text-xs py-3 border-y border-[#355246]">
+            <div class="flex justify-between">
+              <span class="text-[#A3B8AF]" data-i18n="lbl_technique">เทคนิค / วัสดุ:</span>
+              <span id="modal-art-technique" class="text-[#FAF3E3] font-medium text-right">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#A3B8AF]" data-i18n="lbl_dimensions">ขนาดผลงาน:</span>
+              <span id="modal-art-dimensions" class="text-[#FAF3E3] font-medium text-right">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#A3B8AF]" data-i18n="lbl_year">ปีที่สร้างสรรค์:</span>
+              <span id="modal-art-year" class="text-[#FAF3E3] font-medium text-right">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-[#A3B8AF]" data-i18n="nav_3d_gallery">โซนจัดแสดง:</span>
+              <span id="modal-art-zone" class="text-[#FAF3E3] font-medium text-right">Main Hall</span>
+            </div>
+          </div>
+
+          <!-- Description / Concept -->
+          <div class="mt-4">
+            <span class="text-[11px] font-semibold text-[#E8C87A] block mb-1" data-i18n="modal_concept_title">แนวคิดผลงาน (Concept Statement):</span>
+            <p id="modal-art-desc" class="text-xs text-[#C8DBD2] font-light leading-relaxed max-h-36 overflow-y-auto pr-1">
+              -
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Deep-link to Portal Dossier (ไม่เด้งออกไปเว็บอื่น) -->
+        <div class="mt-6 pt-4 border-t border-[#355246] flex flex-col gap-2">
+          <a id="modal-art-event-link" href="#"
+            class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:brightness-110 text-[#141E19] font-bold text-xs text-center shadow-lg shadow-[#C5A059]/20 transition flex items-center justify-center gap-2">
+            <span data-i18n="btn_inspect">ดูรายละเอียดผลงานในพอร์ทัล</span>
+            <svg class="w-4 h-4 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+          <button onclick="closeArtworkModal()" class="w-full py-2 text-xs text-[#A3B8AF] hover:text-white transition">
+            <span data-i18n="gallery3d_inspect_exit">กลับสู่การเดินชม 3D (Resume Walk)</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Help & Control Guide Modal -->
+  <div id="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="max-w-md w-full hud-glass rounded-3xl p-6 sm:p-8 space-y-6 border border-[#C5A059]/30">
+      <div class="flex items-center justify-between">
+        <h3 id="help-modal-title" class="text-lg font-bold text-white font-serif-luxury flex items-center gap-2">
+          <svg class="w-5 h-5 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>คู่มือการควบคุมห้องนิทรรศการ 3D</span>
+        </h3>
+        <button onclick="toggleHelpModal()" aria-label="ปิดคู่มือการควบคุม" class="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 text-[#C8DBD2] hover:text-white flex items-center justify-center transition cursor-pointer">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-300">
+        <div class="p-3 rounded-xl bg-[#141E19]/80 border border-[#355246] flex items-center justify-between">
+          <span>เดินหน้า / ถอยหลัง / เลี้ยวซ้าย / เลี้ยวขวา</span>
+          <span class="font-mono text-[#E8C87A] font-semibold">W / A / S / D หรือ ลูกศร</span>
+        </div>
+        <div class="p-3 rounded-xl bg-[#141E19]/80 border border-[#355246] flex items-center justify-between">
+          <span>มองรอบทิศทาง (Look Around)</span>
+          <span class="font-mono text-[#E8C87A] font-semibold">ขยับเมาส์ หรือ ปัดหน้าจอ</span>
+        </div>
+        <div class="p-3 rounded-xl bg-[#141E19]/80 border border-[#355246] flex items-center justify-between">
+          <span>ซูมดูรายละเอียดผลงาน (Inspect Mode)</span>
+          <span class="font-mono text-[#E8C87A] font-semibold">คลิกที่ภาพ หรือ กด [E]</span>
+        </div>
+        <div class="p-3 rounded-xl bg-[#141E19]/80 border border-[#355246] flex items-center justify-between">
+          <span>โหมดนำชมอัตโนมัติ (Guided Tour)</span>
+          <span class="font-mono text-[#E8C87A] font-semibold">กดปุ่ม 'นำชมอัตโนมัติ' บน HUD</span>
+        </div>
+        <div class="p-3 rounded-xl bg-[#141E19]/80 border border-[#355246] flex items-center justify-between">
+          <span>วาร์ปตำแหน่งทันที (Teleport)</span>
+          <span class="font-mono text-[#E8C87A] font-semibold">คลิกบน Radar Mini-map</span>
+        </div>
+        <div class="p-3 rounded-xl bg-[#141E19]/80 border border-[#355246] flex items-center justify-between">
+          <span>ปลดล็อกเมาส์ / ปิดหน้าต่าง</span>
+          <span class="font-mono text-slate-400 font-semibold">ESC</span>
+        </div>
+      </div>
+
+      <button onclick="toggleHelpModal()" class="w-full min-h-[44px] py-2.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:brightness-110 text-[#141E19] font-bold text-xs transition cursor-pointer">
+        เข้าใจแล้ว (กลับสู่ห้องจัดแสดง)
+      </button>
+    </div>
+  </div>
+
+  <!-- Artwork Directory Slide-over Drawer (Quick Teleport Index) -->
+  <div id="directory-drawer" role="region" aria-label="สารบัญผลงาน (Artwork Directory)" class="fixed inset-y-0 right-0 z-50 w-full sm:w-96 md:w-[460px] bg-[#141E19]/95 backdrop-blur-2xl border-l border-[#355246] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col pointer-events-auto">
+    <!-- Drawer Header -->
+    <div class="p-4 sm:p-5 border-b border-[#355246] flex items-center justify-between bg-[#1A2822]">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#C5A059]"></span>
+        <h3 class="text-sm font-bold text-white font-serif-luxury tracking-wide">สารบัญผลงาน (Artwork Directory)</h3>
+        <span id="drawer-total-count" class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/30">0 Works</span>
+      </div>
+      <button onclick="toggleDirectoryDrawer(false)" aria-label="ปิดสารบัญผลงาน" class="w-11 h-11 rounded-xl bg-[#243830] hover:bg-[#324f43] text-slate-300 hover:text-white flex items-center justify-center transition cursor-pointer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Search & Zone Filters -->
+    <div class="p-4 border-b border-[#355246] space-y-2.5 bg-[#17221C]">
+      <div class="relative">
+        <svg class="w-4 h-4 text-[#A3B8AF] absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" id="drawer-search-input" oninput="filterDirectoryList()" placeholder="ค้นหาชื่อผลงาน, ศิลปิน, หรือเทคนิค..."
+          class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#101713] border border-[#355246] text-xs text-white placeholder-[#64736C] focus:outline-none focus:ring-1 focus:ring-[#C5A059] font-sans">
+      </div>
+      <div id="drawer-zone-filters" class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-mono custom-scrollbar">
+        <!-- Zone pills will be injected dynamically -->
+      </div>
+    </div>
+
+    <!-- Artwork Cards List -->
+    <div id="drawer-artworks-list" class="flex-1 overflow-y-auto p-4 space-y-2.5 custom-scrollbar">
+      <!-- Dynamic item cards will appear here -->
+    </div>
+
+    <!-- Drawer Footer Info -->
+    <div class="p-3 bg-[#101713] border-t border-[#355246] text-[11px] text-[#A3B8AF] text-center font-mono flex items-center justify-between px-4">
+      <span>คลิก <span class="text-[#C5A059] font-bold">"วาร์ป"</span> เพื่อไปชมหน้าผลงาน</span>
+      <button onclick="toggleDirectoryDrawer(false)" class="text-[#A3B8AF] hover:text-white underline cursor-pointer">ปิด</button>
+    </div>
+  </div>
+
+  <!-- Exhibition E-Catalogue Slide-over Drawer (Companion Booklet Viewer in 3D) -->
+  <div id="catalog-drawer" role="region" aria-label="สูจิบัตรดิจิทัลประจำนิทรรศการ" class="fixed inset-y-0 right-0 z-50 w-full sm:w-[540px] md:w-[660px] lg:w-[780px] bg-[#141E19]/95 backdrop-blur-2xl border-l border-[#C5A059]/40 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col pointer-events-auto">
+    <!-- Drawer Header -->
+    <div class="p-3 sm:px-5 py-3.5 border-b border-[#C5A059]/30 bg-gradient-to-r from-[#1A2822] via-[#243830] to-[#141E19] flex items-center justify-between">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="p-1.5 rounded-lg bg-[#C5A059]/20 text-[#E8C87A]">
+          <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </span>
+        <div class="truncate">
+          <h3 id="3d-catalog-title" class="text-xs sm:text-sm font-bold text-white font-serif-luxury truncate">
+            สูจิบัตรดิจิทัลประจำนิทรรศการ
+          </h3>
+          <p class="text-[10px] text-[#E8C87A]/80">
+            ออกแบบสำเร็จจาก Event &bull; เปิดอ่านประกบคู่กับห้องจัดแสดง 3 มิติ
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <a id="btn-3d-catalog-popout" href="#" target="_blank" rel="noopener" title="เปิดหน้าต่างแยก" aria-label="เปิดสูจิบัตรในหน้าต่างแยก"
+          class="w-11 h-11 rounded-xl bg-[#243830] hover:bg-[#324f43] text-slate-300 hover:text-white transition flex items-center justify-center cursor-pointer">
+          <svg class="w-4 h-4 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+        <button onclick="toggleCatalogDrawer(false)" aria-label="ปิดหน้าต่างสูจิบัตร" class="w-11 h-11 rounded-xl bg-[#243830] hover:bg-rose-900/60 text-slate-300 hover:text-white transition flex items-center justify-center cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Iframe Reader Area -->
+    <div class="flex-1 w-full bg-[#101713] relative">
+      <iframe id="3d-catalog-frame" src="about:blank" class="w-full h-full border-0" allowfullscreen></iframe>
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-2.5 bg-[#101713] border-t border-[#355246] text-[11px] text-[#A3B8AF] flex items-center justify-between px-4 font-mono">
+      <span>กดคีย์ลัด <span class="text-[#C5A059] font-bold">C</span> เพื่อเปิด/ปิดสูจิบัตรได้ตลอดเวลา</span>
+      <button onclick="toggleCatalogDrawer(false)" class="text-[#A3B8AF] hover:text-white underline">ปิดสูจิบัตร</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/portal.js"></script>
+  <script src="/js/gallery-3d.js"></script>
+</body>
+</html>

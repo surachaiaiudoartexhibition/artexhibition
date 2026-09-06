@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Cloudflare & Wrangler
+.wrangler/
+.mf/
+
+# Local SQLite databases & cache
+*.sqlite
+*.sqlite-journal
+scripts/*-local.sqlite
+scripts/*-local.sqlite-journal
+
+# Environment variables
+.env
+.env.local
+
+# Operating System
+.DS_Store
+Thumbs.db
