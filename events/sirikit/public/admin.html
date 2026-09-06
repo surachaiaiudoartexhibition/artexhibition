@@ -670,6 +670,9 @@
               <span class="text-xs text-[var(--text-muted)] font-sans">(${(sub.academic_title_en ? sub.academic_title_en + ' ' : '')}${sub.artist_name_en || sub.artist_name})</span>
               <span>${window.getCountryFlagBadge(sub.nationality || 'Thailand', { size: 'sm', showName: true })}</span>
               ${sub.artist_email ? `<span class="text-xs text-[var(--text-subtle)] font-mono">• ✉️ ${sub.artist_email}</span>` : ''}
+              <button onclick="deleteArtistByName('${encodeURIComponent(sub.artist_name)}')" class="text-[10px] text-rose-400 hover:text-rose-200 border border-rose-800/40 hover:bg-rose-900/60 px-2 py-0.5 corner-cut-4 ml-1 transition cursor-pointer" title="ลบศิลปินท่านนี้พร้อมทุกผลงาน">
+                <span>🗑️ ลบศิลปิน</span>
+              </button>
             </div>
 
             <!-- Specs Grid with Bilingual Technique -->
@@ -721,6 +724,13 @@
                 <span>${window.t('btn_reject')}</span>
               </button>
             ` : ""}
+
+            <button onclick="deleteArtwork(${sub.id})" class="flex-1 md:flex-initial px-3 py-2 corner-cut-6 bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 hover:text-rose-200 border border-rose-800/40 text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm" title="ลบผลงานนี้ออกจากระบบอย่างถาวร">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              <span>${window.t('btn_delete_artwork')}</span>
+            </button>
           </div>
         `;
         listContainer.appendChild(item);
@@ -1005,6 +1015,46 @@
           loadDashboardSubmissions();
         } else {
           alert(`${window.t('app_error')} ${res.error}`);
+        }
+      } catch (err) {
+        alert(`${window.t('app_error')} ${err.message}`);
+      }
+    }
+
+    async function deleteArtwork(id) {
+      const art = allLoadedSubmissions.find(s => s.id === id);
+      const artTitle = art ? (window.getField(art, 'title') || art.title) : `#${id}`;
+      const confirmMsg = `${window.t('confirm_delete_artwork') || 'คุณแน่ใจหรือไม่ว่าต้องการลบผลงานชิ้นนี้อย่างถาวร?'} \n\nผลงาน: "${artTitle}" (#${id})`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const res = await EventAPI.deleteArtwork(id, getAdminKey());
+        if (res.success) {
+          showToast(`${window.t('toast_deleted_artwork') || 'ลบผลงานสำเร็จ'} (#${id})`, "info");
+          loadDashboardSubmissions();
+        } else {
+          alert(`${window.t('app_error')} ${res.error || 'Failed to delete artwork'}`);
+        }
+      } catch (err) {
+        alert(`${window.t('app_error')} ${err.message}`);
+      }
+    }
+
+    async function deleteArtistByName(encodedName) {
+      const artistName = decodeURIComponent(encodedName);
+      const artistWorks = allLoadedSubmissions.filter(s => s.artist_name === artistName || s.artist_name_th === artistName || s.artist_name_en === artistName);
+      const count = artistWorks.length;
+
+      const confirmPrompt = `${window.t('confirm_delete_artist') || 'คุณแน่ใจหรือไม่ว่าต้องการลบศิลปินท่านนี้ พร้อมผลงานทั้งหมดที่เกี่ยวข้องอย่างถาวร?'}\n\nศิลปิน: "${artistName}"\nจำนวนผลงานทั้งหมดที่จะถูกลบ: ${count} รายการ\n\nการลบนี้จะลบผลงานออกจากระบบทั้งหมด และไม่สามารถย้อนกลับได้!`;
+      if (!confirm(confirmPrompt)) return;
+
+      try {
+        const res = await EventAPI.deleteArtist(artistName, getAdminKey());
+        if (res.success) {
+          showToast(`${window.t('toast_deleted_artist') || 'ลบศิลปินสำเร็จ'}: "${artistName}" (${res.deletedCount || count} ผลงาน)`, "info");
+          loadDashboardSubmissions();
+        } else {
+          alert(`${window.t('app_error')} ${res.error || 'Failed to delete artist'}`);
         }
       } catch (err) {
         alert(`${window.t('app_error')} ${err.message}`);

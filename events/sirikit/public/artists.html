@@ -219,13 +219,21 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] flex items-center justify-between text-xs">
-        <a href="/catalog.html" class="inline-flex items-center gap-1.5 text-[var(--color-accent-gold)] hover:underline font-medium">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-          <span data-i18n="modal_open_catalog_btn">เปิดดูผลงานในสูจิบัตรดิจิทัล</span>
-        </a>
+      <div class="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-3">
+          <a href="/catalog.html" class="inline-flex items-center gap-1.5 text-[var(--color-accent-gold)] hover:underline font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span data-i18n="modal_open_catalog_btn">เปิดดูผลงานในสูจิบัตรดิจิทัล</span>
+          </a>
+          <button id="btn-modal-delete-artist" class="inline-flex items-center gap-1.5 text-rose-400 hover:text-rose-300 font-medium px-2.5 py-1.5 corner-cut-6 bg-rose-950/40 border border-rose-800/40 hover:bg-rose-900/60 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span data-i18n="btn_delete_artist">ลบศิลปินและผลงานทั้งหมด</span>
+          </button>
+        </div>
         <button onclick="closeArtistModal()" class="px-4 py-2 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-main)] corner-cut-8 font-medium border border-[var(--border-subtle)] transition cursor-pointer" data-i18n="btn_close">ปิดหน้าต่าง</button>
       </div>
 
@@ -479,9 +487,16 @@
               ${artist.artist_email || '-'}
             </td>
             <td class="py-3 px-4 text-right">
-              <button onclick="openArtistModal('${encodeURIComponent(artist.artist_name)}')" class="px-3 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] hover:brightness-110 text-[var(--color-accent-light)] border border-[var(--border-accent)] text-xs font-semibold transition cursor-pointer">
-                ${window.t('btn_open_profile')}
-              </button>
+              <div class="inline-flex items-center gap-1.5 justify-end">
+                <button onclick="openArtistModal('${encodeURIComponent(artist.artist_name)}')" class="px-3 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] hover:brightness-110 text-[var(--color-accent-light)] border border-[var(--border-accent)] text-xs font-semibold transition cursor-pointer">
+                  ${window.t('btn_open_profile')}
+                </button>
+                <button onclick="deleteArtistByName('${encodeURIComponent(artist.artist_name)}', ${artist.artworks_count || (artist.artworks ? artist.artworks.length : 0)})" class="p-1.5 corner-cut-6 text-rose-400/80 hover:text-rose-300 hover:bg-rose-950/50 border border-rose-800/30 transition cursor-pointer" title="ลบศิลปินและผลงานทั้งหมด">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -540,11 +555,38 @@
 
       const modal = document.getElementById('artist-modal');
       const container = document.getElementById('modal-container');
+      
+      const deleteBtn = document.getElementById('btn-modal-delete-artist');
+      if (deleteBtn) {
+        deleteBtn.onclick = () => deleteArtistByName(artist.artist_name, artist.artworks_count || (artist.artworks ? artist.artworks.length : 0));
+      }
+
       modal.classList.remove('hidden');
       setTimeout(() => {
         modal.classList.remove('opacity-0');
         container.classList.remove('scale-95');
       }, 10);
+    }
+
+    async function deleteArtistByName(artistName, artworkCount) {
+      const confirmPrompt = `${window.t('confirm_delete_artist') || 'คุณแน่ใจหรือไม่ว่าต้องการลบศิลปินท่านนี้ พร้อมผลงานทั้งหมดที่เกี่ยวข้องอย่างถาวร?'}\n\nศิลปิน: "${artistName}"\nผลงานทั้งหมด: ${artworkCount} รายการ\n\nการลบนี้จะนำศิลปินและผลงานออกจากทุกหน้าแสดงผล และไม่สามารถย้อนกลับได้!`;
+      if (!confirm(confirmPrompt)) return;
+
+      const adminKey = prompt('กรุณาระบุรหัสผู้ดูแล (Admin Key) เพื่อยืนยันการลบ:', 'admin123');
+      if (!adminKey) return;
+
+      try {
+        const res = await EventAPI.deleteArtist(artistName, adminKey.trim());
+        if (res.success) {
+          alert(`${window.t('toast_deleted_artist') || 'ลบศิลปินและผลงานสำเร็จ'}: ${res.message || ''}`);
+          closeArtistModal();
+          loadArtists();
+        } else {
+          alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + (res.error || 'Failed to delete artist'));
+        }
+      } catch (err) {
+        alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + err.message);
+      }
     }
 
     function closeArtistModal() {

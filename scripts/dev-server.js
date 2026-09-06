@@ -1540,6 +1540,56 @@ const eventServer = http.createServer(async (req, res) => {
     return;
   }
 
+  const matchDelete = pathname.match(/^\/api\/submissions\/(\d+)\/delete$/);
+  if (matchDelete && (req.method === 'POST' || req.method === 'DELETE')) {
+    const id = matchDelete[1];
+    const item = eventDb.prepare('SELECT id, title FROM submissions WHERE id = ?').get(id);
+    if (!item) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: `Submission with ID ${id} not found.` }));
+      return;
+    }
+    eventDb.prepare("DELETE FROM submissions WHERE id = ?").run(id);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: `Artwork #${id} (${item.title}) deleted successfully.`, deletedId: Number(id) }));
+    return;
+  }
+
+  if (pathname === '/api/artists/delete' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const artistName = (body.artist_name || body.name || '').trim();
+    if (!artistName) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'artist_name is required' }));
+      return;
+    }
+    const rows = eventDb.prepare(`
+      SELECT id, title FROM submissions 
+      WHERE artist_name = ? OR artist_name_th = ? OR artist_name_en = ?
+    `).all(artistName, artistName, artistName);
+
+    if (rows.length === 0) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: `No artworks found for artist: ${artistName}` }));
+      return;
+    }
+
+    eventDb.prepare(`
+      DELETE FROM submissions 
+      WHERE artist_name = ? OR artist_name_th = ? OR artist_name_en = ?
+    `).run(artistName, artistName, artistName);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: true,
+      message: `Artist "${artistName}" and ${rows.length} artworks deleted successfully.`,
+      deletedArtist: artistName,
+      deletedCount: rows.length,
+      deletedIds: rows.map(r => r.id)
+    }));
+    return;
+  }
+
   // Serve static UI
   if (serveStaticFile(eventPublicDir, pathname, res)) return;
 

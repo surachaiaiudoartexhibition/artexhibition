@@ -101,6 +101,29 @@ const EventAPI = {
     return await res.json();
   },
 
+  async deleteArtwork(id, adminKey) {
+    const res = await fetch(`/api/submissions/${encodeURIComponent(id)}/delete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": adminKey
+      }
+    });
+    return await res.json();
+  },
+
+  async deleteArtist(artistName, adminKey) {
+    const res = await fetch(`/api/artists/delete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": adminKey
+      },
+      body: JSON.stringify({ artist_name: artistName })
+    });
+    return await res.json();
+  },
+
   async getCatalogConfig() {
     const res = await fetch("/api/catalog-config?_t=" + Date.now());
     return await res.json();
