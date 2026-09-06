@@ -103,19 +103,39 @@
     </section>
 
     <!-- Curatorial Highlights Section -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div class="flex items-end justify-between mb-12 pb-4 border-b border-[var(--border-subtle)]">
+    <section id="highlights-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[var(--border-subtle)] gap-4">
         <div>
-          <span class="text-[11px] font-mono tracking-widest text-[#C5A059] uppercase block mb-1">Curatorial Selection</span>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-[11px] font-mono tracking-widest text-[#C5A059] uppercase block">Curatorial Selection</span>
+            <span id="highlights-indicator" class="hidden items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-[#C5A059]/10 text-[#C5A059] border border-[#C5A059]/25 transition-all">
+              <span id="highlights-pulse" class="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-pulse"></span>
+              <span id="highlights-counter">หมุนเวียนผลงาน</span>
+            </span>
+          </div>
           <h2 class="font-serif-luxury text-3xl sm:text-4xl text-[var(--text-main)] font-normal" data-i18n="sec_highlights_title">ผลงานเด่นในนิทรรศการ</h2>
           <p class="text-xs text-[var(--text-muted)] mt-1 font-light" data-i18n="sec_highlights_desc">คัดเลือกผลงานที่ผ่านการคัดสรรโดยภัณฑารักษ์</p>
         </div>
-        <a href="/gallery.html" class="text-xs tracking-wider uppercase text-[#9A7833] hover:text-[#C5A059] transition flex items-center gap-1.5 font-medium" data-i18n="view_all_arrow">
-          <span>ดูทั้งหมด</span> <span aria-hidden="true">&rarr;</span>
-        </a>
+        <div class="flex items-center gap-3 self-end sm:self-auto">
+          <!-- Manual Prev / Pause / Next Controls -->
+          <div id="highlights-controls" class="hidden items-center gap-1.5 mr-1">
+            <button id="btn-prev-highlight" type="button" aria-label="ผลงานก่อนหน้า" title="ก่อนหน้า (Previous)" class="w-8 h-8 rounded-lg border border-[var(--border-subtle)] hover:border-[#C5A059] text-[var(--text-subtle)] hover:text-[#C5A059] bg-[var(--bg-surface-elevated)]/60 hover:bg-[#C5A059]/10 transition flex items-center justify-center cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button id="btn-pause-highlight" type="button" aria-label="หยุด/เล่นหมุนเวียน" title="หยุด/เล่นอัตโนมัติ (Pause/Play)" class="w-8 h-8 rounded-lg border border-[var(--border-subtle)] hover:border-[#C5A059] text-[var(--text-subtle)] hover:text-[#C5A059] bg-[var(--bg-surface-elevated)]/60 hover:bg-[#C5A059]/10 transition flex items-center justify-center cursor-pointer text-xs">
+              <span id="pause-icon">⏸</span>
+            </button>
+            <button id="btn-next-highlight" type="button" aria-label="ผลงานถัดไป" title="ถัดไป (Next)" class="w-8 h-8 rounded-lg border border-[var(--border-subtle)] hover:border-[#C5A059] text-[var(--text-subtle)] hover:text-[#C5A059] bg-[var(--bg-surface-elevated)]/60 hover:bg-[#C5A059]/10 transition flex items-center justify-center cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+          <a href="/gallery.html" class="text-xs tracking-wider uppercase text-[#9A7833] hover:text-[#C5A059] transition flex items-center gap-1.5 font-medium whitespace-nowrap ml-2" data-i18n="view_all_arrow">
+            <span>ดูทั้งหมด</span> <span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
       </div>
 
-      <div id="preview-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div id="preview-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-300">
         <!-- Loading Skeleton -->
         <div class="gallery-surface rounded-2xl p-4 animate-pulse">
           <div class="aspect-[4/3] bg-[var(--mat-bg)] rounded-xl mb-4"></div>
@@ -180,13 +200,102 @@
 
   <script src="/js/api.js"></script>
   <script>
-    let previewList = [];
+    // Highlights endless shuffled rotator state
+    let allHighlights = [];
+    let highlightDeck = [];
+    let currentDeckIndex = 0;
+    let currentActiveBatch = [];
+    let batchHistory = [];
+    let seenInCycleSet = new Set();
+    let autoRotateInterval = null;
+    let isUserPaused = false;
+    let isHoverPaused = false;
+    let isTransitioning = false;
+    let interactionsBound = false;
+    const ROTATE_DELAY_MS = 5000;
+
+    function getHighlightBatchSize() {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 640) return 2;
+      return 1;
+    }
+
+    function shuffleArray(arr) {
+      const c = [...arr];
+      for (let i = c.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [c[i], c[j]] = [c[j], c[i]];
+      }
+      return c;
+    }
+
+    function makeNewDeck(items, excludeFromStart = []) {
+      const excludeSet = new Set(excludeFromStart.map(x => x.id || x));
+      let deck = shuffleArray(items);
+      for (let i = 0; i < excludeFromStart.length && i < deck.length; i++) {
+        if (excludeSet.has(deck[i].id || deck[i])) {
+          for (let j = excludeFromStart.length; j < deck.length; j++) {
+            if (!excludeSet.has(deck[j].id || deck[j])) {
+              [deck[i], deck[j]] = [deck[j], deck[i]];
+              break;
+            }
+          }
+        }
+      }
+      return deck;
+    }
+
+    function updateHighlightCounter() {
+      const indicator = document.getElementById("highlights-indicator");
+      const counterEl = document.getElementById("highlights-counter");
+      const pulseEl = document.getElementById("highlights-pulse");
+      if (!indicator || !counterEl) return;
+
+      const total = allHighlights.length;
+      const batchSize = getHighlightBatchSize();
+      indicator.classList.remove("hidden");
+      indicator.classList.add("inline-flex");
+
+      if (total <= batchSize) {
+        if (pulseEl) pulseEl.classList.remove("animate-pulse");
+        counterEl.textContent = window.i18n.getLang() === 'th' ? `ทั้งหมด ${total} ผลงาน` : `${total} Artworks`;
+        return;
+      }
+
+      const isPaused = isUserPaused || isHoverPaused;
+      if (pulseEl) {
+        if (isPaused) {
+          pulseEl.classList.remove("animate-pulse", "bg-[#C5A059]");
+          pulseEl.classList.add("bg-amber-400/60");
+        } else {
+          pulseEl.classList.add("animate-pulse", "bg-[#C5A059]");
+          pulseEl.classList.remove("bg-amber-400/60");
+        }
+      }
+
+      const shown = Math.min(seenInCycleSet.size, total);
+      if (isHoverPaused) {
+        counterEl.textContent = window.i18n.getLang() === 'th' 
+          ? `พักชั่วคราว (${shown}/${total} ผลงาน)` 
+          : `Paused (${shown}/${total})`;
+      } else if (isUserPaused) {
+        counterEl.textContent = window.i18n.getLang() === 'th' 
+          ? `หยุดหมุนเวียน (${shown}/${total} ผลงาน)` 
+          : `Paused (${shown}/${total})`;
+      } else {
+        counterEl.textContent = window.i18n.getLang() === 'th' 
+          ? `สุ่มหมุนเวียน (${shown}/${total} ผลงาน)` 
+          : `Rotating (${shown}/${total})`;
+      }
+    }
 
     function renderHighlights() {
       const container = document.getElementById("preview-grid");
-      if (!container || !previewList.length) return;
+      if (!container || !currentActiveBatch.length) return;
+
       container.innerHTML = "";
-      previewList.forEach(art => {
+      currentActiveBatch.forEach(art => {
+        seenInCycleSet.add(art.id);
         const title = window.getField(art, 'title');
         const artistName = window.getArtistFullName(art);
         const technique = window.getField(art, 'technique') || (window.i18n.getLang() === 'th' ? 'ภาพพิมพ์ร่วมสมัย' : 'Contemporary Printmaking');
@@ -198,7 +307,9 @@
             <!-- Artwork Presentation Mat (Clean Light Ivory - No Dark Frame) -->
             <div class="relative aspect-[4/3] bg-[var(--mat-bg)] p-4 flex items-center justify-center overflow-hidden border-b border-[var(--border-subtle)]">
               <img src="${art.thumbnail_url || art.image_url}" alt="${title}" 
-                   class="max-h-full max-w-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.06)] group-hover:scale-[1.03] transition duration-500 ease-out" loading="lazy">
+                   class="max-h-full max-w-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.06)] group-hover:scale-[1.03] transition duration-500 ease-out" 
+                   loading="lazy"
+                   onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80';">
             </div>
             <div class="p-5 space-y-2 bg-[var(--bg-surface-solid)]">
               <div class="text-[11px] font-mono tracking-widest text-[#9A7833] uppercase">${window.t('by_artist')} ${artistName}</div>
@@ -211,6 +322,180 @@
           </a>
         `;
         container.appendChild(card);
+      });
+
+      updateHighlightCounter();
+    }
+
+    function advanceHighlights(direction = 1) {
+      if (isTransitioning || allHighlights.length <= getHighlightBatchSize()) return;
+
+      const container = document.getElementById("preview-grid");
+      const batchSize = getHighlightBatchSize();
+      let nextBatch = [];
+
+      if (direction > 0) {
+        if (currentActiveBatch.length) {
+          batchHistory.push([...currentActiveBatch]);
+          if (batchHistory.length > 30) batchHistory.shift();
+        }
+
+        let remaining = highlightDeck.slice(currentDeckIndex);
+        if (remaining.length >= batchSize) {
+          nextBatch = remaining.slice(0, batchSize);
+          currentDeckIndex += batchSize;
+        } else {
+          nextBatch = [...remaining];
+          const needed = batchSize - nextBatch.length;
+          highlightDeck = makeNewDeck(allHighlights, nextBatch);
+          const extra = highlightDeck.slice(0, needed);
+          nextBatch = nextBatch.concat(extra);
+          currentDeckIndex = needed;
+          seenInCycleSet.clear();
+        }
+      } else {
+        if (batchHistory.length > 0) {
+          nextBatch = batchHistory.pop();
+        } else {
+          currentDeckIndex = Math.max(0, currentDeckIndex - batchSize);
+          nextBatch = highlightDeck.slice(currentDeckIndex, currentDeckIndex + batchSize);
+          if (nextBatch.length < batchSize) {
+            nextBatch = allHighlights.slice(0, batchSize);
+          }
+        }
+      }
+
+      if (!nextBatch || !nextBatch.length) return;
+
+      isTransitioning = true;
+      if (container) {
+        container.style.opacity = '0';
+        container.style.transform = 'scale(0.985)';
+      }
+
+      setTimeout(() => {
+        currentActiveBatch = nextBatch;
+        renderHighlights();
+        if (container) {
+          container.style.opacity = '1';
+          container.style.transform = 'scale(1)';
+        }
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 300);
+      }, 220);
+    }
+
+    function startHighlightAutoRotate() {
+      if (autoRotateInterval) clearInterval(autoRotateInterval);
+      autoRotateInterval = setInterval(() => {
+        if (!isUserPaused && !isHoverPaused && document.visibilityState === 'visible') {
+          advanceHighlights(1);
+        }
+      }, ROTATE_DELAY_MS);
+    }
+
+    function setupHighlightInteractions() {
+      const controls = document.getElementById("highlights-controls");
+      const btnPrev = document.getElementById("btn-prev-highlight");
+      const btnNext = document.getElementById("btn-next-highlight");
+      const btnPause = document.getElementById("btn-pause-highlight");
+      const pauseIcon = document.getElementById("pause-icon");
+      const section = document.getElementById("highlights-section");
+
+      if (allHighlights.length > getHighlightBatchSize() && controls) {
+        controls.classList.remove("hidden");
+        controls.classList.add("flex");
+      }
+
+      if (interactionsBound) return;
+      interactionsBound = true;
+
+      if (btnPrev) {
+        btnPrev.addEventListener("click", () => {
+          advanceHighlights(-1);
+          startHighlightAutoRotate();
+        });
+      }
+
+      if (btnNext) {
+        btnNext.addEventListener("click", () => {
+          advanceHighlights(1);
+          startHighlightAutoRotate();
+        });
+      }
+
+      if (btnPause) {
+        btnPause.addEventListener("click", () => {
+          isUserPaused = !isUserPaused;
+          if (pauseIcon) {
+            pauseIcon.textContent = isUserPaused ? "▶" : "⏸";
+          }
+          btnPause.title = isUserPaused 
+            ? (window.i18n.getLang() === 'th' ? "เล่นอัตโนมัติ (Resume)" : "Resume auto-play")
+            : (window.i18n.getLang() === 'th' ? "หยุดชั่วคราว (Pause)" : "Pause auto-play");
+          updateHighlightCounter();
+        });
+      }
+
+      if (section) {
+        section.addEventListener("mouseenter", () => {
+          isHoverPaused = true;
+          updateHighlightCounter();
+        });
+        section.addEventListener("mouseleave", () => {
+          isHoverPaused = false;
+          updateHighlightCounter();
+        });
+
+        // Touch gestures for mobile
+        let touchStartX = 0;
+        section.addEventListener("touchstart", (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        section.addEventListener("touchend", (e) => {
+          const diffX = e.changedTouches[0].screenX - touchStartX;
+          if (Math.abs(diffX) > 45) {
+            if (diffX < 0) {
+              advanceHighlights(1);
+            } else {
+              advanceHighlights(-1);
+            }
+            startHighlightAutoRotate();
+          }
+        }, { passive: true });
+      }
+
+      // Responsive resize: re-render to match batch size without losing position
+      let resizeTimer = null;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (allHighlights.length > 0) {
+            const batchSize = getHighlightBatchSize();
+            if (controls) {
+              if (allHighlights.length > batchSize) {
+                controls.classList.remove("hidden");
+                controls.classList.add("flex");
+              } else {
+                controls.classList.add("hidden");
+                controls.classList.remove("flex");
+              }
+            }
+            if (currentActiveBatch.length !== batchSize) {
+              let startIdx = 0;
+              if (currentActiveBatch.length && highlightDeck.length) {
+                const foundIdx = highlightDeck.findIndex(a => a.id === currentActiveBatch[0].id);
+                if (foundIdx !== -1) startIdx = foundIdx;
+              }
+              currentActiveBatch = highlightDeck.slice(startIdx, startIdx + batchSize);
+              if (currentActiveBatch.length < batchSize) {
+                currentActiveBatch = allHighlights.slice(0, batchSize);
+              }
+              renderHighlights();
+            }
+          }
+        }, 200);
       });
     }
 
@@ -277,8 +562,23 @@
           return;
         }
 
-        previewList = data.submissions.slice(0, 3);
+        allHighlights = data.submissions;
+        const batchSize = getHighlightBatchSize();
+        highlightDeck = shuffleArray(allHighlights);
+        currentDeckIndex = 0;
+        batchHistory = [];
+        seenInCycleSet = new Set();
+
+        if (allHighlights.length <= batchSize) {
+          currentActiveBatch = [...allHighlights];
+        } else {
+          currentActiveBatch = highlightDeck.slice(0, batchSize);
+          currentDeckIndex = batchSize;
+        }
+
         renderHighlights();
+        setupHighlightInteractions();
+        startHighlightAutoRotate();
       } catch (err) {
         console.error("Preview load error:", err);
         container.innerHTML = `
