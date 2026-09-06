@@ -696,14 +696,16 @@
         const w = 2.4;
         const h = 1.8;
 
-        const frameGeo = new THREE.BoxGeometry(w + 0.16, h + 0.16, 0.08);
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x1a1c22, roughness: 0.35, metalness: 0.7 });
+        const frameGeo = new THREE.BoxGeometry(w + 0.12, h + 0.12, 0.06);
+        // Poh-Chang Heritage Antique Gold/Bronze Frame (No heavy pitch-black frame)
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0xC5A059, roughness: 0.28, metalness: 0.65 });
         const frameMesh = new THREE.Mesh(frameGeo, frameMat);
         frameMesh.castShadow = false;
         artworkGroup.add(frameMesh);
 
         const canvasGeo = new THREE.PlaneGeometry(w, h);
-        const canvasMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
+        // Warm ivory curatorial mat surface
+        const canvasMat = new THREE.MeshBasicMaterial({ color: 0xF4EFE6 });
 
         const initialImgUrl = art.thumbnail_url || art.image_url;
         textureLoader.load(initialImgUrl, (tex) => {
@@ -713,11 +715,11 @@
           canvasMat.color.setHex(0xffffff);
           canvasMat.needsUpdate = true;
         }, undefined, () => {
-          canvasMat.color.setHex(0x2d3748);
+          canvasMat.color.setHex(0xE8E0D2);
         });
 
         const canvasMesh = new THREE.Mesh(canvasGeo, canvasMat);
-        canvasMesh.position.z = 0.05;
+        canvasMesh.position.z = 0.04;
         artworkGroup.add(canvasMesh);
 
         const placardGeo = new THREE.PlaneGeometry(0.9, 0.32);

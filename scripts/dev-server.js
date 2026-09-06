@@ -740,7 +740,7 @@ const eventServer = http.createServer(async (req, res) => {
         },
         layout: {
           template: "split",
-          theme: "luxury-dark"
+          theme: "heritage"
         },
         elements: {
           showTitle: true,
@@ -1876,6 +1876,8 @@ const masterServer = http.createServer(async (req, res) => {
   if (pathname === '/api/artworks' && req.method === 'GET') {
     const event_id = parsedUrl.searchParams.get('event_id');
     const q = parsedUrl.searchParams.get('q');
+    const limit = parseInt(parsedUrl.searchParams.get('limit') || '0', 10);
+    const offset = parseInt(parsedUrl.searchParams.get('offset') || '0', 10);
 
     let query = `
       SELECT m.*, e.event_title, e.portal_url as event_portal_url
@@ -1894,9 +1896,18 @@ const masterServer = http.createServer(async (req, res) => {
     }
     query += ' ORDER BY m.published_at DESC';
 
+    // Count total before applying pagination
+    const countQuery = `SELECT COUNT(*) as cnt FROM (${query}) t`;
+    const { cnt: total } = masterDb.prepare(countQuery).get(...params);
+
+    if (limit > 0) {
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(limit, offset);
+    }
+
     const rows = masterDb.prepare(query).all(...params);
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, artworks: rows, total: rows.length }));
+    res.end(JSON.stringify({ success: true, artworks: rows, total }));
     return;
   }
 

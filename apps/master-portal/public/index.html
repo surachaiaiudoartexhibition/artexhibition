@@ -767,13 +767,13 @@
       const secCatalog = document.getElementById("event-content-catalog");
 
       if (mode === 'catalog') {
-        tabArtworks.className = "px-4 py-2 rounded-lg text-xs font-normal text-stone-400 hover:text-stone-200 transition flex items-center gap-2 cursor-pointer";
-        tabCatalog.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#c5a059] text-stone-950 shadow-sm cursor-pointer";
+        tabArtworks.className = "px-4 py-2 rounded-lg text-xs font-medium text-[#64736C] hover:text-[#171C1A] transition flex items-center gap-2 cursor-pointer";
+        tabCatalog.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#1A2822] text-white shadow-xs cursor-pointer";
         secArtworks.classList.add("hidden");
         secCatalog.classList.remove("hidden");
       } else {
-        tabArtworks.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#c5a059] text-stone-950 shadow-sm cursor-pointer";
-        tabCatalog.className = "px-4 py-2 rounded-lg text-xs font-normal text-stone-400 hover:text-stone-200 transition flex items-center gap-2 cursor-pointer";
+        tabArtworks.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#1A2822] text-white shadow-xs cursor-pointer";
+        tabCatalog.className = "px-4 py-2 rounded-lg text-xs font-medium text-[#64736C] hover:text-[#171C1A] transition flex items-center gap-2 cursor-pointer";
         secArtworks.classList.remove("hidden");
         secCatalog.classList.add("hidden");
       }
@@ -833,21 +833,43 @@
     // 5. Load Artworks of Selected Event
     async function loadSingleEventArtworks(eventId) {
       const grid = document.getElementById("single-event-artworks-grid");
+      const countBadge = document.getElementById("single-event-artworks-count");
+
       grid.innerHTML = `
-        <div class="gallery-card rounded-2xl p-4 animate-pulse">
-          <div class="aspect-[4/3] bg-slate-800 rounded-xl mb-3"></div>
-          <div class="h-4 bg-slate-800 rounded w-2/3 mb-2"></div>
+        <div class="gallery-card rounded-3xl p-5 bg-white border border-[#E8E0D2] animate-pulse">
+          <div class="aspect-[4/3] bg-[#F4EFE6] rounded-2xl mb-4"></div>
+          <div class="h-5 bg-[#F4EFE6] rounded w-3/4 mb-3"></div>
+          <div class="h-4 bg-[#F4EFE6] rounded w-1/2 mb-4"></div>
+          <div class="h-10 bg-[#F4EFE6] rounded-xl"></div>
+        </div>
+        <div class="gallery-card rounded-3xl p-5 bg-white border border-[#E8E0D2] animate-pulse hidden sm:block">
+          <div class="aspect-[4/3] bg-[#F4EFE6] rounded-2xl mb-4"></div>
+          <div class="h-5 bg-[#F4EFE6] rounded w-3/4 mb-3"></div>
+          <div class="h-4 bg-[#F4EFE6] rounded w-1/2 mb-4"></div>
+          <div class="h-10 bg-[#F4EFE6] rounded-xl"></div>
         </div>
       `;
 
       try {
         const res = await MasterPortalAPI.getArtworks({ event_id: eventId });
         currentEventArtworks = res.artworks || [];
-        document.getElementById("single-event-artworks-count").textContent = currentEventArtworks.length;
 
+        // Auto-pull fallback: If master cache has 0 artworks for this active event, trigger sync from event source
+        if (currentEventArtworks.length === 0) {
+          try {
+            const pullRes = await MasterPortalAPI.pullArtworks(eventId);
+            if (pullRes && pullRes.success && pullRes.total_synced > 0) {
+              const retryRes = await MasterPortalAPI.getArtworks({ event_id: eventId });
+              currentEventArtworks = retryRes.artworks || [];
+            }
+          } catch (_) {}
+        }
+
+        if (countBadge) countBadge.textContent = currentEventArtworks.length;
         renderSingleEventArtworksGrid(currentEventArtworks);
       } catch (err) {
-        grid.innerHTML = `<div class="col-span-full py-10 text-center text-rose-400">เกิดข้อผิดพลาด: ${err.message}</div>`;
+        console.error("Failed to load artworks:", err);
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-rose-500 font-medium">${window.t('empty_artworks_title') || 'เกิดข้อผิดพลาดในการโหลดผลงาน'}: ${err.message}</div>`;
       }
     }
 
@@ -857,11 +879,12 @@
 
       if (artworksList.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-full text-center py-16 gallery-surface rounded-2xl">
-            <svg class="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="col-span-full text-center py-16 bg-white border border-[#E8E0D2] rounded-3xl">
+            <svg class="w-12 h-12 text-[#9A7833] mx-auto mb-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
-            <p class="text-slate-400 font-medium">${window.t('empty_artworks_title') || 'ไม่พบผลงานที่ตรงกับเงื่อนไขในนิทรรศการนี้'}</p>
+            <p class="text-[#64736C] font-medium">${window.t('empty_artworks_title') || 'ไม่พบผลงานที่ตรงกับเงื่อนไขในนิทรรศการนี้'}</p>
+            <p class="text-[#8A9890] text-xs mt-1 font-light">${window.t('empty_artworks_desc') || 'กรุณาลองเปลี่ยนคำค้นหา หรือล้างตัวกรอง'}</p>
           </div>
         `;
         return;
@@ -872,50 +895,93 @@
         const artistName = window.getArtistFullName(art, 'Unknown Artist');
         const technique = window.getField(art, 'technique', 'ภาพพิมพ์และสื่อผสมร่วมสมัย');
         const dimensions = window.getField(art, 'dimensions', '');
-        const year = art.year_created || "";
-        const zone = art.zone || "";
+        const year = art.year_created || "2026";
+        const zone = art.zone || "Main Gallery";
         const nationality = art.nationality || "";
         const desc = window.getField(art, 'description', '');
         const imageUrl = art.thumbnail_url || art.image_url;
-        const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=1c1e26&color=D4AF37&bold=true`;
+        const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=FAF7F0&color=9A7833&bold=true`;
+        const eventPageUrl = art.event_page_url || '#';
 
         const card = document.createElement("div");
-        card.className = "bg-white rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col cursor-pointer border border-[#E8E0D2] shadow-xs";
-        card.setAttribute("onclick", `openArtworkDetailModal('${art.global_id}')`);
+        card.className = "bg-white rounded-3xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[#E8E0D2] shadow-xs";
 
         card.innerHTML = `
-          <!-- Artwork Image Display (Clean, Light Curatorial Surface - No Dark Frame) -->
-          <div class="relative aspect-[4/3] bg-[#F7F4EC] p-3 flex items-center justify-center overflow-hidden border-b border-[#E8E0D2]">
+          <!-- Artwork Image Display with Clean Light Curatorial Surface (NO Black Frame) -->
+          <div class="relative aspect-[4/3] bg-[#F7F4EC] p-4 flex items-center justify-center overflow-hidden border-b border-[#E8E0D2]">
+            <!-- Top Badges Overlay -->
+            <div class="absolute top-3 inset-x-3 flex items-center justify-between z-10 pointer-events-none">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#1A2822]/85 text-[#E8C87A] border border-[#C5A059]/40 backdrop-blur-xs flex items-center gap-1.5 shadow-2xs max-w-[200px] truncate">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0"></span>
+                <span class="truncate">${zone}</span>
+              </span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-[#1A2822]/85 text-[#C8DBD2] border border-[#355246] backdrop-blur-xs shadow-2xs">
+                ${year}
+              </span>
+            </div>
+
             <img src="${imageUrl}" alt="${title}" 
-                 class="max-h-full max-w-full object-contain rounded-xs drop-shadow-[0_2px_8px_rgba(0,0,0,0.08)] group-hover:scale-[1.03] transition-transform duration-500 ease-out" loading="lazy">
+                 onclick="openArtworkDetailModal('${art.global_id}')"
+                 class="max-h-full max-w-full object-contain rounded-xs drop-shadow-[0_4px_16px_rgba(0,0,0,0.08)] group-hover:scale-[1.03] transition-transform duration-500 ease-out cursor-pointer" loading="lazy">
           </div>
 
           <!-- Card Museum Plaque Content -->
-          <div class="p-5 flex-1 flex flex-col justify-between space-y-3 bg-white">
+          <div class="p-5 flex-1 flex flex-col justify-between bg-white">
             <div>
-              <h3 class="font-serif-luxury text-lg text-[#171C1A] group-hover:text-[#9A7833] transition truncate leading-snug font-normal" title="${title}">
+              <h3 onclick="openArtworkDetailModal('${art.global_id}')" class="font-serif-luxury text-xl text-[#171C1A] group-hover:text-[#9A7833] transition truncate leading-snug font-normal cursor-pointer" title="${title}">
                 ${title}
               </h3>
               <p class="text-[11px] text-[#64736C] truncate mt-1 font-light" title="${technique}">
-                ${technique}${dimensions ? ` • ${dimensions}` : ''}
+                ${technique}${dimensions ? ` &bull; ${dimensions}` : ''}
               </p>
+              ${desc ? `<p class="text-xs text-[#4D5D55] font-light leading-relaxed line-clamp-2 mt-2" title="${desc}">${desc}</p>` : ''}
             </div>
 
-            <!-- Artist Badge Row -->
-            <div class="pt-3 border-t border-[#E8E0D2] flex items-center justify-between">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <img src="${avatar}" alt="${artistName}" 
-                     class="w-6 h-6 rounded-full object-cover border border-[#C5A059]/50 shrink-0 shadow-2xs"
-                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=FAF7F0&color=9A7833&bold=true'">
-                <div class="min-w-0">
-                  <span class="text-xs text-[#323F38] font-medium tracking-wide truncate block">${artistName}</span>
-                  ${nationality ? `<span class="text-[10px] text-[#64736C] font-light truncate block">${nationality}</span>` : ''}
+            <div class="mt-4 pt-3.5 border-t border-[#E8E0D2] space-y-3">
+              <!-- Artist Row & In-Portal Detail Button -->
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <img src="${avatar}" alt="${artistName}" 
+                       class="w-8 h-8 rounded-full object-cover border border-[#C5A059]/60 shrink-0 shadow-2xs"
+                       onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=FAF7F0&color=9A7833&bold=true'">
+                  <div class="min-w-0">
+                    <span class="text-xs text-[#171C1A] font-medium tracking-wide truncate block">${artistName}</span>
+                    ${nationality ? `<span class="text-[10px] text-[#64736C] font-light truncate block">${nationality}</span>` : ''}
+                  </div>
                 </div>
+
+                <!-- Open in-portal modal directly without leaving the portal -->
+                <button onclick="openArtworkDetailModal('${art.global_id}')"
+                  class="px-2.5 py-1.5 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] bg-[#FAF3E3]/60 hover:bg-[#FAF3E3] text-[#9A7833] hover:text-[#6D531F] text-xs font-semibold flex items-center gap-1 transition shrink-0 cursor-pointer shadow-2xs">
+                  <span>${window.t('btn_inspect') || 'รายละเอียด'}</span>
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </button>
               </div>
 
-              <span class="text-[11px] text-[#9A7833] group-hover:text-[#6D531F] transition flex items-center gap-1 shrink-0 tracking-wider uppercase font-semibold">
-                <span>${window.t('btn_inspect') || 'ดูรายละเอียด'}</span>
-                <span aria-hidden="true">&rarr;</span>
+              <!-- Quick Action Row: Official Event Site vs 3D Room -->
+              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-[#E8E0D2]/60">
+                <a href="${eventPageUrl}" target="_blank" rel="noopener"
+                   class="min-h-[38px] py-1.5 px-2.5 rounded-xl bg-[#F4EFE6] hover:bg-[#ECE5D8] text-[#323F38] hover:text-[#171C1A] font-medium text-xs text-center border border-[#E8E0D2] transition flex items-center justify-center gap-1 shadow-2xs">
+                  <span>${window.t('nav_event_webapp') || 'เว็บอีเวนต์'}</span>
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+
+                <a href="/gallery-3d.html?event_id=${encodeURIComponent(currentEventId || art.event_id)}"
+                   class="min-h-[38px] py-1.5 px-2.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs text-center shadow-sm shadow-[#C5A059]/20 transition flex items-center justify-center gap-1">
+                  <svg class="w-3.5 h-3.5 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                  </svg>
+                  <span>${window.t('nav_3d_gallery') || 'ชมในห้อง 3D'}</span>
+                </a>
+              </div>
+
+              <!-- Global ID footer tag -->
+              <span class="text-[10px] font-mono text-[#8A9890] text-center block pt-0.5">
+                Global ID: ${art.global_id}
               </span>
             </div>
           </div>

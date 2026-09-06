@@ -303,7 +303,13 @@ const I18N_DICTIONARY = {
 
 class MasterI18nManager {
   constructor() {
-    this.currentLang = localStorage.getItem('exhibition_lang') || 'th';
+    let savedLang = 'th';
+    try {
+      if (typeof localStorage !== 'undefined') {
+        savedLang = localStorage.getItem('exhibition_lang') || 'th';
+      }
+    } catch (_) {}
+    this.currentLang = (savedLang === 'en') ? 'en' : 'th';
   }
 
   getLang() {
@@ -313,7 +319,11 @@ class MasterI18nManager {
   setLang(lang) {
     if (lang !== 'th' && lang !== 'en') return;
     this.currentLang = lang;
-    localStorage.setItem('exhibition_lang', lang);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('exhibition_lang', lang);
+      }
+    } catch (_) {}
     this.apply();
     window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
   }
