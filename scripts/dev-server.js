@@ -1390,9 +1390,13 @@ const eventServer = http.createServer(async (req, res) => {
       'title', 'title_th', 'title_en',
       'academic_title', 'academic_title_th', 'academic_title_en',
       'artist_name', 'artist_name_th', 'artist_name_en',
-      'artist_bio', 'artist_bio_th', 'artist_bio_en',
+      'artist_avatar_url', 'artist_bio', 'artist_bio_th', 'artist_bio_en',
+      'nationality', 'artist_email', 'artist_phone',
       'technique', 'technique_th', 'technique_en',
       'dimensions', 'year_created', 'price',
+      'description', 'description_th', 'description_en',
+      'cloudinary_public_id', 'image_url', 'thumbnail_url',
+      'zone', 'display_order', 'status'
     ];
     const setClauses = [];
     const params = [];
@@ -1402,6 +1406,18 @@ const eventServer = http.createServer(async (req, res) => {
         params.push(body[key]);
       }
     }
+    if (body.title_th && body.title === undefined) {
+      setClauses.push('title = ?');
+      params.push(body.title_th);
+    }
+    if (body.artist_name_th && body.artist_name === undefined) {
+      setClauses.push('artist_name = ?');
+      params.push(body.artist_name_th);
+    }
+    if (body.image_url && body.thumbnail_url === undefined) {
+      setClauses.push('thumbnail_url = ?');
+      params.push(body.image_url);
+    }
     if (setClauses.length > 0) {
       params.push(id);
       eventDb.prepare(`UPDATE submissions SET ${setClauses.join(', ')} WHERE id = ?`).run(...params);
@@ -1410,6 +1426,47 @@ const eventServer = http.createServer(async (req, res) => {
     const updated = eventDb.prepare('SELECT * FROM submissions WHERE id = ?').get(id);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, submission: updated }));
+    return;
+  }
+
+  if (pathname === '/api/artists/update' && req.method === 'POST') {
+    const body = await parseBody(req);
+    const oldArtistName = (body.old_artist_name || body.artist_name || '').trim();
+    if (!oldArtistName) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Missing old_artist_name' }));
+      return;
+    }
+
+    const allowed = [
+      'artist_name', 'artist_name_th', 'artist_name_en',
+      'academic_title', 'academic_title_th', 'academic_title_en',
+      'artist_avatar_url', 'artist_bio', 'artist_bio_th', 'artist_bio_en',
+      'nationality', 'artist_email', 'artist_phone'
+    ];
+    const setClauses = [];
+    const params = [];
+    for (const key of allowed) {
+      if (body[key] !== undefined) {
+        setClauses.push(`${key} = ?`);
+        params.push(body[key]);
+      }
+    }
+    if (body.artist_name_th && body.artist_name === undefined) {
+      setClauses.push('artist_name = ?');
+      params.push(body.artist_name_th);
+    }
+
+    if (setClauses.length > 0) {
+      params.push(oldArtistName, oldArtistName, oldArtistName);
+      eventDb.prepare(`
+        UPDATE submissions SET ${setClauses.join(', ')} 
+        WHERE artist_name = ? OR artist_name_th = ? OR artist_name_en = ?
+      `).run(...params);
+    }
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true }));
     return;
   }
 

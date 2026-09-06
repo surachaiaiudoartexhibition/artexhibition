@@ -124,6 +124,18 @@ const EventAPI = {
     return await res.json();
   },
 
+  async updateArtist(oldArtistName, data, adminKey) {
+    const res = await fetch(`/api/artists/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": adminKey
+      },
+      body: JSON.stringify({ old_artist_name: oldArtistName, ...data })
+    });
+    return await res.json();
+  },
+
   async getCatalogConfig() {
     const res = await fetch("/api/catalog-config?_t=" + Date.now());
     return await res.json();

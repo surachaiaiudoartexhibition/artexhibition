@@ -340,88 +340,254 @@
       </div>
     </div>
 
-    <!-- Edit Translation Modal -->
-    <div id="edit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
-      <div class="gallery-surface max-w-2xl w-full corner-cut-20 p-6 sm:p-8 space-y-5 border border-[var(--border-accent)] shadow-2xl max-h-[90vh] overflow-y-auto">
+    <!-- Full Artwork & Artist Editor Modal -->
+    <div id="edit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md hidden">
+      <div class="gallery-surface max-w-3xl w-full corner-cut-20 p-5 sm:p-7 space-y-6 border border-[var(--border-accent)] shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
+        <!-- Header -->
         <div class="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-          <h3 class="font-serif-luxury text-lg font-bold text-[var(--text-main)] flex items-center gap-2">
-            <span>✏️</span>
-            <span data-i18n="refine_translation_title">ปรับปรุง / เกลาคำแปล (Refine Bilingual Translation)</span>
-          </h3>
-          <button onclick="closeEditModal()" class="text-[var(--text-subtle)] hover:text-[var(--text-main)] text-xl cursor-pointer">&times;</button>
+          <div>
+            <h3 class="font-serif-luxury text-lg sm:text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
+              <span>✏️</span>
+              <span>แก้ไขข้อมูลผลงานและศิลปิน (Edit Artwork & Artist)</span>
+            </h3>
+            <p id="edit-modal-subtitle" class="text-xs text-[var(--text-subtle)] mt-0.5 font-mono"></p>
+          </div>
+          <button onclick="closeEditModal()" class="text-[var(--text-subtle)] hover:text-[var(--text-main)] text-2xl leading-none cursor-pointer">&times;</button>
         </div>
 
         <input type="hidden" id="edit-id">
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Title TH & EN -->
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_title_th">ชื่อผลงาน (ไทย / TH)</label>
-            <input type="text" id="edit-title-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_title_en">Artwork Title (EN)</label>
-            <input type="text" id="edit-title-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
-          </div>
-
-          <!-- Academic Title TH & EN -->
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_academic_th">ตำแหน่งทางวิชาการ/ราชการ (ไทย / TH)</label>
-            <input type="text" id="edit-academic-th" placeholder="เช่น ศ.ดร., รศ., ผศ., อาจารย์" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:border-[var(--color-accent)] focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_academic_en">Academic Title (EN)</label>
-            <input type="text" id="edit-academic-en" placeholder="e.g. Prof. Dr., Assoc. Prof., Asst. Prof." class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:border-[var(--color-accent)] focus:outline-none">
+        <!-- Section 1: Artwork Media & Replacement -->
+        <div class="space-y-3 bg-[var(--bg-base)] p-4 corner-cut-12 border border-[var(--border-subtle)]">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold flex items-center gap-1.5">
+              <span>🖼️</span>
+              <span>รูปภาพผลงาน (Artwork Image)</span>
+            </span>
+            <span id="edit-art-img-status" class="text-[11px] font-mono text-[var(--text-subtle)]"></span>
           </div>
 
-          <!-- Artist TH & EN -->
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_name_th">ชื่อศิลปิน (ไทย / TH)</label>
-            <input type="text" id="edit-artist-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_name_en">Artist Name (EN)</label>
-            <input type="text" id="edit-artist-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
-          </div>
+          <div class="flex flex-col sm:flex-row gap-4 items-start">
+            <!-- Preview Box -->
+            <div class="w-full sm:w-44 h-44 bg-[var(--mat-bg)] corner-cut-10 overflow-hidden border border-[var(--border-subtle)] flex items-center justify-center relative shrink-0 p-1.5">
+              <img id="edit-art-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Artwork Preview" class="max-w-full max-h-full object-contain">
+              <span id="edit-art-badge-new" class="hidden absolute top-1 right-1 bg-emerald-500 text-black text-[10px] font-bold px-1.5 py-0.5 corner-cut-4">NEW</span>
+            </div>
 
-          <!-- Technique TH & EN -->
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_technique_th">เทคนิค (ไทย / TH)</label>
-            <input type="text" id="edit-technique-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_technique_en">Technique (EN)</label>
-            <input type="text" id="edit-technique-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            <!-- Upload Controls & Progress -->
+            <div class="flex-1 space-y-2.5 w-full">
+              <p class="text-xs text-[var(--text-muted)]">
+                อัปโหลดรูปภาพใหม่เพื่อแทนที่รูปเดิม ระบบจะทำการอัปโหลดขึ้น Cloudinary และลบรูปเก่าออกจาก Cloudinary โดยอัตโนมัติเมื่อกดบันทึก
+              </p>
+              
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="px-3 py-2 corner-cut-6 bg-[var(--color-accent-glow)] hover:brightness-110 text-[var(--color-accent-light)] border border-[var(--border-accent)] text-xs font-semibold cursor-pointer transition inline-flex items-center gap-1.5 shadow-sm">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <span>📷 เลือกรูปภาพผลงานใหม่</span>
+                  <input type="file" id="edit-art-file-input" accept="image/*" class="hidden" onchange="handleEditArtFileChange(event)">
+                </label>
+
+                <button type="button" id="btn-edit-crop-direct" onclick="openCropFromEditModal()" class="px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:border-[var(--border-accent)] text-[var(--text-main)] border border-[var(--border-subtle)] text-xs font-medium cursor-pointer transition inline-flex items-center gap-1">
+                  <span>✂️</span>
+                  <span>ตัดขอบ/หมุนภาพ</span>
+                </button>
+              </div>
+
+              <!-- Upload Progress Bar -->
+              <div id="edit-art-progress-wrap" class="hidden space-y-1 pt-1">
+                <div class="flex justify-between text-[11px] font-mono text-[var(--color-accent-gold)]">
+                  <span id="edit-art-progress-text">กำลังอัปโหลด...</span>
+                  <span id="edit-art-progress-pct">0%</span>
+                </div>
+                <div class="w-full bg-[var(--mat-bg)] h-1.5 corner-cut-4 overflow-hidden border border-[var(--border-subtle)]">
+                  <div id="edit-art-progress-bar" class="bg-[var(--color-accent)] h-full transition-all duration-150" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <input type="hidden" id="edit-art-image-url">
+              <input type="hidden" id="edit-art-thumb-url">
+              <input type="hidden" id="edit-art-public-id">
+            </div>
           </div>
         </div>
 
-        <!-- Description TH & EN -->
-        <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_desc_th">แนวคิดผลงาน (ไทย / TH)</label>
-            <textarea id="edit-desc-th" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+        <!-- Section 2: Artwork Specifications -->
+        <div class="space-y-3 bg-[var(--bg-base)] p-4 corner-cut-12 border border-[var(--border-subtle)]">
+          <span class="text-xs font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold flex items-center gap-1.5">
+            <span>🎨</span>
+            <span>ข้อมูลผลงานศิลปะ (Artwork Details)</span>
+          </span>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- Title TH & EN -->
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">ชื่อผลงาน (ไทย / TH) *</label>
+              <input type="text" id="edit-title-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Artwork Title (EN)</label>
+              <input type="text" id="edit-title-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+
+            <!-- Technique TH & EN -->
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">เทคนิค / วัสดุ (ไทย / TH)</label>
+              <input type="text" id="edit-technique-th" placeholder="เช่น ภาพพิมพ์แกะไม้, ภาพพิมพ์โลหะร่องลึก" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Technique / Medium (EN)</label>
+              <input type="text" id="edit-technique-en" placeholder="e.g. Woodcut, Intaglio Etching" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+
+            <!-- Dimensions, Year, Price -->
+            <div class="grid grid-cols-3 gap-2 col-span-1 sm:col-span-2">
+              <div>
+                <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">ขนาด (Dimensions)</label>
+                <input type="text" id="edit-dimensions" placeholder="เช่น 60 × 80 ซม." class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">ปีที่สร้าง (Year)</label>
+                <input type="text" id="edit-year" placeholder="2026" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">ราคา (Price)</label>
+                <input type="text" id="edit-price" placeholder="เช่น 35,000 บาท หรือ N/A" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_desc_en">Artist Statement / Concept (EN)</label>
-            <textarea id="edit-desc-en" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+
+          <!-- Description / Concept TH & EN -->
+          <div class="space-y-2 pt-1">
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">แนวคิดผลงาน (ไทย / TH)</label>
+              <textarea id="edit-desc-th" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Artist Statement / Concept (EN)</label>
+              <textarea id="edit-desc-en" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+            </div>
           </div>
         </div>
 
-        <!-- Bio TH & EN -->
-        <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1" data-i18n="lbl_bio_th">ประวัติศิลปิน (ไทย / TH)</label>
-            <textarea id="edit-bio-th" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+        <!-- Section 3: Artist Profile & Portrait Replacement -->
+        <div class="space-y-3 bg-[var(--bg-base)] p-4 corner-cut-12 border border-[var(--border-subtle)]">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold flex items-center gap-1.5">
+              <span>👤</span>
+              <span>ข้อมูลและรูปโปรไฟล์ศิลปิน (Artist Profile)</span>
+            </span>
+            <span id="edit-avatar-img-status" class="text-[11px] font-mono text-[var(--text-subtle)]"></span>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1" data-i18n="lbl_bio_en">Artist Bio (EN)</label>
-            <textarea id="edit-bio-en" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+
+          <!-- Avatar Box & Uploader -->
+          <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+            <div class="w-20 h-20 bg-[var(--mat-bg)] corner-cut-12 overflow-hidden border border-[var(--border-accent)] flex items-center justify-center relative shrink-0">
+              <img id="edit-avatar-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Avatar Preview" class="w-full h-full object-cover">
+              <span id="edit-avatar-badge-new" class="hidden absolute top-0 right-0 bg-emerald-500 text-black text-[9px] font-bold px-1 corner-cut-2">NEW</span>
+            </div>
+
+            <div class="flex-1 space-y-2 w-full">
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="px-3 py-1.5 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:border-[var(--border-accent)] text-[var(--color-accent-light)] border border-[var(--border-subtle)] text-xs font-semibold cursor-pointer transition inline-flex items-center gap-1.5">
+                  <span>📸 เปลี่ยนรูปศิลปิน</span>
+                  <input type="file" id="edit-avatar-file-input" accept="image/*" class="hidden" onchange="handleEditAvatarFileChange(event)">
+                </label>
+                <button type="button" onclick="clearEditAvatar()" class="px-2.5 py-1.5 corner-cut-6 text-xs text-rose-400 hover:text-rose-200 border border-rose-800/40 hover:bg-rose-900/40 transition cursor-pointer">
+                  ลบรูปศิลปิน
+                </button>
+              </div>
+
+              <!-- Avatar Progress Bar -->
+              <div id="edit-avatar-progress-wrap" class="hidden space-y-1">
+                <div class="flex justify-between text-[10px] font-mono text-[var(--color-accent-gold)]">
+                  <span>กำลังอัปโหลดรูปศิลปิน...</span>
+                  <span id="edit-avatar-progress-pct">0%</span>
+                </div>
+                <div class="w-full bg-[var(--mat-bg)] h-1 corner-cut-2 overflow-hidden">
+                  <div id="edit-avatar-progress-bar" class="bg-[var(--color-accent)] h-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <input type="hidden" id="edit-avatar-url">
+            </div>
+          </div>
+
+          <!-- Artist Details Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+            <!-- Academic Title TH & EN -->
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">ตำแหน่งทางวิชาการ/ราชการ (ไทย / TH)</label>
+              <input type="text" id="edit-academic-th" placeholder="เช่น ศ.ดร., รศ., ผศ., อาจารย์" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Academic Title (EN)</label>
+              <input type="text" id="edit-academic-en" placeholder="e.g. Prof. Dr., Assoc. Prof., Asst. Prof." class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+
+            <!-- Artist Name TH & EN -->
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">ชื่อศิลปิน (ไทย / TH) *</label>
+              <input type="text" id="edit-artist-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Artist Name (EN)</label>
+              <input type="text" id="edit-artist-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+
+            <!-- Nationality & Contact -->
+            <div>
+              <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">สัญชาติ / ประเทศ (Nationality)</label>
+              <input type="text" id="edit-nationality" list="country-suggestions-admin" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+              <datalist id="country-suggestions-admin">
+                <option value="Thailand">🇹🇭 ไทย (Thailand)</option>
+                <option value="Japan">🇯🇵 ญี่ปุ่น (Japan)</option>
+                <option value="France">🇫🇷 ฝรั่งเศส (France)</option>
+                <option value="Sweden">🇸🇪 สวีเดน (Sweden)</option>
+                <option value="United States">🇺🇸 สหรัฐอเมริกา (USA)</option>
+                <option value="United Kingdom">🇬🇧 สหราชอาณาจักร (UK)</option>
+                <option value="Germany">🇩🇪 เยอรมนี (Germany)</option>
+                <option value="Italy">🇮🇹 อิตาลี (Italy)</option>
+                <option value="China">🇨🇳 จีน (China)</option>
+                <option value="South Korea">🇰🇷 เกาหลีใต้ (South Korea)</option>
+                <option value="Australia">🇦🇺 ออสเตรเลีย (Australia)</option>
+                <option value="Singapore">🇸🇬 สิงคโปร์ (Singapore)</option>
+                <option value="Vietnam">🇻🇳 เวียดนาม (Vietnam)</option>
+                <option value="Malaysia">🇲🇾 มาเลเซีย (Malaysia)</option>
+              </datalist>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">อีเมลติดต่อ (Email)</label>
+              <input type="email" id="edit-email" placeholder="artist@example.com" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Bio TH & EN -->
+          <div class="space-y-2 pt-1">
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">ประวัติศิลปิน (ไทย / TH)</label>
+              <textarea id="edit-bio-th" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Artist Bio (EN)</label>
+              <textarea id="edit-bio-en" rows="2" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+            </div>
           </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border-subtle)]">
-          <button onclick="closeEditModal()" class="px-4 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] text-xs font-semibold transition border border-[var(--border-subtle)] cursor-pointer" data-i18n="btn_cancel">ยกเลิก</button>
-          <button onclick="saveArtworkEdits()" class="px-5 py-2 corner-cut-8 bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:brightness-110 text-xs font-bold transition shadow-md cursor-pointer" data-i18n="btn_save_edits">บันทึกการแก้ไข</button>
+        <!-- Action Footer -->
+        <div class="flex items-center justify-between gap-3 pt-3 border-t border-[var(--border-subtle)]">
+          <div class="text-[11px] text-[var(--text-subtle)] font-mono">
+            ID: <span id="edit-footer-id" class="text-[var(--color-accent-gold)]">-</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" onclick="closeEditModal()" class="px-4 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] text-xs font-semibold transition border border-[var(--border-subtle)] cursor-pointer">ยกเลิก</button>
+            <button type="button" id="btn-save-artwork-edits" onclick="saveArtworkEdits()" class="px-5 py-2 corner-cut-8 bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:brightness-110 text-xs font-bold transition shadow-md cursor-pointer flex items-center gap-1.5">
+              <span>💾</span>
+              <span>บันทึกการแก้ไขทั้งหมด</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -542,6 +708,7 @@
     </div>
   </footer>
 
+  <script src="/js/cloudinary-upload.js"></script>
   <script src="/js/api.js"></script>
   <script>
     let currentTab = "pending";
@@ -698,9 +865,9 @@
               <span>${window.t('btn_crop_rotate')}</span>
             </button>
 
-            <button onclick="openEditModal(${sub.id})" class="px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:border-[var(--color-accent)] text-[var(--text-main)] text-xs font-semibold border border-[var(--border-subtle)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm" title="ปรับปรุงคำแปล">
+            <button onclick="openEditModal(${sub.id})" class="px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:border-[var(--color-accent)] text-[var(--text-main)] text-xs font-semibold border border-[var(--border-subtle)] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm" title="แก้ไขข้อมูลผลงาน ศิลปิน และเปลี่ยนรูปภาพ">
               <span>✏️</span>
-              <span>${window.t('btn_edit_translation')}</span>
+              <span>แก้ไขข้อมูล & เปลี่ยนรูป</span>
             </button>
 
             ${sub.status !== "approved" ? `
@@ -737,25 +904,68 @@
       });
     }
 
-    // Modal Edit Translation logic
+    // Modal Full Artwork & Artist Edit logic
     let editingArtwork = null;
+    let pendingArtworkFile = null;
+    let pendingAvatarFile = null;
 
     function openEditModal(id) {
       const art = allLoadedSubmissions.find(s => s.id === id);
       if (!art) return;
       editingArtwork = art;
+      pendingArtworkFile = null;
+      pendingAvatarFile = null;
 
+      // Modal info
       document.getElementById('edit-id').value = art.id;
+      document.getElementById('edit-footer-id').textContent = `#${art.id}`;
+      document.getElementById('edit-modal-subtitle').textContent = `#${art.id} • ${window.getField(art, 'title')} (${window.getField(art, 'artist_name')})`;
+
+      // Artwork Image preview & fields
+      const artImg = art.thumbnail_url || art.image_url || '';
+      document.getElementById('edit-art-preview').src = artImg;
+      document.getElementById('edit-art-image-url').value = art.image_url || '';
+      document.getElementById('edit-art-thumb-url').value = art.thumbnail_url || '';
+      document.getElementById('edit-art-public-id').value = art.cloudinary_public_id || '';
+      document.getElementById('edit-art-img-status').textContent = art.image_url ? 'มีรูปภาพผลงานแล้ว' : 'ยังไม่มีรูปภาพ';
+      document.getElementById('edit-art-badge-new').classList.add('hidden');
+      document.getElementById('edit-art-file-input').value = '';
+      document.getElementById('edit-art-progress-wrap').classList.add('hidden');
+
+      // Artwork text fields
       document.getElementById('edit-title-th').value = art.title_th || art.title || '';
       document.getElementById('edit-title-en').value = art.title_en || art.title || '';
+      document.getElementById('edit-technique-th').value = art.technique_th || art.technique || '';
+      document.getElementById('edit-technique-en').value = art.technique_en || art.technique || '';
+      document.getElementById('edit-dimensions').value = art.dimensions || '';
+      document.getElementById('edit-year').value = art.year_created || '2026';
+      document.getElementById('edit-price').value = art.price || '';
+      document.getElementById('edit-desc-th').value = art.description_th || art.description || '';
+      document.getElementById('edit-desc-en').value = art.description_en || art.description || '';
+
+      // Artist Avatar & fields
+      const hasAvatar = Boolean(art.artist_avatar_url && art.artist_avatar_url.trim() && !art.artist_avatar_url.includes('unsplash.com'));
+      const avatarPreview = document.getElementById('edit-avatar-preview');
+      if (hasAvatar) {
+        avatarPreview.src = art.artist_avatar_url;
+        avatarPreview.classList.remove('hidden');
+        document.getElementById('edit-avatar-img-status').textContent = 'มีรูปศิลปินแล้ว';
+      } else {
+        avatarPreview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(art.artist_name || 'Artist')}&background=13141f&color=D4AF37&bold=true`;
+        document.getElementById('edit-avatar-img-status').textContent = 'ไม่มีรูปภาพ (ใช้ตัวแทน)';
+      }
+      document.getElementById('edit-avatar-url').value = art.artist_avatar_url || '';
+      document.getElementById('edit-avatar-badge-new').classList.add('hidden');
+      document.getElementById('edit-avatar-file-input').value = '';
+      document.getElementById('edit-avatar-progress-wrap').classList.add('hidden');
+
+      // Artist text fields
       document.getElementById('edit-academic-th').value = art.academic_title_th || art.academic_title || '';
       document.getElementById('edit-academic-en').value = art.academic_title_en || art.academic_title || '';
       document.getElementById('edit-artist-th').value = art.artist_name_th || art.artist_name || '';
       document.getElementById('edit-artist-en').value = art.artist_name_en || art.artist_name || '';
-      document.getElementById('edit-technique-th').value = art.technique_th || art.technique || '';
-      document.getElementById('edit-technique-en').value = art.technique_en || art.technique || '';
-      document.getElementById('edit-desc-th').value = art.description_th || art.description || '';
-      document.getElementById('edit-desc-en').value = art.description_en || art.description || '';
+      document.getElementById('edit-nationality').value = art.nationality || 'Thailand';
+      document.getElementById('edit-email').value = art.artist_email || '';
       document.getElementById('edit-bio-th').value = art.artist_bio_th || art.artist_bio || '';
       document.getElementById('edit-bio-en').value = art.artist_bio_en || art.artist_bio || '';
 
@@ -765,40 +975,168 @@
     function closeEditModal() {
       document.getElementById('edit-modal').classList.add('hidden');
       editingArtwork = null;
+      pendingArtworkFile = null;
+      pendingAvatarFile = null;
+    }
+
+    function openCropFromEditModal() {
+      if (!editingArtwork) return;
+      const curImgUrl = document.getElementById('edit-art-image-url').value;
+      if (curImgUrl) {
+        editingArtwork.image_url = curImgUrl;
+      }
+      closeEditModal();
+      openCropModal(editingArtwork.id);
+    }
+
+    function handleEditArtFileChange(e) {
+      if (!e.target.files || !e.target.files[0]) return;
+      const file = e.target.files[0];
+      pendingArtworkFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('edit-art-preview').src = ev.target.result;
+        document.getElementById('edit-art-badge-new').classList.remove('hidden');
+        document.getElementById('edit-art-img-status').textContent = `✓ เลือกรูปใหม่แล้ว (${file.name})`;
+        document.getElementById('edit-art-img-status').className = 'text-[11px] font-mono text-emerald-400 font-semibold';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleEditAvatarFileChange(e) {
+      if (!e.target.files || !e.target.files[0]) return;
+      const file = e.target.files[0];
+      pendingAvatarFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('edit-avatar-preview').src = ev.target.result;
+        document.getElementById('edit-avatar-badge-new').classList.remove('hidden');
+        document.getElementById('edit-avatar-img-status').textContent = `✓ เลือกรูปศิลปินใหม่แล้ว (${file.name})`;
+        document.getElementById('edit-avatar-img-status').className = 'text-[11px] font-mono text-emerald-400 font-semibold';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearEditAvatar() {
+      pendingAvatarFile = null;
+      document.getElementById('edit-avatar-url').value = '';
+      document.getElementById('edit-avatar-file-input').value = '';
+      const artistName = document.getElementById('edit-artist-th').value || 'Artist';
+      document.getElementById('edit-avatar-preview').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=13141f&color=D4AF37&bold=true`;
+      document.getElementById('edit-avatar-badge-new').classList.remove('hidden');
+      document.getElementById('edit-avatar-badge-new').textContent = 'ลบแล้ว';
+      document.getElementById('edit-avatar-img-status').textContent = 'จะลบรูปศิลปินเมื่อบันทึก';
+      document.getElementById('edit-avatar-img-status').className = 'text-[11px] font-mono text-amber-400';
     }
 
     async function saveArtworkEdits() {
       if (!editingArtwork) return;
       const id = editingArtwork.id;
-      const academicTh = document.getElementById('edit-academic-th').value.trim();
-      const academicEn = document.getElementById('edit-academic-en').value.trim();
-      const payload = {
-        title_th: document.getElementById('edit-title-th').value.trim(),
-        title_en: document.getElementById('edit-title-en').value.trim(),
-        academic_title: academicTh || academicEn,
-        academic_title_th: academicTh,
-        academic_title_en: academicEn,
-        artist_name_th: document.getElementById('edit-artist-th').value.trim(),
-        artist_name_en: document.getElementById('edit-artist-en').value.trim(),
-        technique_th: document.getElementById('edit-technique-th').value.trim(),
-        technique_en: document.getElementById('edit-technique-en').value.trim(),
-        description_th: document.getElementById('edit-desc-th').value.trim(),
-        description_en: document.getElementById('edit-desc-en').value.trim(),
-        artist_bio_th: document.getElementById('edit-bio-th').value.trim(),
-        artist_bio_en: document.getElementById('edit-bio-en').value.trim()
-      };
+      const btnSave = document.getElementById('btn-save-artwork-edits');
+      btnSave.disabled = true;
+      btnSave.innerHTML = `<span>⏳</span><span>กำลังบันทึกข้อมูล...</span>`;
 
       try {
+        const config = await EventAPI.getConfig();
+        let newArtworkImageUrl = document.getElementById('edit-art-image-url').value;
+        let newArtworkThumbUrl = document.getElementById('edit-art-thumb-url').value;
+        let newCloudinaryPublicId = document.getElementById('edit-art-public-id').value;
+        let newAvatarUrl = document.getElementById('edit-avatar-url').value;
+
+        // 1. Upload new Artwork file to Cloudinary if selected
+        if (pendingArtworkFile) {
+          const wrapEl = document.getElementById('edit-art-progress-wrap');
+          const barEl = document.getElementById('edit-art-progress-bar');
+          const pctEl = document.getElementById('edit-art-progress-pct');
+          const txtEl = document.getElementById('edit-art-progress-text');
+          wrapEl.classList.remove('hidden');
+
+          const uploadRes = await CloudinaryUploader.uploadDirect(pendingArtworkFile, {
+            cloudName: config.cloudinaryCloudName,
+            uploadPreset: config.cloudinaryUploadPreset,
+            onProgress: (pct) => {
+              barEl.style.width = `${pct}%`;
+              pctEl.textContent = `${pct}%`;
+              txtEl.textContent = `กำลังอัปโหลดผลงาน... ${pct}%`;
+            }
+          });
+
+          newArtworkImageUrl = uploadRes.imageUrl;
+          newArtworkThumbUrl = uploadRes.thumbnailUrl || uploadRes.imageUrl;
+          newCloudinaryPublicId = uploadRes.publicId || '';
+        }
+
+        // 2. Upload new Avatar file to Cloudinary if selected
+        if (pendingAvatarFile) {
+          const wrapEl = document.getElementById('edit-avatar-progress-wrap');
+          const barEl = document.getElementById('edit-avatar-progress-bar');
+          const pctEl = document.getElementById('edit-avatar-progress-pct');
+          wrapEl.classList.remove('hidden');
+
+          const avatarUploadRes = await CloudinaryUploader.uploadDirect(pendingAvatarFile, {
+            cloudName: config.cloudinaryCloudName,
+            uploadPreset: config.cloudinaryUploadPreset,
+            onProgress: (pct) => {
+              barEl.style.width = `${pct}%`;
+              pctEl.textContent = `${pct}%`;
+            }
+          });
+
+          newAvatarUrl = avatarUploadRes.imageUrl;
+        }
+
+        const academicTh = document.getElementById('edit-academic-th').value.trim();
+        const academicEn = document.getElementById('edit-academic-en').value.trim();
+        const artistTh = document.getElementById('edit-artist-th').value.trim();
+        const artistEn = document.getElementById('edit-artist-en').value.trim();
+        const titleTh = document.getElementById('edit-title-th').value.trim();
+        const titleEn = document.getElementById('edit-title-en').value.trim();
+        const techTh = document.getElementById('edit-technique-th').value.trim();
+        const techEn = document.getElementById('edit-technique-en').value.trim();
+
+        const payload = {
+          title: titleTh || titleEn || editingArtwork.title,
+          title_th: titleTh,
+          title_en: titleEn,
+          academic_title: academicTh || academicEn,
+          academic_title_th: academicTh,
+          academic_title_en: academicEn,
+          artist_name: artistTh || artistEn || editingArtwork.artist_name,
+          artist_name_th: artistTh,
+          artist_name_en: artistEn,
+          technique: techTh || techEn,
+          technique_th: techTh,
+          technique_en: techEn,
+          dimensions: document.getElementById('edit-dimensions').value.trim(),
+          year_created: document.getElementById('edit-year').value.trim(),
+          price: document.getElementById('edit-price').value.trim(),
+          description_th: document.getElementById('edit-desc-th').value.trim(),
+          description_en: document.getElementById('edit-desc-en').value.trim(),
+          nationality: document.getElementById('edit-nationality').value.trim() || 'Thailand',
+          artist_email: document.getElementById('edit-email').value.trim(),
+          artist_bio_th: document.getElementById('edit-bio-th').value.trim(),
+          artist_bio_en: document.getElementById('edit-bio-en').value.trim(),
+          image_url: newArtworkImageUrl,
+          thumbnail_url: newArtworkThumbUrl,
+          cloudinary_public_id: newCloudinaryPublicId,
+          artist_avatar_url: newAvatarUrl
+        };
+
         const res = await EventAPI.updateArtwork(id, payload, getAdminKey());
-        if (res.success) {
-          showToast(window.i18n.getLang() === 'th' ? 'บันทึกการปรับปรุงคำแปลเรียบร้อยแล้ว' : 'Bilingual translation updated successfully', 'success');
+        if (res && res.success) {
+          showToast(window.i18n.getLang() === 'th' ? 'บันทึกการแก้ไขผลงานและรูปภาพเรียบร้อยแล้ว' : 'Artwork and images updated successfully', 'success');
           closeEditModal();
-          loadDashboardSubmissions();
+          await loadDashboardSubmissions();
         } else {
-          alert((window.t('app_error') || 'เกิดข้อผิดพลาดในการบันทึก: ') + ' ' + (res.error || ''));
+          alert((window.t('app_error') || 'เกิดข้อผิดพลาดในการบันทึก: ') + ' ' + (res?.error || 'Unknown error'));
         }
       } catch (err) {
         alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + err.message);
+      } finally {
+        btnSave.disabled = false;
+        btnSave.innerHTML = `<span>💾</span><span>บันทึกการแก้ไขทั้งหมด</span>`;
       }
     }
 
