@@ -313,7 +313,72 @@
     return tex;
   }
 
-  function createPlacardTexture(title, artist, eventTitle) {
+  // ==========================================
+  // 2.1 Artwork Dimensions & Real-Scale Parser
+  // ==========================================
+  function parseArtworkDimensions(dimStr) {
+    if (!dimStr || typeof dimStr !== 'string') return null;
+    const s = dimStr.trim();
+    if (!s || s === '-' || s.toLowerCase() === 'null') return null;
+
+    // Pattern 1: Thai labeled format (e.g., "กว้าง 37 ซม. สูง 71 ซม. ลึก 46 ซม." or "กว้าง 17 สูง 55 ซม.")
+    const thaiW = s.match(/กว้าง\s*([\d.]+)/);
+    const thaiH = s.match(/สูง\s*([\d.]+)/);
+    if (thaiW && thaiH) {
+      const w = parseFloat(thaiW[1]);
+      const h = parseFloat(thaiH[1]);
+      if (w > 0 && h > 0) return { widthCm: w, heightCm: h, raw: s };
+    }
+
+    // Pattern 2: Circular / Diameter (e.g., "เส้นผ่าศูนย์กลาง 70 ซม." or "diameter 70 cm")
+    const diaMatch = s.match(/(?:เส้นผ่าศูนย์กลาง|diameter|dia)\s*([\d.]+)/i);
+    if (diaMatch) {
+      const d = parseFloat(diaMatch[1]);
+      if (d > 0) return { widthCm: d, heightCm: d, raw: s };
+    }
+
+    // Pattern 3: Standard W x H format (e.g., "80 x 60 ซม.", "60 x 80 cm", "100 × 80 ซม.", "69.8 x 44.5 ซม.")
+    const numMatch = s.match(/([\d.]+)\s*[xX×*]\s*([\d.]+)/);
+    if (numMatch) {
+      const w = parseFloat(numMatch[1]);
+      const h = parseFloat(numMatch[2]);
+      if (w > 0 && h > 0) return { widthCm: w, heightCm: h, raw: s };
+    }
+
+    return null;
+  }
+
+  function calculateArtwork3DDimensions(dimStr) {
+    const parsed = parseArtworkDimensions(dimStr);
+    const METER_SCALE = 0.022; // 1 cm real = 0.022 Three.js units (e.g. 100 cm = 2.2m)
+    const MIN_W = 0.85;
+    const MAX_W = 3.2;
+    const MIN_H = 0.7;
+    const MAX_H = 2.5;
+
+    if (parsed) {
+      let w = parsed.widthCm * METER_SCALE;
+      let h = parsed.heightCm * METER_SCALE;
+
+      // Maintain exact aspect ratio while fitting museum gallery bounds
+      if (w > MAX_W || h > MAX_H) {
+        const scaleDown = Math.min(MAX_W / w, MAX_H / h);
+        w *= scaleDown;
+        h *= scaleDown;
+      }
+      if (w < MIN_W && h < MIN_H) {
+        const scaleUp = Math.min(MIN_W / w, MIN_H / h);
+        w *= scaleUp;
+        h *= scaleUp;
+      }
+      return { w, h, fromReal: true, widthCm: parsed.widthCm, heightCm: parsed.heightCm, dimText: parsed.raw };
+    }
+
+    // Default fallback if dimension text is absent or '-'
+    return { w: 2.2, h: 1.65, fromReal: false, dimText: '' };
+  }
+
+  function createPlacardTexture(title, artist, eventTitle, dimText) {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 180;
@@ -333,18 +398,25 @@
 
     // Event title badge
     ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 20px sans-serif';
-    ctx.fillText((eventTitle || 'VIRTUAL EXHIBITION').toUpperCase().slice(0, 38), 24, 42);
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillText((eventTitle || 'VIRTUAL EXHIBITION').toUpperCase().slice(0, 36), 24, 38);
 
     // Title
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 28px "Sarabun", sans-serif';
-    ctx.fillText((title || 'Untitled').slice(0, 32), 24, 88);
+    ctx.font = 'bold 26px "Sarabun", sans-serif';
+    ctx.fillText((title || 'Untitled').slice(0, 30), 24, 80);
 
     // Artist
     ctx.fillStyle = '#c5a059';
-    ctx.font = '22px "Sarabun", sans-serif';
-    ctx.fillText(`ศิลปิน: ${artist || 'ไม่ระบุศิลปิน'}`.slice(0, 36), 24, 134);
+    ctx.font = '20px "Sarabun", sans-serif';
+    ctx.fillText(`ศิลปิน: ${artist || 'ไม่ระบุศิลปิน'}`.slice(0, 34), 24, 120);
+
+    // Dimensions (if available)
+    if (dimText && dimText !== '-') {
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '16px "Sarabun", sans-serif';
+      ctx.fillText(`ขนาดจริง: ${dimText}`.slice(0, 38), 24, 154);
+    }
 
     const tex = new THREE.CanvasTexture(canvas);
     return tex;
@@ -693,8 +765,10 @@
         artworkGroup.position.set(slot.x, slot.y, slot.z);
         artworkGroup.rotation.y = slot.rotY;
 
-        const w = 2.4;
-        const h = 1.8;
+        // Calculate size adhering to real artwork physical dimensions
+        const dimSpec = calculateArtwork3DDimensions(art.dimensions);
+        let w = dimSpec.w;
+        let h = dimSpec.h;
 
         const frameGeo = new THREE.BoxGeometry(w + 0.12, h + 0.12, 0.06);
         // Poh-Chang Heritage Antique Gold/Bronze Frame (No heavy pitch-black frame)
@@ -714,6 +788,25 @@
           canvasMat.map = tex;
           canvasMat.color.setHex(0xffffff);
           canvasMat.needsUpdate = true;
+
+          // If no explicit dimensions were registered, adjust canvas & frame ratio to the actual image aspect ratio
+          if (!dimSpec.fromReal && tex.image && tex.image.width && tex.image.height) {
+            const aspect = tex.image.width / tex.image.height;
+            let autoW = 2.2;
+            let autoH = autoW / aspect;
+            if (autoH > 2.4) {
+              autoH = 2.4;
+              autoW = autoH * aspect;
+            }
+            if (autoW > 3.0) {
+              autoW = 3.0;
+              autoH = autoW / aspect;
+            }
+            canvasMesh.scale.set(autoW / w, autoH / h, 1);
+            frameMesh.scale.set((autoW + 0.12) / (w + 0.12), (autoH + 0.12) / (h + 0.12), 1);
+            placardMesh.position.set(0, -autoH / 2 - 0.28, 0.05);
+            hitMesh.scale.set((autoW + 0.4) / (w + 0.4), (autoH + 0.8) / (h + 0.8), 1);
+          }
         }, undefined, () => {
           canvasMat.color.setHex(0xE8E0D2);
         });
@@ -722,11 +815,11 @@
         canvasMesh.position.z = 0.04;
         artworkGroup.add(canvasMesh);
 
-        const placardGeo = new THREE.PlaneGeometry(0.9, 0.32);
-        const placardTex = createPlacardTexture(art.title, art.artist_name, art.event_title);
+        const placardGeo = new THREE.PlaneGeometry(0.95, 0.34);
+        const placardTex = createPlacardTexture(art.title, art.artist_name, art.event_title, dimSpec.dimText);
         const placardMat = new THREE.MeshBasicMaterial({ map: placardTex });
         const placardMesh = new THREE.Mesh(placardGeo, placardMat);
-        placardMesh.position.set(0, -h / 2 - 0.3, 0.05);
+        placardMesh.position.set(0, -h / 2 - 0.28, 0.05);
         artworkGroup.add(placardMesh);
 
         // Individual spotlights removed for optimal 60fps performance across 100+ artworks
@@ -743,7 +836,11 @@
           artwork: art,
           group: artworkGroup,
           canvasMat,
+          canvasMesh,
+          frameMesh,
+          placardMesh,
           hitMesh,
+          dimSpec,
           slot,
           index,
           highResLoaded: false
@@ -770,6 +867,27 @@
           item.canvasMat.needsUpdate = true;
           if (oldMap && oldMap !== hiTex) {
             oldMap.dispose(); // Free GPU VRAM
+          }
+
+          // In case thumbnail was missing or had different aspect, adjust aspect ratio if no real dimension was given
+          if (item.dimSpec && !item.dimSpec.fromReal && hiTex.image && hiTex.image.width && hiTex.image.height && item.canvasMesh) {
+            const aspect = hiTex.image.width / hiTex.image.height;
+            let autoW = 2.2;
+            let autoH = autoW / aspect;
+            if (autoH > 2.4) {
+              autoH = 2.4;
+              autoW = autoH * aspect;
+            }
+            if (autoW > 3.0) {
+              autoW = 3.0;
+              autoH = autoW / aspect;
+            }
+            const origW = item.dimSpec.w;
+            const origH = item.dimSpec.h;
+            item.canvasMesh.scale.set(autoW / origW, autoH / origH, 1);
+            if (item.frameMesh) item.frameMesh.scale.set((autoW + 0.12) / (origW + 0.12), (autoH + 0.12) / (origH + 0.12), 1);
+            if (item.placardMesh) item.placardMesh.position.set(0, -autoH / 2 - 0.28, 0.05);
+            if (item.hitMesh) item.hitMesh.scale.set((autoW + 0.4) / (origW + 0.4), (autoH + 0.8) / (origH + 0.8), 1);
           }
         });
       }
@@ -1167,20 +1285,22 @@
     const isEn = window.i18n && window.i18n.getLang() === 'en';
     if (artistEl) artistEl.textContent = isEn ? `By ${artistName}` : `โดย ${artistName}`;
 
+    const cleanField = (val) => (!val || val === '-' || val === 'null' || val === 'undefined') ? '' : val;
+
     const techEl = document.getElementById('modal-art-technique');
-    if (techEl) techEl.textContent = window.getField(art, 'technique', '-');
+    if (techEl) techEl.textContent = cleanField(window.getField(art, 'technique', '')) || 'ไม่ระบุเทคนิค';
 
     const dimEl = document.getElementById('modal-art-dimensions');
-    if (dimEl) dimEl.textContent = window.getField(art, 'dimensions', '-');
+    if (dimEl) dimEl.textContent = cleanField(window.getField(art, 'dimensions', '')) || 'ตามสัดส่วนภาพจริง';
 
     const yearEl = document.getElementById('modal-art-year');
-    if (yearEl) yearEl.textContent = art.year_created || '-';
+    if (yearEl) yearEl.textContent = cleanField(art.year_created) || 'ไม่ระบุ';
 
     const zoneEl = document.getElementById('modal-art-zone');
-    if (zoneEl) zoneEl.textContent = art.zone || 'Main Hall';
+    if (zoneEl) zoneEl.textContent = cleanField(art.zone) || 'Main Hall';
 
     const descEl = document.getElementById('modal-art-desc');
-    if (descEl) descEl.textContent = window.getField(art, 'description', window.t('hero_desc'));
+    if (descEl) descEl.textContent = cleanField(window.getField(art, 'description', '')) || 'ไม่มีข้อมูลรายละเอียดเพิ่มเติม';
 
     const eventBadge = document.getElementById('modal-event-badge');
     if (eventBadge) eventBadge.textContent = window.getField(art, 'event_title', art.event_id || 'Exhibition');
