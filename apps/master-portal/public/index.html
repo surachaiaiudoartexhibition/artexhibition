@@ -268,7 +268,7 @@
         </div>
 
         <!-- Artworks Grid of this Event -->
-        <div id="single-event-artworks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div id="single-event-artworks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-7">
           <!-- Populated by JS -->
         </div>
       </section>
@@ -891,33 +891,43 @@
       }
 
       artworksList.forEach(art => {
-        const title = window.getField(art, 'title', 'Untitled');
-        const artistName = window.getArtistFullName(art, 'Unknown Artist');
-        const technique = window.getField(art, 'technique', 'ภาพพิมพ์และสื่อผสมร่วมสมัย');
-        const dimensions = window.getField(art, 'dimensions', '');
-        const year = art.year_created || "2026";
-        const zone = art.zone || "Main Gallery";
-        const nationality = art.nationality || "";
-        const desc = window.getField(art, 'description', '');
+        // Sanitize string to eliminate null, undefined, '-'
+        const clean = (val) => {
+          if (!val) return '';
+          const s = String(val).trim();
+          if (s === '-' || s === '–' || s === '—' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') return '';
+          return s;
+        };
+
+        const title = clean(window.getField(art, 'title')) || 'Untitled';
+        const artistName = clean(window.getArtistFullName(art)) || 'Unknown Artist';
+        const technique = clean(window.getField(art, 'technique'));
+        const dimensions = clean(window.getField(art, 'dimensions'));
+        const year = clean(art.year_created);
+        const zone = clean(art.zone) || "Main Gallery";
+        const nationality = clean(art.nationality);
+        const desc = clean(window.getField(art, 'description'));
         const imageUrl = art.thumbnail_url || art.image_url;
         const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=FAF7F0&color=9A7833&bold=true`;
-        const eventPageUrl = art.event_page_url || '#';
+        const eventPageUrl = (art.event_page_url && art.event_page_url !== '#') ? art.event_page_url : '';
 
         const card = document.createElement("div");
-        card.className = "bg-white rounded-3xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[#E8E0D2] shadow-xs";
+        card.className = "bg-white rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[#E8E0D2] shadow-xs";
 
         card.innerHTML = `
-          <!-- Artwork Image Display with Clean Light Curatorial Surface (NO Black Frame) -->
-          <div class="relative aspect-[4/3] bg-[#F7F4EC] p-4 flex items-center justify-center overflow-hidden border-b border-[#E8E0D2]">
+          <!-- Artwork Image Display with Clean Light Curatorial Surface -->
+          <div class="relative aspect-[4/3] bg-[#F7F4EC] p-3 sm:p-4 flex items-center justify-center overflow-hidden border-b border-[#E8E0D2]">
             <!-- Top Badges Overlay -->
-            <div class="absolute top-3 inset-x-3 flex items-center justify-between z-10 pointer-events-none">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#1A2822]/85 text-[#E8C87A] border border-[#C5A059]/40 backdrop-blur-xs flex items-center gap-1.5 shadow-2xs max-w-[200px] truncate">
+            <div class="absolute top-2.5 inset-x-2.5 flex items-center justify-between z-10 pointer-events-none gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#1A2822]/90 text-[#E8C87A] border border-[#C5A059]/40 backdrop-blur-xs flex items-center gap-1.5 shadow-xs truncate max-w-[180px]">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0"></span>
                 <span class="truncate">${zone}</span>
               </span>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-[#1A2822]/85 text-[#C8DBD2] border border-[#355246] backdrop-blur-xs shadow-2xs">
-                ${year}
-              </span>
+              ${year ? `
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-[#1A2822]/90 text-[#C8DBD2] border border-[#355246] backdrop-blur-xs shadow-xs shrink-0">
+                  ${year}
+                </span>
+              ` : ''}
             </div>
 
             <img src="${imageUrl}" alt="${title}" 
@@ -926,63 +936,79 @@
           </div>
 
           <!-- Card Museum Plaque Content -->
-          <div class="p-5 flex-1 flex flex-col justify-between bg-white">
-            <div>
-              <h3 onclick="openArtworkDetailModal('${art.global_id}')" class="font-serif-luxury text-xl text-[#171C1A] group-hover:text-[#9A7833] transition truncate leading-snug font-normal cursor-pointer" title="${title}">
+          <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-white">
+            <div class="space-y-1.5">
+              <!-- Title: 2 lines max, no abrupt truncation -->
+              <h3 onclick="openArtworkDetailModal('${art.global_id}')" 
+                  class="font-serif-luxury text-lg sm:text-xl text-[#171C1A] group-hover:text-[#9A7833] transition line-clamp-2 leading-snug font-medium cursor-pointer" 
+                  title="${title}">
                 ${title}
               </h3>
-              <p class="text-[11px] text-[#64736C] truncate mt-1 font-light" title="${technique}">
-                ${technique}${dimensions ? ` &bull; ${dimensions}` : ''}
-              </p>
-              ${desc ? `<p class="text-xs text-[#4D5D55] font-light leading-relaxed line-clamp-2 mt-2" title="${desc}">${desc}</p>` : ''}
+
+              <!-- Technique & Dimensions: crisp contrast, no orphan '-' -->
+              <div class="text-xs text-[#4A5852] font-normal leading-relaxed">
+                ${technique ? `<span>${technique}</span>` : '<span>ภาพพิมพ์และสื่อผสมร่วมสมัย</span>'}
+                ${dimensions ? `<span class="text-[#9A7833] mx-1.5 font-bold">&bull;</span><span class="font-mono text-[#5C6E66]">${dimensions}</span>` : ''}
+              </div>
+
+              <!-- Curatorial Statement Excerpt (only if real text exists) -->
+              ${desc ? `
+                <p class="text-xs text-[#5C6E66] font-light leading-relaxed line-clamp-2 italic pt-1.5 border-t border-[#E8E0D2]/50 mt-1.5" title="${desc}">
+                  "${desc}"
+                </p>
+              ` : ''}
             </div>
 
             <div class="mt-4 pt-3.5 border-t border-[#E8E0D2] space-y-3">
-              <!-- Artist Row & In-Portal Detail Button -->
-              <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2.5 min-w-0">
-                  <img src="${avatar}" alt="${artistName}" 
-                       class="w-8 h-8 rounded-full object-cover border border-[#C5A059]/60 shrink-0 shadow-2xs"
-                       onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=FAF7F0&color=9A7833&bold=true'">
-                  <div class="min-w-0">
-                    <span class="text-xs text-[#171C1A] font-medium tracking-wide truncate block">${artistName}</span>
-                    ${nationality ? `<span class="text-[10px] text-[#64736C] font-light truncate block">${nationality}</span>` : ''}
-                  </div>
+              <!-- Artist Profile Row: dedicated row with full breathing room -->
+              <div class="flex items-center gap-3">
+                <img src="${avatar}" alt="${artistName}" 
+                     class="w-9 h-9 rounded-full object-cover border border-[#C5A059]/50 shrink-0 shadow-2xs"
+                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=FAF7F0&color=9A7833&bold=true'">
+                <div class="min-w-0 flex-1">
+                  <span class="text-xs font-semibold text-[#171C1A] truncate block group-hover:text-[#9A7833] transition" title="${artistName}">
+                    ${artistName}
+                  </span>
+                  ${nationality ? `
+                    <span class="text-[11px] text-[#7A8B84] truncate block mt-0.5">${nationality}</span>
+                  ` : `
+                    <span class="text-[10px] font-mono text-[#9A7833] tracking-wider block mt-0.5">ARTIST</span>
+                  `}
                 </div>
-
-                <!-- Open in-portal modal directly without leaving the portal -->
-                <button onclick="openArtworkDetailModal('${art.global_id}')"
-                  class="px-2.5 py-1.5 rounded-lg border border-[#C5A059]/50 hover:border-[#C5A059] bg-[#FAF3E3]/60 hover:bg-[#FAF3E3] text-[#9A7833] hover:text-[#6D531F] text-xs font-semibold flex items-center gap-1 transition shrink-0 cursor-pointer shadow-2xs">
-                  <span>${window.t('btn_inspect') || 'รายละเอียด'}</span>
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </button>
               </div>
 
-              <!-- Quick Action Row: Official Event Site vs 3D Room -->
-              <div class="grid grid-cols-2 gap-2 pt-2 border-t border-[#E8E0D2]/60">
-                <a href="${eventPageUrl}" target="_blank" rel="noopener"
-                   class="min-h-[38px] py-1.5 px-2.5 rounded-xl bg-[#F4EFE6] hover:bg-[#ECE5D8] text-[#323F38] hover:text-[#171C1A] font-medium text-xs text-center border border-[#E8E0D2] transition flex items-center justify-center gap-1 shadow-2xs">
-                  <span>${window.t('nav_event_webapp') || 'เว็บอีเวนต์'}</span>
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              <!-- Action Buttons Row: 2 Clean, Perfectly Balanced, Non-wrapping Buttons -->
+              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#E8E0D2]/60">
+                <button onclick="openArtworkDetailModal('${art.global_id}')"
+                  class="min-h-[38px] py-1.5 px-2 rounded-xl border border-[#C5A059]/60 hover:border-[#C5A059] bg-[#FAF3E3]/80 hover:bg-[#FAF3E3] text-[#8C6D2D] hover:text-[#6D531F] text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs whitespace-nowrap">
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
-                </a>
+                  <span>ดูรายละเอียด</span>
+                </button>
 
                 <a href="/gallery-3d.html?event_id=${encodeURIComponent(currentEventId || art.event_id)}"
-                   class="min-h-[38px] py-1.5 px-2.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs text-center shadow-sm shadow-[#C5A059]/20 transition flex items-center justify-center gap-1">
-                  <svg class="w-3.5 h-3.5 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="min-h-[38px] py-1.5 px-2 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+                  <svg class="w-3.5 h-3.5 shrink-0 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
                   </svg>
-                  <span>${window.t('nav_3d_gallery') || 'ชมในห้อง 3D'}</span>
+                  <span>ห้องจัดแสดง 3D</span>
                 </a>
               </div>
 
-              <!-- Global ID footer tag -->
-              <span class="text-[10px] font-mono text-[#8A9890] text-center block pt-0.5">
-                Global ID: ${art.global_id}
-              </span>
+              <!-- Footer: Global ID and Optional Event Webapp Link -->
+              <div class="flex items-center justify-between pt-0.5 text-[10px] font-mono text-[#8A9890]">
+                <span>ID: ${art.global_id}</span>
+                ${eventPageUrl ? `
+                  <a href="${eventPageUrl}" target="_blank" rel="noopener" class="text-[#9A7833] hover:text-[#6D531F] hover:underline flex items-center gap-0.5 font-sans font-medium" title="เปิดหน้าผลงานในเว็บเฉพาะนิทรรศการ">
+                    <span>เว็บงาน</span>
+                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                ` : ''}
+              </div>
             </div>
           </div>
         `;
@@ -1014,33 +1040,42 @@
       const art = currentEventArtworks.find(a => a.global_id === globalId);
       if (!art) return;
 
+      const clean = (val) => {
+        if (!val) return '';
+        const s = String(val).trim();
+        if (s === '-' || s === '–' || s === '—' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') return '';
+        return s;
+      };
+
       const modal = document.getElementById("artwork-detail-modal");
-      const title = window.getField(art, 'title', 'Untitled');
-      const artistName = window.getArtistFullName(art, 'Unknown Artist');
-      const technique = window.getField(art, 'technique', 'ภาพพิมพ์และสื่อผสมร่วมสมัย');
-      const dimensions = window.getField(art, 'dimensions', '-');
-      const year = art.year_created || "-";
-      const zone = art.zone || "Main Gallery";
-      const nationality = art.nationality || "";
-      const desc = window.getField(art, 'description', window.t('hero_desc'));
+      const title = clean(window.getField(art, 'title')) || 'Untitled';
+      const artistName = clean(window.getArtistFullName(art)) || 'Unknown Artist';
+      const technique = clean(window.getField(art, 'technique')) || 'ภาพพิมพ์และสื่อผสมร่วมสมัย';
+      const dimensions = clean(window.getField(art, 'dimensions'));
+      const year = clean(art.year_created);
+      const zone = clean(art.zone) || "Main Gallery";
+      const nationality = clean(art.nationality);
+      const desc = clean(window.getField(art, 'description'));
       const imageUrl = art.image_url || art.thumbnail_url;
-      const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=1c1e26&color=D4AF37&bold=true`;
+      const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=FAF7F0&color=9A7833&bold=true`;
 
       document.getElementById("detail-art-image").src = imageUrl;
       document.getElementById("detail-art-raw-link").href = imageUrl;
-      document.getElementById("detail-art-stage-dim").textContent = dimensions !== "-" ? `${dimensions} • ${year}` : year;
+      
+      const dimParts = [dimensions, year].filter(Boolean);
+      document.getElementById("detail-art-stage-dim").textContent = dimParts.join(" • ");
 
       document.getElementById("detail-art-title").textContent = title;
       document.getElementById("detail-art-technique").textContent = technique;
-      document.getElementById("detail-art-dimensions").textContent = dimensions;
-      document.getElementById("detail-art-year").textContent = year;
+      document.getElementById("detail-art-dimensions").textContent = dimensions || "ตามสัดส่วนผลงานจริง";
+      document.getElementById("detail-art-year").textContent = year || "2026";
       document.getElementById("detail-art-zone").textContent = zone;
       document.getElementById("detail-art-event").textContent = window.getField(art, 'event_title', currentEventId);
 
       document.getElementById("detail-art-zone-badge").textContent = zone;
       document.getElementById("detail-art-id-badge").textContent = `ID: ${art.global_id}`;
 
-      document.getElementById("detail-art-description").textContent = desc;
+      document.getElementById("detail-art-description").textContent = desc || "ผลงานศิลปกรรมร่วมสมัยที่ผ่านการคัดสรรจัดแสดงอย่างเป็นทางการในนิทรรศการนี้ ถ่ายทอดอัตลักษณ์และสุนทรียะผ่านเทคนิคสร้างสรรค์ระดับสากล";
       document.getElementById("detail-art-artist-avatar").src = avatar;
       document.getElementById("detail-art-artist-name").textContent = artistName;
       document.getElementById("detail-art-artist-nationality").textContent = nationality;
