@@ -4,8 +4,8 @@ pages_build_output_dir = "public"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "event-db"
-database_id = "local-event-db"
+database_name = "art_event_1"
+database_id = "e483980b-c034-448f-a1a3-9b61d392a13f"
 
 [vars]
 EVENT_ID = "printmaking-2026"
