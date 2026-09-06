@@ -74,7 +74,7 @@ export async function onRequestGet(context) {
             }
           ]
         },
-        layout: { template: "split", theme: "luxury-dark" },
+        layout: { template: "split", theme: "heritage" },
         elements: {
           showTitle: true, showArtist: true, showFlag: true, showTechnique: true,
           showDimensions: true, showYear: true, showPrice: true, showConcept: true,

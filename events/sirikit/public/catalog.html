@@ -13,7 +13,7 @@
     .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
     .font-cinzel { font-family: 'Cinzel', serif; }
     .gold-text {
-      background: linear-gradient(135deg, #FAF3E3 0%, #C5A059 50%, #9A7833 100%);
+      background: linear-gradient(135deg, #A88126 0%, #C5A059 50%, #8A6414 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -618,19 +618,26 @@
           <!-- Theme Selection -->
           <div class="bg-slate-900/60 p-4 rounded-sm border border-slate-800 space-y-2">
             <label class="block text-sm font-bold text-white mb-2" data-i18n="studio_theme_title">โทนสีและธีมของสูจิบัตร (Catalog Theme)</label>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <label class="cursor-pointer border border-slate-700 rounded-sm p-4 bg-slate-900/70 hover:border-amber-500/60 transition flex items-start gap-3">
-                <input type="radio" name="studio-layout-theme" value="luxury-dark" class="mt-1 text-amber-500">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label class="cursor-pointer border border-amber-500/60 rounded-sm p-3.5 bg-slate-900/80 hover:border-amber-400 transition flex items-start gap-3">
+                <input type="radio" name="studio-layout-theme" value="heritage" class="mt-1 text-amber-500" checked>
                 <div>
-                  <span class="font-bold text-amber-300 block text-sm" data-i18n="studio_theme_dark_name">Luxury Dark (รัตติกาลทองคำ)</span>
-                  <p class="text-slate-400 text-xs mt-1" data-i18n="studio_theme_dark_desc">พื้นหลังดำสนิท ขอบสีทอง ผสมผสานความร่วมสมัย สง่างาม และน่าค้นหา</p>
+                  <span class="font-bold text-amber-300 block text-sm" data-i18n="studio_theme_heritage_name">🏛️ เพาะช่าง เฮอริเทจ (Heritage)</span>
+                  <p class="text-slate-400 text-xs mt-1" data-i18n="studio_theme_heritage_desc">กระดาษสีงาช้างนวลตา ขอบทองคำโบราณ สไตล์วิทยาลัยเพาะช่าง (ค่าเริ่มต้น)</p>
                 </div>
               </label>
-              <label class="cursor-pointer border border-slate-700 rounded-sm p-4 bg-slate-900/70 hover:border-amber-500/60 transition flex items-start gap-3">
+              <label class="cursor-pointer border border-slate-700 rounded-sm p-3.5 bg-slate-900/70 hover:border-amber-500/60 transition flex items-start gap-3">
                 <input type="radio" name="studio-layout-theme" value="fine-white" class="mt-1 text-amber-500">
                 <div>
-                  <span class="font-bold text-slate-100 block text-sm" data-i18n="studio_theme_white_name">Fine Art White (ขาวบริสุทธิ์ สไตล์หอศิลป์)</span>
-                  <p class="text-slate-400 text-xs mt-1" data-i18n="studio_theme_white_desc">พื้นหลังสีขาวนวล สไตล์พิพิธภัณฑ์ศิลปะระดับสากล สะอาดตา ดูสบาย</p>
+                  <span class="font-bold text-slate-100 block text-sm" data-i18n="studio_theme_white_name">Fine Art White (ขาวบริสุทธิ์)</span>
+                  <p class="text-slate-400 text-xs mt-1" data-i18n="studio_theme_white_desc">พื้นหลังสีขาวนวล สไตล์พิพิธภัณฑ์ศิลปะสากล สะอาดตา</p>
+                </div>
+              </label>
+              <label class="cursor-pointer border border-slate-700 rounded-sm p-3.5 bg-slate-900/70 hover:border-amber-500/60 transition flex items-start gap-3">
+                <input type="radio" name="studio-layout-theme" value="luxury-dark" class="mt-1 text-amber-500">
+                <div>
+                  <span class="font-bold text-slate-300 block text-sm" data-i18n="studio_theme_dark_name">Luxury Dark (รัตติกาลทองคำ)</span>
+                  <p class="text-slate-400 text-xs mt-1" data-i18n="studio_theme_dark_desc">พื้นหลังดำสนิท ขอบสีทอง ผสมผสานความร่วมสมัย สง่างาม</p>
                 </div>
               </label>
             </div>
@@ -1103,34 +1110,69 @@
       const isTh = window.i18n.getLang() === 'th';
       const pages = [];
 
-      const currentTheme = (catalogConfig.layout && catalogConfig.layout.theme) || 'luxury-dark';
+      const currentTheme = (catalogConfig.layout && catalogConfig.layout.theme) || 'heritage';
       const currentTemplate = (catalogConfig.layout && catalogConfig.layout.template) || 'split';
 
       // Apply body theme class
+      document.body.classList.remove('theme-fine-white', 'theme-luxury-dark', 'theme-heritage');
       if (currentTheme === 'fine-white') {
         document.body.classList.add('theme-fine-white');
+      } else if (currentTheme === 'luxury-dark') {
+        document.body.classList.add('theme-luxury-dark');
       } else {
-        document.body.classList.remove('theme-fine-white');
+        document.body.classList.add('theme-heritage');
       }
 
       // --- Theme styling tokens ---
+      const isHeritage = currentTheme !== 'fine-white' && currentTheme !== 'luxury-dark';
       const isWhite = currentTheme === 'fine-white';
-      const coverBgClass = isWhite
-        ? 'bg-gradient-to-b from-[#f8fafc] via-[#ffffff] to-[#f1f5f9] border-amber-500/40 text-slate-900 shadow-2xl'
-        : 'bg-gradient-to-b from-[#181924] via-[#12131b] to-[#0c0d12] border-amber-500/30 text-white';
-      const forewordBgClass = isWhite
-        ? 'bg-[#ffffff] border-amber-500/30 text-slate-800 shadow-2xl'
-        : 'bg-[#13141c] border-amber-500/20 text-white';
-      const pageBgClass = isWhite ? 'bg-[#ffffff] text-slate-900' : 'bg-[#13141c] text-white';
-      const pageBorderClass = isWhite ? 'border-slate-200 shadow-xl' : 'border-slate-800';
-      const borderSubClass = isWhite ? 'border-slate-200' : 'border-slate-800';
-      const textHeadingClass = isWhite ? 'text-slate-900' : 'text-white';
-      const textSubClass = isWhite ? 'text-slate-500' : 'text-slate-400';
-      const textConceptClass = isWhite ? 'text-slate-700' : 'text-neutral-300';
-      const cardBoxClass = isWhite ? 'bg-slate-50 text-slate-700 border-slate-200' : 'bg-slate-900/70 text-neutral-300 border-slate-800';
-      const conceptBgClass = isWhite ? 'bg-slate-50 border-slate-200' : 'bg-black/20 border-slate-800/80';
-      const imageBgClass = isWhite ? 'bg-slate-100 border-slate-200' : 'bg-black/60 border-slate-700';
-      const artistCardClass = isWhite ? 'bg-slate-50 border-slate-200' : 'bg-gradient-to-r from-slate-900 to-[#191a24] border-amber-500/20';
+      const isDark = currentTheme === 'luxury-dark';
+
+      let coverBgClass, forewordBgClass, pageBgClass, pageBorderClass, borderSubClass;
+      let textHeadingClass, textSubClass, textConceptClass, cardBoxClass, conceptBgClass, imageBgClass, artistCardClass;
+
+      if (isHeritage) {
+        // Poh-Chang Heritage warm ivory paper & antique gold (MANDATORY DEFAULT)
+        coverBgClass = 'bg-gradient-to-b from-[#FBF9F4] via-[#FAF6ED] to-[#F4EFE6] border-[#C5A059]/40 text-[#171C1A] shadow-2xl';
+        forewordBgClass = 'bg-[#FBF9F4] border-[#C5A059]/30 text-[#171C1A] shadow-2xl';
+        pageBgClass = 'bg-[#FBF9F4] text-[#171C1A]';
+        pageBorderClass = 'border-[#E8E0D2] shadow-xl';
+        borderSubClass = 'border-[#E8E0D2]';
+        textHeadingClass = 'text-[#171C1A]';
+        textSubClass = 'text-[#4A5852]';
+        textConceptClass = 'text-[#171C1A]';
+        cardBoxClass = 'bg-[#FAF6ED] text-[#171C1A] border-[#E8E0D2]';
+        conceptBgClass = 'bg-[#FAF6ED]/80 border-[#E8E0D2]';
+        imageBgClass = 'bg-[#F7F4EC] border-[#E8E0D2]';
+        artistCardClass = 'bg-[#FAF6ED] border-[#C5A059]/30';
+      } else if (isWhite) {
+        coverBgClass = 'bg-gradient-to-b from-[#f8fafc] via-[#ffffff] to-[#f1f5f9] border-amber-500/40 text-slate-900 shadow-2xl';
+        forewordBgClass = 'bg-[#ffffff] border-amber-500/30 text-slate-800 shadow-2xl';
+        pageBgClass = 'bg-[#ffffff] text-slate-900';
+        pageBorderClass = 'border-slate-200 shadow-xl';
+        borderSubClass = 'border-slate-200';
+        textHeadingClass = 'text-slate-900';
+        textSubClass = 'text-slate-500';
+        textConceptClass = 'text-slate-700';
+        cardBoxClass = 'bg-slate-50 text-slate-700 border-slate-200';
+        conceptBgClass = 'bg-slate-50 border-slate-200';
+        imageBgClass = 'bg-slate-100 border-slate-200';
+        artistCardClass = 'bg-slate-50 border-slate-200';
+      } else {
+        // Luxury dark
+        coverBgClass = 'bg-gradient-to-b from-[#181924] via-[#12131b] to-[#0c0d12] border-amber-500/30 text-white shadow-2xl';
+        forewordBgClass = 'bg-[#13141c] border-amber-500/20 text-white shadow-2xl';
+        pageBgClass = 'bg-[#13141c] text-white';
+        pageBorderClass = 'border-slate-800';
+        borderSubClass = 'border-slate-800';
+        textHeadingClass = 'text-white';
+        textSubClass = 'text-slate-400';
+        textConceptClass = 'text-neutral-300';
+        cardBoxClass = 'bg-slate-900/70 text-neutral-300 border-slate-800';
+        conceptBgClass = 'bg-black/20 border-slate-800/80';
+        imageBgClass = 'bg-slate-900/80 border-slate-700';
+        artistCardClass = 'bg-gradient-to-r from-slate-900 to-[#191a24] border-amber-500/20';
+      }
 
       // --- Custom / Default Cover Texts ---
       const coverData = catalogConfig.cover || {};
@@ -1192,12 +1234,12 @@
                 <span class="text-[9px] text-[var(--color-accent-gold)] font-mono tracking-widest uppercase block mt-0.5">POH-CHANG ACADEMY OF ARTS • FOUNDED 1913</span>
               </div>
             </div>
-            <span class="px-2.5 py-1 corner-cut-6 text-[10px] font-mono bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] font-bold">OFFICIAL CATALOG</span>
+            <span class="px-2.5 py-1 corner-cut-6 text-[10px] font-mono bg-[var(--color-accent-glow)] text-[var(--color-accent-dark)] border border-[var(--border-accent)] font-bold">OFFICIAL CATALOG</span>
           </div>
 
           <!-- Center Exhibition Title Lockup -->
           <div class="my-auto py-10 text-center space-y-4">
-            <div class="inline-block px-3 py-1 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)] text-xs font-mono tracking-widest uppercase">
+            <div class="inline-block px-3 py-1 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-dark)] text-xs font-mono tracking-widest uppercase font-semibold">
               ${coverBadge}
             </div>
             <h1 class="font-serif-luxury text-3xl font-bold text-[var(--text-main)] tracking-wider leading-tight max-w-xl mx-auto">
@@ -1302,7 +1344,7 @@
               <div class="min-w-0 flex-1">
                 <span class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold block">${m.role_th || 'กรรมการผู้ทรงคุณวุฒิ'}</span>
                 <h3 class="font-serif-luxury text-base font-bold text-[var(--text-main)] truncate mt-0.5">${m.name_th}</h3>
-                ${m.academic_title ? `<p class="text-[11px] text-[var(--color-accent-light)] font-medium mt-0.5 truncate">${m.academic_title}</p>` : ''}
+                ${m.academic_title ? `<p class="text-[11px] text-[var(--color-accent-gold)] font-medium mt-0.5 truncate">${m.academic_title}</p>` : ''}
                 <p class="text-[10px] text-[var(--text-subtle)] truncate mt-0.5">${m.institution || ''}</p>
               </div>
             </div>
@@ -1608,7 +1650,7 @@
           `;
         } else {
           previewHtml = `
-            <div class="relative w-12 h-16 corner-cut-4 bg-black/40 overflow-hidden border border-[var(--border-subtle)] shrink-0 flex items-center justify-center">
+            <div class="relative w-12 h-16 corner-cut-4 bg-[var(--bg-surface-elevated)] overflow-hidden border border-[var(--border-subtle)] shrink-0 flex items-center justify-center">
               ${item.image ? `<img src="${item.image}" alt="" class="w-full h-full object-cover">` : `<span class="text-[8px] text-[var(--text-subtle)]">ART</span>`}
             </div>
           `;
@@ -1690,7 +1732,7 @@
       }
       if (!studioTempConfig.cover) studioTempConfig.cover = {};
       if (!studioTempConfig.foreword) studioTempConfig.foreword = {};
-      if (!studioTempConfig.layout) studioTempConfig.layout = { template: 'freeform', theme: 'luxury-dark' };
+      if (!studioTempConfig.layout) studioTempConfig.layout = { template: 'freeform', theme: 'heritage' };
 
       // Initialize Elements Visibility
       if (!studioTempConfig.elements) {
@@ -1762,7 +1804,7 @@
       document.getElementById('elem-show-pagenum').checked = elCfg.showPageNum !== false;
 
       // Pre-fill Theme radio
-      const theme = (studioTempConfig.layout && studioTempConfig.layout.theme) || 'luxury-dark';
+      const theme = (studioTempConfig.layout && studioTempConfig.layout.theme) || 'heritage';
       const themeRadio = document.querySelector(`input[name="studio-layout-theme"][value="${theme}"]`);
       if (themeRadio) themeRadio.checked = true;
 
@@ -2152,7 +2194,7 @@
       const selectedTheme = document.querySelector('input[name="studio-layout-theme"]:checked');
       studioTempConfig.layout = {
         template: 'freeform',
-        theme: selectedTheme ? selectedTheme.value : 'luxury-dark'
+        theme: selectedTheme ? selectedTheme.value : 'heritage'
       };
 
       // Synchronize masterTemplate blocks with freeLayout blocks

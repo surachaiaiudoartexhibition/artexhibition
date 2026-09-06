@@ -1330,13 +1330,13 @@
             masterTemplate: activeTemplate,
             pageOverrides: catalogConfig.pageOverrides || {},
             freeLayout: {
-              theme: canvasBgColor === '#FFFFFF' ? 'fine-white' : 'luxury-dark',
+              theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage'),
               gridSnap: true,
               blocks: freeBlocks
             },
             layout: {
               template: 'freeform',
-              theme: canvasBgColor === '#FFFFFF' ? 'fine-white' : 'luxury-dark'
+              theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage')
             }
           }
         };

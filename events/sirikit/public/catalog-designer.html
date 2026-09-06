@@ -453,8 +453,8 @@
     let dragStartX = 0;
     let dragStartY = 0;
     let initialBlockCoords = { x: 0, y: 0, w: 0, h: 0 };
-    let canvasBgColor = '#FFFFFF';
-    let canvasTextColor = '#1F1C17';
+    let canvasBgColor = '#FBF9F4';
+    let canvasTextColor = '#171C1A';
 
     let activeTemplate = {
       paperSize: 'a4_portrait',
@@ -463,7 +463,7 @@
       bleedInches: 0.125,
       gridSizeInches: 0.25,
       snapToGrid: true,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '#FBF9F4',
       paddingInches: { top: 0.6, bottom: 0.6, left: 0.6, right: 0.6 },
       blocks: []
     };
@@ -1330,13 +1330,13 @@
             masterTemplate: activeTemplate,
             pageOverrides: catalogConfig.pageOverrides || {},
             freeLayout: {
-              theme: canvasBgColor === '#FFFFFF' ? 'fine-white' : 'luxury-dark',
+              theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage'),
               gridSnap: true,
               blocks: freeBlocks
             },
             layout: {
               template: 'freeform',
-              theme: canvasBgColor === '#FFFFFF' ? 'fine-white' : 'luxury-dark'
+              theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage')
             }
           }
         };
