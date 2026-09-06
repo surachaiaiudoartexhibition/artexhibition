@@ -13,8 +13,8 @@
     },
     "cloudinary": {
       "accountEmail": "surachai.ai.udo@gmail.com",
-      "cloudName": "sirikit-media",
-      "uploadPreset": "sirikit_preset"
+      "cloudName": "gpea1udi",
+      "uploadPreset": "art_event_sirikit"
     }
   },
   "security": {
