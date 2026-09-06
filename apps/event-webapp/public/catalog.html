@@ -822,7 +822,7 @@
             }
 
             case 'artist_photo': {
-              if (elem.showAvatar === false) return '';
+              if (elem.showAvatar === false || !avatar) return '';
               return `
                 <div class="cat-free-block flex items-center justify-center overflow-hidden" style="${posStyle}">
                   <img src="${avatar}" alt="" class="w-full h-full object-cover rounded-sm ring-2 ring-amber-500/40">
@@ -842,7 +842,7 @@
             case 'artist_profile': {
               return `
                 <div class="cat-free-block flex items-center gap-3 pt-1" style="${posStyle}">
-                  ${elem.showAvatar !== false ? `
+                  ${(elem.showAvatar !== false && avatar) ? `
                     <img src="${avatar}" alt="" class="w-12 h-12 rounded-sm object-cover ring-2 ring-amber-500/40 shrink-0">
                   ` : ''}
                   <div class="min-w-0">
@@ -1072,7 +1072,7 @@
 
         <!-- Block 4: Artist Profile & Flag -->
         <div class="cat-free-block cat-block-artist flex items-center gap-3 pt-1" style="left: ${bl.artist.x}%; top: ${bl.artist.y}%; width: ${bl.artist.w}%;">
-          ${elem.showAvatar !== false ? `
+          ${(elem.showAvatar !== false && avatar) ? `
             <img src="${avatar}" alt="" class="w-12 h-12 rounded-sm object-cover ring-2 ring-amber-500/40 shrink-0">
           ` : ''}
           <div class="min-w-0">
@@ -1351,7 +1351,8 @@
         const artistName = window.getArtistFullName(item);
         const technique = window.getField(item, 'technique') || (isTh ? 'ภาพพิมพ์' : 'Printmaking');
         const description = window.getField(item, 'description') || (isTh ? 'ถ่ายทอดอารมณ์ความรู้สึกและสุนทรียะผ่านเทคนิคการสร้างสรรค์อันเป็นเอกลักษณ์' : 'Expressing emotion and aesthetics through unique creative techniques.');
-        const avatar = item.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=D4AF37&color=000&bold=true`;
+        const hasAvatar = Boolean(item.artist_avatar_url && item.artist_avatar_url.trim() && !item.artist_avatar_url.includes('unsplash.com'));
+        const avatar = hasAvatar ? item.artist_avatar_url : '';
 
         // Check if any metadata specs are visible
         const hasVisibleSpecs = (elem.showTechnique !== false) || (elem.showDimensions !== false) || (elem.showYear !== false) || (elem.showPrice !== false && item.price);

@@ -642,7 +642,7 @@
           statusBadge = `<span class="px-2.5 py-0.5 corner-cut-6 text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">${window.i18n.getLang() === 'th' ? 'ปฏิเสธ' : 'Rejected'}</span>`;
         }
 
-        const avatar = sub.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sub.artist_name)}&background=D4AF37&color=000&bold=true`;
+        const hasAvatar = Boolean(sub.artist_avatar_url && sub.artist_avatar_url.trim() && !sub.artist_avatar_url.includes('unsplash.com'));
         item.innerHTML = `
           <div class="w-full md:w-48 h-48 flex-shrink-0 bg-[var(--mat-bg)] corner-cut-12 overflow-hidden relative border border-[var(--border-subtle)] p-1.5 flex items-center justify-center">
             <img src="${sub.thumbnail_url || sub.image_url}" alt="${sub.title}" class="max-w-full max-h-full object-contain">
@@ -662,7 +662,9 @@
             
             <!-- Artist Row with Avatar, Academic Title & Bilingual Name -->
             <div class="flex items-center gap-2.5 flex-wrap">
-              <img src="${avatar}" alt="" class="w-7 h-7 corner-cut-6 object-cover border border-[var(--border-accent)] shrink-0 bg-[var(--mat-bg)]">
+              ${hasAvatar ? `
+                <img src="${sub.artist_avatar_url}" alt="" class="w-7 h-7 corner-cut-6 object-cover border border-[var(--border-accent)] shrink-0 bg-[var(--mat-bg)]">
+              ` : ''}
               ${(sub.academic_title_th || sub.academic_title) ? `<span class="px-2 py-0.5 corner-cut-6 bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] text-[11px] font-semibold">${sub.academic_title_th || sub.academic_title}</span>` : ''}
               <span class="text-sm font-semibold text-[var(--text-main)]">${sub.artist_name_th || sub.artist_name}</span>
               <span class="text-xs text-[var(--text-muted)] font-sans">(${(sub.academic_title_en ? sub.academic_title_en + ' ' : '')}${sub.artist_name_en || sub.artist_name})</span>

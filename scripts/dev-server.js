@@ -1320,8 +1320,9 @@ const eventServer = http.createServer(async (req, res) => {
         const title = cleanDash(item.title || item.artworkTitle || item.ชื่องาน);
         const artist = cleanDash(item.artist_name || item.artistName || item.ชื่อศิลปิน);
         const desc = cleanDash(item.description || item.concept || item.แนวคิด);
-        let img = item.image_url || item.imageUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1200&q=80';
-        let avatar = item.artist_avatar_url || item.artistAvatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80';
+        let img = item.image_url || item.imageUrl || '';
+        let avatar = item.artist_avatar_url || item.artistAvatarUrl || '';
+        if (avatar && avatar.includes('unsplash.com')) avatar = '';
 
         // Auto save artwork base64 dataUrl if provided
         if (item.image_data_url && typeof item.image_data_url === 'string' && item.image_data_url.startsWith('data:image/')) {

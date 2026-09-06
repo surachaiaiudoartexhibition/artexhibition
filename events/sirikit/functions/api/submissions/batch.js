@@ -39,6 +39,35 @@ export async function onRequestPost(context) {
     });
   }
 
+  // Cloudinary configuration for storage
+  const cloudName = env.CLOUDINARY_CLOUD_NAME || 'gpea1udi';
+  const uploadPreset = env.CLOUDINARY_UPLOAD_PRESET || 'art_event_sirikit';
+
+  async function uploadToCloudinary(base64DataUrl) {
+    if (!base64DataUrl || typeof base64DataUrl !== 'string' || !base64DataUrl.startsWith('data:image/')) {
+      return '';
+    }
+    try {
+      const formData = new FormData();
+      formData.append('file', base64DataUrl);
+      formData.append('upload_preset', uploadPreset);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        console.warn('Cloudinary upload error:', res.status, errText);
+        return '';
+      }
+      const data = await res.json();
+      return data.secure_url || data.url || '';
+    } catch (e) {
+      console.warn('Cloudinary upload exception:', e.message);
+      return '';
+    }
+  }
+
   try {
     // Get max display order
     const maxRes = await env.DB.prepare('SELECT MAX(display_order) as maxOrder FROM submissions').first();
@@ -66,13 +95,35 @@ export async function onRequestPost(context) {
     `);
 
     const cleanDash = (v) => (!v || String(v).trim() === '' || String(v).trim() === '-') ? '-' : String(v).trim();
-    const batchStatements = items.map(item => {
+    const batchStatements = [];
+
+    for (let idx = 0; idx < items.length; idx++) {
+      const item = items[idx];
       currentOrder += 1;
       const title = cleanDash(item.title || item.artworkTitle || item.ชื่องาน);
       const artist = cleanDash(item.artist_name || item.artistName || item.ชื่อศิลปิน);
       const desc = cleanDash(item.description || item.concept || item.แนวคิด);
-      const img = item.image_url || item.imageUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1200&q=80';
-      const avatar = item.artist_avatar_url || item.artistAvatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80';
+
+      // Artwork Image resolution:
+      // 1. Direct image_url if provided
+      // 2. Upload image_data_url to Cloudinary
+      // 3. Fallback: empty string (NEVER mockup)
+      let img = item.image_url || item.imageUrl || '';
+      if (!img && item.image_data_url) {
+        img = await uploadToCloudinary(item.image_data_url);
+      }
+
+      // Artist Avatar resolution:
+      // Strictly NO mockup! If not provided, empty string
+      let avatar = item.artist_avatar_url || item.artistAvatarUrl || '';
+      // If user had an unsplash mockup url passed in, strip it
+      if (avatar && avatar.includes('unsplash.com')) {
+        avatar = '';
+      }
+      if (!avatar && item.artist_avatar_data_url) {
+        avatar = await uploadToCloudinary(item.artist_avatar_data_url);
+      }
+
       const bio = cleanDash(item.artist_bio || item.bio || item.ประวัติ);
       const nat = cleanDash(item.nationality || item.country || item.สัญชาติ || item.ประเทศ);
       const tech = cleanDash(item.technique || item.medium || item.เทคนิค);
@@ -81,16 +132,18 @@ export async function onRequestPost(context) {
       const pr = cleanDash(item.price || item.ราคา);
       const stat = item.status || defaultStatus;
 
-      return insertStmt.bind(
-        title, artist, desc,
-        img, img,
-        avatar, bio,
-        nat, tech, dims,
-        yr, pr, stat, currentOrder,
-        title, artist, bio,
-        tech, desc
+      batchStatements.push(
+        insertStmt.bind(
+          title, artist, desc,
+          img, img,
+          avatar, bio,
+          nat, tech, dims,
+          yr, pr, stat, currentOrder,
+          title, artist, bio,
+          tech, desc
+        )
       );
-    });
+    }
 
     await env.DB.batch(batchStatements);
 

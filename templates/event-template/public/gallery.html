@@ -213,7 +213,7 @@
         const title = window.getField(art, 'title');
         const artistName = window.getArtistFullName(art);
         const technique = window.getField(art, 'technique') || (isTh ? 'ภาพพิมพ์ร่วมสมัย' : 'Contemporary Printmaking');
-        const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=1c1e26&color=D4AF37&bold=true`;
+        const hasAvatar = Boolean(art.artist_avatar_url && art.artist_avatar_url.trim() && !art.artist_avatar_url.includes('unsplash.com'));
         const card = document.createElement("div");
         card.className = "gallery-surface rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[var(--border-subtle)]";
         card.innerHTML = `
@@ -250,7 +250,7 @@
             <!-- Artist Badge -->
             <div class="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between">
               <a href="/artists.html" class="flex items-center gap-2.5 group/art hover:opacity-80 transition min-w-0" title="${window.t('btn_view_profile')}">
-                <img src="${avatar}" alt="" class="w-6 h-6 rounded-full object-cover border border-[#C5A059]/40 shrink-0">
+                ${hasAvatar ? `<img src="${art.artist_avatar_url}" alt="" class="w-6 h-6 rounded-full object-cover border border-[#C5A059]/40 shrink-0">` : ''}
                 <span class="text-xs text-[var(--text-muted)] font-normal tracking-wide truncate">${artistName}</span>
               </a>
               <a href="/artwork.html?id=${art.id}" class="text-[11px] text-[#9A7833] hover:text-[#C5A059] transition flex items-center gap-1 shrink-0 tracking-wider uppercase font-semibold">

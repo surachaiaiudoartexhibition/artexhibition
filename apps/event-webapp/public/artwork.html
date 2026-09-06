@@ -323,8 +323,13 @@
       document.getElementById("artist-nationality-tag").innerHTML = window.getCountryFlagBadge(art.nationality || 'Thailand', { size: 'sm', showName: true });
       document.getElementById("artist-bio-text").textContent = bio;
 
-      const avatar = art.artist_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=1c1e26&color=D4AF37&bold=true`;
-      document.getElementById("artist-avatar").src = avatar;
+      const avatarEl = document.getElementById("artist-avatar");
+      if (art.artist_avatar_url && art.artist_avatar_url.trim() && !art.artist_avatar_url.includes('unsplash.com')) {
+        avatarEl.src = art.artist_avatar_url;
+        avatarEl.classList.remove("hidden");
+      } else {
+        avatarEl.classList.add("hidden");
+      }
     }
 
     function showError() {
