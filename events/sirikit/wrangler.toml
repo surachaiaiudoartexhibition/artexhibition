@@ -1,0 +1,26 @@
+# Cloudflare Pages Configuration for Event: Queen Sirikit Art Exhibition
+# Dedicated Account Email: surachai.ai.udo@gmail.com
+
+name = "sirikit"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "public"
+
+# Isolated D1 Database for this Event
+[[d1_databases]]
+binding = "DB"
+database_name = "art_event_1"
+database_id = "e483980b-c034-448f-a1a3-9b61d392a13f"
+
+[vars]
+EVENT_ID = "sirikit"
+EVENT_TITLE = "Queen Sirikit Art Exhibition"
+ADMIN_EMAIL = "surachai.ai.udo@gmail.com"
+MASTER_PORTAL_URL = "https://artexhibition.pages.dev"
+SHARED_SECRET_TOKEN = "sec_sirikit_2026_art"
+ADMIN_KEY = "admin123"
+EVENT_PAGE_BASE_URL = "https://sirikit.pages.dev"
+EVENT_THEME = "heritage"
+
+# Dedicated Cloudinary Storage Account for this Event
+CLOUDINARY_CLOUD_NAME = "sirikit-media"
+CLOUDINARY_UPLOAD_PRESET = "sirikit_preset"

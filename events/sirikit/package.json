@@ -1,0 +1,15 @@
+{
+  "name": "sirikit",
+  "version": "1.0.0",
+  "description": "Virtual Exhibition Instance for Queen Sirikit Art Exhibition",
+  "scripts": {
+    "dev": "wrangler pages dev public --d1 DB=art_event_1 --local",
+    "init-db:local": "wrangler d1 execute art_event_1 --file=schema.sql --local",
+    "init-db:remote": "wrangler d1 execute art_event_1 --file=schema.sql --remote",
+    "deploy": "wrangler pages deploy public"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^3.114.0"
+  }
+}

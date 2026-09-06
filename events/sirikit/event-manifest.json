@@ -1,0 +1,28 @@
+{
+  "eventId": "sirikit",
+  "eventTitle": "Queen Sirikit Art Exhibition",
+  "eventTheme": "heritage",
+  "adminEmail": "surachai.ai.udo@gmail.com",
+  "createdAt": "2026-09-06T08:42:07.572Z",
+  "accountIsolation": {
+    "cloudflare": {
+      "accountEmail": "surachai.ai.udo@gmail.com",
+      "d1DatabaseName": "art_event_1",
+      "d1DatabaseId": "e483980b-c034-448f-a1a3-9b61d392a13f",
+      "pagesProject": "sirikit"
+    },
+    "cloudinary": {
+      "accountEmail": "surachai.ai.udo@gmail.com",
+      "cloudName": "sirikit-media",
+      "uploadPreset": "sirikit_preset"
+    }
+  },
+  "security": {
+    "sharedSecretToken": "sec_sirikit_2026_art",
+    "adminKey": "admin123"
+  },
+  "integration": {
+    "masterPortalUrl": "https://artexhibition.pages.dev",
+    "eventPageBaseUrl": "https://sirikit.pages.dev"
+  }
+}
