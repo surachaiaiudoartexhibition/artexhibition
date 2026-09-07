@@ -266,13 +266,38 @@
             <p data-i18n="event_artworks_desc" class="text-xs text-[#64736C] mt-0.5 font-light">ผลงานที่ผ่านการคัดเลือกและจัดแสดงอย่างเป็นทางการ</p>
           </div>
 
-          <!-- Search within this event -->
-          <div class="relative w-full sm:w-80">
-            <input type="text" id="event-artworks-search" placeholder="ค้นหาชื่อผลงาน, ศิลปิน, หรือเทคนิค..." data-i18n-placeholder="search_artworks_ph"
-              class="w-full pl-10 pr-4 py-2 rounded-xl bg-white border border-[#E8E0D2] text-xs text-[#171C1A] placeholder-[#8A9890] focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] font-light shadow-xs">
-            <svg class="w-4 h-4 text-stone-500 absolute left-3.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+          <!-- Filters & Search Toolbar -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Search within this event -->
+            <div class="relative w-full sm:w-64">
+              <input type="text" id="event-artworks-search" placeholder="ค้นหาชื่อผลงาน, ศิลปิน, หรือเทคนิค..." data-i18n-placeholder="search_artworks_ph"
+                class="w-full pl-9 pr-4 py-2 rounded-xl bg-white border border-[#E8E0D2] text-xs text-[#171C1A] placeholder-[#8A9890] focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] font-light shadow-xs">
+              <svg class="w-4 h-4 text-stone-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+
+            <!-- Country / Nationality Filter -->
+            <div class="flex items-center gap-1.5 bg-white border border-[#E8E0D2] px-3 py-2 rounded-xl text-xs shadow-xs">
+              <span class="text-sm">🌐</span>
+              <select id="event-artworks-country-filter" class="bg-transparent text-xs text-[#171C1A] focus:outline-none cursor-pointer font-medium">
+                <option value="all" data-i18n="filter_all_countries">ทุกประเทศ (All Countries)</option>
+              </select>
+            </div>
+
+            <!-- Sort Filter -->
+            <div class="flex items-center gap-1.5 bg-white border border-[#E8E0D2] px-3 py-2 rounded-xl text-xs shadow-xs">
+              <span class="text-sm">↕️</span>
+              <select id="event-artworks-sort-filter" class="bg-transparent text-xs text-[#171C1A] focus:outline-none cursor-pointer font-medium">
+                <option value="default" data-i18n="gallery_sort_default">ลำดับการจัดแสดง (Curated Order)</option>
+                <option value="artist_asc" data-i18n="gallery_sort_artist_asc">ชื่อศิลปิน (A - Z / ก - ฮ)</option>
+                <option value="title_asc" data-i18n="gallery_sort_title_asc">ชื่อผลงาน (A - Z / ก - ฮ)</option>
+                <option value="country_asc" data-i18n="gallery_sort_country_asc">ตามประเทศ / สัญชาติ (A - Z)</option>
+                <option value="price_desc" data-i18n="gallery_sort_price_desc">ราคาผลงาน (มากไปน้อย)</option>
+                <option value="price_asc" data-i18n="gallery_sort_price_asc">ราคาผลงาน (น้อยไปมาก)</option>
+                <option value="year_desc" data-i18n="gallery_sort_year_desc">ปีที่สร้างสรรค์ (ใหม่สุด)</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -534,9 +559,8 @@
             document.getElementById("single-event-subtitle").textContent = window.getField(ev, 'description', window.t('event_artworks_desc'));
             document.getElementById("companion-catalog-title").textContent = `${window.t('modal_btn_catalog')}: ${window.getField(ev, 'event_title')}`;
           }
-          const searchInput = document.getElementById("event-artworks-search");
-          const q = searchInput ? searchInput.value.trim() : "";
-          filterSingleEventArtworks(q);
+          populateSingleEventCountryFilter();
+          filterSingleEventArtworks();
         }
         if (currentOpenArtId) {
           openArtworkDetailModal(currentOpenArtId);
@@ -559,11 +583,25 @@
         showEventsSelectorView();
       }
 
-      // Search input within single event view
+      // Filtering and sorting within single event view
       const searchInput = document.getElementById("event-artworks-search");
       if (searchInput) {
-        searchInput.addEventListener("input", (e) => {
-          filterSingleEventArtworks(e.target.value.trim());
+        searchInput.addEventListener("input", () => {
+          filterSingleEventArtworks();
+        });
+      }
+
+      const countryFilter = document.getElementById("event-artworks-country-filter");
+      if (countryFilter) {
+        countryFilter.addEventListener("change", () => {
+          filterSingleEventArtworks();
+        });
+      }
+
+      const sortFilter = document.getElementById("event-artworks-sort-filter");
+      if (sortFilter) {
+        sortFilter.addEventListener("change", () => {
+          filterSingleEventArtworks();
         });
       }
 
@@ -879,7 +917,8 @@
         }
 
         if (countBadge) countBadge.textContent = currentEventArtworks.length;
-        renderSingleEventArtworksGrid(currentEventArtworks);
+        populateSingleEventCountryFilter();
+        filterSingleEventArtworks();
       } catch (err) {
         console.error("Failed to load artworks:", err);
         grid.innerHTML = `<div class="col-span-full py-12 text-center text-rose-500 font-medium">${window.t('empty_artworks_title') || 'เกิดข้อผิดพลาดในการโหลดผลงาน'}: ${err.message}</div>`;
@@ -1029,21 +1068,115 @@
       });
     }
 
-    function filterSingleEventArtworks(query) {
-      if (!query) {
-        renderSingleEventArtworksGrid(currentEventArtworks);
-        return;
-      }
-      const q = query.toLowerCase();
-      const filtered = currentEventArtworks.filter(a => {
-        const title = (window.getField(a, 'title') || '').toLowerCase();
-        const artistName = (window.getArtistFullName(a) || '').toLowerCase();
-        const tech = (window.getField(a, 'technique') || '').toLowerCase();
-        const desc = (window.getField(a, 'description') || '').toLowerCase();
-        const zone = (a.zone || '').toLowerCase();
-        const nat = (a.nationality || '').toLowerCase();
-        return title.includes(q) || artistName.includes(q) || tech.includes(q) || desc.includes(q) || zone.includes(q) || nat.includes(q);
+    function parsePrice(art) {
+      if (!art || !art.price) return null;
+      const str = String(art.price).replace(/,/g, '');
+      const match = str.match(/\d+(\.\d+)?/);
+      return match ? parseFloat(match[0]) : null;
+    }
+
+    function populateSingleEventCountryFilter() {
+      const select = document.getElementById("event-artworks-country-filter");
+      if (!select) return;
+      const currentVal = select.value || "all";
+      select.innerHTML = `<option value="all" data-i18n="filter_all_countries">${window.t('filter_all_countries') || 'ทุกประเทศ (All Countries)'}</option>`;
+
+      const countries = new Set();
+      currentEventArtworks.forEach(a => {
+        if (a.nationality && a.nationality.trim() !== '' && a.nationality !== '-') {
+          countries.add(a.nationality.trim());
+        }
       });
+
+      Array.from(countries).sort().forEach(country => {
+        const opt = document.createElement("option");
+        opt.value = country;
+        opt.textContent = country;
+        if (country === currentVal) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function filterSingleEventArtworks() {
+      const searchInput = document.getElementById("event-artworks-search");
+      const countrySelect = document.getElementById("event-artworks-country-filter");
+      const sortSelect = document.getElementById("event-artworks-sort-filter");
+      const countBadge = document.getElementById("single-event-artworks-count");
+
+      const q = (searchInput ? searchInput.value.trim() : "").toLowerCase();
+      const country = countrySelect ? countrySelect.value : "all";
+      const sortVal = sortSelect ? sortSelect.value : "default";
+
+      let filtered = currentEventArtworks.filter(a => {
+        const matchSearch = !q || (
+          (window.getField(a, 'title') || '').toLowerCase().includes(q) ||
+          (window.getArtistFullName(a) || '').toLowerCase().includes(q) ||
+          (window.getField(a, 'technique') || '').toLowerCase().includes(q) ||
+          (window.getField(a, 'description') || '').toLowerCase().includes(q) ||
+          (a.zone || '').toLowerCase().includes(q) ||
+          (a.nationality || '').toLowerCase().includes(q)
+        );
+
+        const matchCountry = (country === 'all') || (
+          a.nationality && a.nationality.trim().toLowerCase() === country.toLowerCase()
+        );
+
+        return matchSearch && matchCountry;
+      });
+
+      // Sorting
+      if (sortVal === 'artist_asc') {
+        filtered.sort((a, b) => {
+          const nameA = window.getArtistFullName(a) || '';
+          const nameB = window.getArtistFullName(b) || '';
+          return nameA.localeCompare(nameB, window.i18n ? (window.i18n.getLang() === 'th' ? 'th' : 'en') : 'th');
+        });
+      } else if (sortVal === 'title_asc') {
+        filtered.sort((a, b) => {
+          const titleA = window.getField(a, 'title') || '';
+          const titleB = window.getField(b, 'title') || '';
+          return titleA.localeCompare(titleB, window.i18n ? (window.i18n.getLang() === 'th' ? 'th' : 'en') : 'th');
+        });
+      } else if (sortVal === 'country_asc') {
+        filtered.sort((a, b) => {
+          const cA = a.nationality || '';
+          const cB = b.nationality || '';
+          return cA.localeCompare(cB, window.i18n ? (window.i18n.getLang() === 'th' ? 'th' : 'en') : 'th');
+        });
+      } else if (sortVal === 'price_desc') {
+        filtered.sort((a, b) => {
+          const pA = parsePrice(a);
+          const pB = parsePrice(b);
+          if (pA === null && pB === null) return 0;
+          if (pA === null) return 1;
+          if (pB === null) return -1;
+          return pB - pA;
+        });
+      } else if (sortVal === 'price_asc') {
+        filtered.sort((a, b) => {
+          const pA = parsePrice(a);
+          const pB = parsePrice(b);
+          if (pA === null && pB === null) return 0;
+          if (pA === null) return 1;
+          if (pB === null) return -1;
+          return pA - pB;
+        });
+      } else if (sortVal === 'year_desc') {
+        filtered.sort((a, b) => {
+          const yA = parseInt(a.year_created, 10) || 0;
+          const yB = parseInt(b.year_created, 10) || 0;
+          return yB - yA;
+        });
+      }
+
+      if (countBadge) {
+        if (q || country !== 'all' || sortVal !== 'default') {
+          countBadge.textContent = `${filtered.length} / ${currentEventArtworks.length}`;
+        } else {
+          countBadge.textContent = currentEventArtworks.length;
+        }
+      }
+
       renderSingleEventArtworksGrid(filtered);
     }
 
