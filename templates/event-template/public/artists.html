@@ -110,6 +110,20 @@
           </select>
         </div>
 
+        <!-- Sort Filter -->
+        <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-2 corner-cut-8 text-xs">
+          <span class="text-sm">↕️</span>
+          <select id="sort-filter" class="bg-transparent text-xs text-[var(--text-main)] focus:outline-none cursor-pointer font-medium">
+            <option value="default" data-i18n="sort_default">ค่าเริ่มต้น (Default)</option>
+            <option value="name_asc" data-i18n="sort_name_asc">ชื่อศิลปิน (A - Z / ก - ฮ)</option>
+            <option value="name_desc" data-i18n="sort_name_desc">ชื่อศิลปิน (Z - A / ฮ - ก)</option>
+            <option value="country_asc" data-i18n="sort_country_asc">ตามประเทศ / สัญชาติ (A - Z)</option>
+            <option value="price_desc" data-i18n="sort_price_desc">ราคาผลงาน (มากไปน้อย)</option>
+            <option value="price_asc" data-i18n="sort_price_asc">ราคาผลงาน (น้อยไปมาก)</option>
+            <option value="artworks_desc" data-i18n="sort_artworks_desc">จำนวนผลงาน (มากไปน้อย)</option>
+          </select>
+        </div>
+
         <!-- Jump to Artist Dropdown -->
         <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-2 corner-cut-8 text-xs max-w-[200px]">
           <span>🎯</span>
@@ -155,6 +169,7 @@
               <th scope="col" class="py-3.5 px-4" data-i18n="th_nationality">สัญชาติ</th>
               <th scope="col" class="py-3.5 px-4 text-center" data-i18n="th_works_count">จำนวนผลงาน</th>
               <th scope="col" class="py-3.5 px-4" data-i18n="th_technique">เทคนิคหลัก</th>
+              <th scope="col" class="py-3.5 px-4 text-right font-mono" data-i18n="th_price">ราคา</th>
               <th scope="col" class="py-3.5 px-4" data-i18n="th_contact">ติดต่อ</th>
               <th scope="col" class="py-3.5 px-4 text-right" data-i18n="th_action">ดำเนินการ</th>
             </tr>
@@ -479,11 +494,35 @@
       });
     }
 
+    function parsePrice(art) {
+      if (!art || !art.price) return null;
+      const str = String(art.price).replace(/,/g, '');
+      const match = str.match(/\d+(\.\d+)?/);
+      return match ? parseFloat(match[0]) : null;
+    }
+
+    function getArtistMaxPrice(artist) {
+      let max = null;
+      (artist.artworks || []).forEach(art => {
+        const p = parsePrice(art);
+        if (p !== null) {
+          if (max === null || p > max) max = p;
+        }
+      });
+      return max;
+    }
+
+    function formatPriceDisplay(priceVal) {
+      if (priceVal == null) return '-';
+      return '฿' + Number(priceVal).toLocaleString('th-TH');
+    }
+
     function getFilteredArtists() {
       const search = (document.getElementById('artist-search').value || '').toLowerCase().trim();
       const country = document.getElementById('country-filter').value;
+      const sortVal = (document.getElementById('sort-filter') && document.getElementById('sort-filter').value) || 'default';
 
-      return allArtists.filter(artist => {
+      let list = allArtists.filter(artist => {
         const artistCode = window.resolveCountryCode(artist.nationality);
         const filterCode = window.resolveCountryCode(country);
         const matchCountry = country === 'all' || 
@@ -506,6 +545,49 @@
 
         return nameMatch || bioMatch || natMatch || emailMatch || artMatch;
       });
+
+      // Sorting logic
+      if (sortVal === 'name_asc') {
+        list.sort((a, b) => {
+          const nameA = window.getArtistFullName(a) || a.artist_name || '';
+          const nameB = window.getArtistFullName(b) || b.artist_name || '';
+          return nameA.localeCompare(nameB, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'name_desc') {
+        list.sort((a, b) => {
+          const nameA = window.getArtistFullName(a) || a.artist_name || '';
+          const nameB = window.getArtistFullName(b) || b.artist_name || '';
+          return nameB.localeCompare(nameA, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'country_asc') {
+        list.sort((a, b) => {
+          const cA = window.getCountryDisplayName(a.nationality) || a.nationality || '';
+          const cB = window.getCountryDisplayName(b.nationality) || b.nationality || '';
+          return cA.localeCompare(cB, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'price_desc') {
+        list.sort((a, b) => {
+          const pA = getArtistMaxPrice(a);
+          const pB = getArtistMaxPrice(b);
+          if (pA === null && pB === null) return 0;
+          if (pA === null) return 1;
+          if (pB === null) return -1;
+          return pB - pA;
+        });
+      } else if (sortVal === 'price_asc') {
+        list.sort((a, b) => {
+          const pA = getArtistMaxPrice(a);
+          const pB = getArtistMaxPrice(b);
+          if (pA === null && pB === null) return 0;
+          if (pA === null) return 1;
+          if (pB === null) return -1;
+          return pA - pB;
+        });
+      } else if (sortVal === 'artworks_desc') {
+        list.sort((a, b) => (b.artworks_count || 0) - (a.artworks_count || 0));
+      }
+
+      return list;
     }
 
     function render() {
@@ -542,6 +624,7 @@
         const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes('unsplash.com'));
         const cleanBio = bio && bio.trim() !== '-' ? bio.trim() : '';
         const bioSnippet = cleanBio ? `"${cleanBio.slice(0, 110)}..."` : (window.i18n.getLang() === 'th' ? 'ศิลปินร่วมจัดแสดงในนิทรรศการ' : 'Exhibiting artist');
+        const maxPrice = getArtistMaxPrice(artist);
         
         // Render artwork thumbnails (up to 3) with signature cut - filter out empty image URLs
         const validArtworks = (artist.artworks || []).filter(art => Boolean((art.thumbnail_url || art.image_url || '').trim()));
@@ -581,9 +664,16 @@
                     </div>
                   </div>
                 </div>
-                <span class="px-2.5 py-1 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)] shrink-0">
-                  ${artist.artworks_count} ${window.t('works_suffix')}
-                </span>
+                <div class="flex flex-col items-end gap-1 shrink-0">
+                  <span class="px-2.5 py-1 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)]">
+                    ${artist.artworks_count} ${window.t('works_suffix')}
+                  </span>
+                  ${maxPrice !== null ? `
+                    <span class="text-[11px] font-mono font-bold text-[var(--color-accent-gold)]">
+                      ${formatPriceDisplay(maxPrice)}
+                    </span>
+                  ` : ''}
+                </div>
               </div>
 
               <!-- Artwork Preview Strip (Only if artist has valid images) -->
@@ -623,6 +713,7 @@
         const artistName = window.getArtistFullName(artist);
         const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes('unsplash.com'));
         const firstTechnique = (artist.artworks && artist.artworks[0] && window.getField(artist.artworks[0], 'technique')) || (window.i18n.getLang() === 'th' ? 'ภาพพิมพ์ร่วมสมัย' : 'Contemporary Printmaking');
+        const maxPrice = getArtistMaxPrice(artist);
 
         return `
           <tr class="hover:bg-[var(--bg-surface-elevated)]/60 transition-colors border-b border-[var(--border-subtle)]">
@@ -642,6 +733,9 @@
             </td>
             <td class="py-3 px-4 text-xs text-[var(--text-muted)] max-w-[180px] truncate">
               ${firstTechnique}
+            </td>
+            <td class="py-3 px-4 text-right font-mono text-xs font-semibold ${maxPrice !== null ? 'text-[var(--color-accent-gold)]' : 'text-[var(--text-subtle)]'}">
+              ${formatPriceDisplay(maxPrice)}
             </td>
             <td class="py-3 px-4 text-xs text-[var(--text-subtle)] font-mono">
               ${artist.artist_email || '-'}
@@ -698,6 +792,7 @@
       artworksGrid.innerHTML = (artist.artworks || []).map(art => {
         const artTitle = window.getField(art, 'title');
         const artTech = window.getField(art, 'technique') || (window.i18n.getLang() === 'th' ? 'ภาพพิมพ์' : 'Printmaking');
+        const artPrice = parsePrice(art);
         return `
           <div class="p-3 corner-cut-12 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] flex gap-3 group/item">
             <img src="${art.thumbnail_url || art.image_url}" alt="${artTitle}" class="w-20 h-20 corner-cut-8 object-cover border border-[var(--border-subtle)] shrink-0 bg-[var(--mat-bg)]">
@@ -706,6 +801,9 @@
                 <h5 class="font-serif-luxury font-bold text-sm text-[var(--text-main)] truncate group-hover/item:text-[var(--color-accent-gold)] transition-colors">${artTitle}</h5>
                 <p class="text-[11px] text-[var(--text-subtle)] mt-0.5 truncate">${artTech}</p>
                 <p class="text-[10px] text-[var(--text-subtle)] font-mono">${art.dimensions ? window.formatDimensions(art.dimensions) + ' • ' : ''}${art.year_created || ''}</p>
+                ${artPrice !== null ? `
+                  <p class="text-[11px] font-mono font-bold text-[var(--color-accent-gold)] mt-0.5">${formatPriceDisplay(artPrice)}</p>
+                ` : ''}
               </div>
               <a href="/artwork.html?id=${art.id}" class="text-[11px] text-[var(--color-accent-gold)] hover:underline font-semibold mt-1 inline-flex items-center gap-1">
                 <span>${window.t('modal_view_artwork')}</span>
@@ -928,6 +1026,9 @@
     function resetFilters() {
       document.getElementById('artist-search').value = '';
       document.getElementById('country-filter').value = 'all';
+      if (document.getElementById('sort-filter')) {
+        document.getElementById('sort-filter').value = 'default';
+      }
       render();
     }
 
@@ -946,6 +1047,9 @@
     // Event Listeners
     document.getElementById('artist-search').addEventListener('input', render);
     document.getElementById('country-filter').addEventListener('change', render);
+    if (document.getElementById('sort-filter')) {
+      document.getElementById('sort-filter').addEventListener('change', render);
+    }
 
     document.getElementById('jump-artist').addEventListener('change', (e) => {
       if (e.target.value) {
