@@ -1984,7 +1984,7 @@
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-base">📖</span>
               <span class="font-serif-luxury font-bold text-sm text-[var(--color-accent-light)]">คู่มือลำดับคอลัมน์และการจัดเตรียมข้อมูลตาราง (Column Ordering Guide)</span>
-              <span class="text-[10px] font-mono px-2 py-0.5 corner-cut-4 bg-[var(--color-accent-glow)] text-[var(--color-accent-gold)] border border-[var(--border-accent)]">10 คอลัมน์มาตรฐาน</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 corner-cut-4 bg-[var(--color-accent-glow)] text-[var(--color-accent-gold)] border border-[var(--border-accent)]">11 คอลัมน์มาตรฐาน</span>
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <button type="button" onclick="event.stopPropagation(); copyHeaderRowToClipboard();" class="px-2.5 py-1 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-[var(--selection-text)] font-bold text-[10px] flex items-center gap-1 shadow-sm cursor-pointer transition">
@@ -2093,6 +2093,15 @@
                     <td class="p-2 text-[var(--text-subtle)]">จิตวิญญาณแห่งจักรวาลและพลังธรรมชาติ</td>
                     <td class="p-2 text-center"><span class="text-[9px] text-amber-400">แนะนำ</span></td>
                   </tr>
+                  <tr class="bg-sky-500/5 border-t border-sky-500/20">
+                    <td class="p-2 text-center font-bold text-sky-400">11</td>
+                    <td class="p-2 font-mono font-semibold text-sky-400">Email</td>
+                    <td class="p-2 text-[var(--text-muted)]">อีเมล, Email, อีเมล์ศิลปิน</td>
+                    <td class="p-2">อีเมลสำหรับติดต่อศิลปิน ใช้ลงทะเบียนระบบและสูจิบัตร</td>
+                    <td class="p-2 font-mono text-[var(--text-subtle)]">artist@example.com</td>
+                    <td class="p-2 text-center"><span class="text-[9px] text-sky-400">แนะนำ</span></td>
+                  </tr>
+
                 </tbody>
               </table>
             </div>
@@ -2279,6 +2288,7 @@
                   <th class="p-2.5 w-28">รูปผลงาน</th>
                   <th class="p-2.5">ชื่อผลงาน / เทคนิค</th>
                   <th class="p-2.5">ชื่อศิลปิน / สัญชาติ</th>
+                  <th class="p-2.5 text-sky-400">อีเมล</th>
                   <th class="p-2.5">ขนาด / ปี</th>
                   <th class="p-2.5">ราคา</th>
                   <th class="p-2.5 text-center w-28">สถานะประกบ</th>
@@ -2339,11 +2349,11 @@
     }
 
     function downloadSampleCsvTemplate() {
-      const sample = "ID,ArtistName,Country,ArtworkTitle,Medium,Dimensions,Year,Price,Bio,Concept\n" +
-                     "001,ถวัลย์ ดัชนี,Thailand,สุริยุปราคาจักรวาล,สีน้ำมันบนผ้าใบ,150 x 200 cm.,1998,1500000,ศิลปินแห่งชาติสาขาทัศนศิลป์,จิตวิญญาณแห่งจักรวาลและพลังธรรมชาติ\n" +
-                     "002,เฉลิมชัย โฆษิตพิพัฒน์,Thailand,พระพุทธเมตตาบารมี,สีอะคริลิคปิดทอง,120 x 100 cm.,2005,2000000,ผู้สร้างวัดร่องขุน,ความสว่างไสวแห่งปัญญา\n" +
-                     "003,Claude Monet,France,Water Lilies Harmony,Oil on Canvas,100 x 100 cm.,1916,5000000,French Impressionist master,Light and reflections\n" +
-                     "004,ศิลปินใหม่ทดสอบ,Japan,ซากุระราตรี,สีน้ำและหมึกญี่ปุ่น,80 x 60 cm.,2024,120000,ศิลปินร่วมสมัย,ความงามอันร่วงโรยและเกิดใหม่\n";
+      const sample = "ID,ArtistName,Country,ArtworkTitle,Medium,Dimensions,Year,Price,Bio,Concept,Email\n" +
+                     "001,ถวัลย์ ดัชนี,Thailand,สุริยุปราคาจักรวาล,สีน้ำมันบนผ้าใบ,150 x 200 cm.,1998,1500000,ศิลปินแห่งชาติสาขาทัศนศิลป์,จิตวิญญาณแห่งจักรวาลและพลังธรรมชาติ,tawan@example.com\n" +
+                     "002,เฉลิมชัย โฆษิตพิพัฒน์,Thailand,พระพุทธเมตตาบารมี,สีอะคริลิคปิดทอง,120 x 100 cm.,2005,2000000,ผู้สร้างวัดร่องขุน,ความสว่างไสวแห่งปัญญา,chalerm@example.com\n" +
+                     "003,Claude Monet,France,Water Lilies Harmony,Oil on Canvas,100 x 100 cm.,1916,5000000,French Impressionist master,Light and reflections,monet@example.com\n" +
+                     "004,ศิลปินใหม่ทดสอบ,Japan,ซากุระราตรี,สีน้ำและหมึกญี่ปุ่น,80 x 60 cm.,2024,120000,ศิลปินร่วมสมัย,ความงามอันร่วงโรยและเกิดใหม่,\n";
       const blob = new Blob([sample], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -2639,10 +2649,11 @@
             else if (['price', 'ราคา'].some(k => h.includes(k))) obj.price = val;
             else if (['bio', 'ประวัติ', 'ประวัติศิลปิน'].some(k => h.includes(k))) obj.artist_bio = val;
             else if (['concept', 'description', 'แนวคิด', 'คำอธิบาย'].some(k => h.includes(k))) obj.description = val;
+            else if (['email', 'อีเมล', 'อีเมล์', 'mail', 'e-mail'].some(k => h.includes(k))) obj.email = val;
           });
 
           // Ensure any missing standard fields default to '-'
-          const stdFields = ['title', 'artist_name', 'nationality', 'technique', 'dimensions', 'year_created', 'price', 'artist_bio', 'description'];
+          const stdFields = ['title', 'artist_name', 'nationality', 'technique', 'dimensions', 'year_created', 'price', 'artist_bio', 'description', 'email'];
           stdFields.forEach(f => {
             if (!obj[f] || obj[f] === '') obj[f] = '-';
           });
@@ -2686,11 +2697,11 @@
     // ⚡ Fast Sample Loader
     async function loadSampleImportData() {
       // 1. Put CSV into textarea
-      const sampleCsv = "ID,ArtistName,Country,ArtworkTitle,Medium,Dimensions,Year,Price,Bio,Concept\n" +
-                        "001,ถวัลย์ ดัชนี,Thailand,สุริยุปราคาจักรวาล,สีน้ำมันบนผ้าใบ,150 x 200 cm.,1998,1500000,ศิลปินแห่งชาติสาขาทัศนศิลป์,จิตวิญญาณแห่งจักรวาลและพลังธรรมชาติ\n" +
-                        "002,เฉลิมชัย โฆษิตพิพัฒน์,Thailand,พระพุทธเมตตาบารมี,สีอะคริลิคปิดทอง,120 x 100 cm.,2005,2000000,ผู้สร้างวัดร่องขุน จังหวัดเชียงราย,ความสว่างไสวแห่งปัญญาและพุทธธรรม\n" +
-                        "003,Claude Monet,France,Water Lilies Harmony,Oil on Canvas,100 x 100 cm.,1916,5000000,French Impressionist master painter,Impression of light and reflections on the pond\n" +
-                        "004,ศิลปินใหม่ทดสอบ,Japan,ซากุระราตรี,สีน้ำและหมึกญี่ปุ่น,80 x 60 cm.,2024,120000,ศิลปินร่วมสมัยผู้ผสมผสานความดั้งเดิม,ความงามอันร่วงโรยและเกิดใหม่\n";
+      const sampleCsv = "ID,ArtistName,Country,ArtworkTitle,Medium,Dimensions,Year,Price,Bio,Concept,Email\n" +
+                        "001,ถวัลย์ ดัชนี,Thailand,สุริยุปราคาจักรวาล,สีน้ำมันบนผ้าใบ,150 x 200 cm.,1998,1500000,ศิลปินแห่งชาติสาขาทัศนศิลป์,จิตวิญญาณแห่งจักรวาลและพลังธรรมชาติ,tawan@example.com\n" +
+                        "002,เฉลิมชัย โฆษิตพิพัฒน์,Thailand,พระพุทธเมตตาบารมี,สีอะคริลิคปิดทอง,120 x 100 cm.,2005,2000000,ผู้สร้างวัดร่องขุน จังหวัดเชียงราย,ความสว่างไสวแห่งปัญญาและพุทธธรรม,chalerm@example.com\n" +
+                        "003,Claude Monet,France,Water Lilies Harmony,Oil on Canvas,100 x 100 cm.,1916,5000000,French Impressionist master painter,Impression of light and reflections on the pond,monet@example.com\n" +
+                        "004,ศิลปินใหม่ทดสอบ,Japan,ซากุระราตรี,สีน้ำและหมึกญี่ปุ่น,80 x 60 cm.,2024,120000,ศิลปินร่วมสมัยผู้ผสมผสานความดั้งเดิม,ความงามอันร่วงโรยและเกิดใหม่,\n";
       
       document.getElementById('input-table-paste').value = sampleCsv;
       parseAndSetTableData(sampleCsv);
@@ -2823,6 +2834,12 @@
               <span class="font-semibold text-[var(--text-main)] block truncate max-w-[140px]">${row.artist_name && row.artist_name !== '-' ? row.artist_name : '-'}</span>
               <span class="text-[10px] text-[var(--text-muted)] block truncate max-w-[140px]">${row.nationality && row.nationality !== '-' ? row.nationality : '-'}</span>
             </td>
+            <td class="p-2.5">
+              ${row.email && row.email !== '-'
+                ? `<a href="mailto:${row.email}" class="text-sky-400 hover:text-sky-300 font-mono text-[10px] block truncate max-w-[160px] transition" title="${row.email}">${row.email}</a>`
+                : '<span class="text-[10px] text-[var(--text-subtle)] italic">-</span>'
+              }
+            </td>
             <td class="p-2.5 text-[11px] text-[var(--text-muted)]">
               <div>${row.dimensions && row.dimensions !== '-' ? row.dimensions : '-'}</div>
               <div class="font-mono text-[10px] text-[var(--text-subtle)]">${row.year_created && row.year_created !== '-' ? (row.year_created.startsWith('ปี') ? row.year_created : 'ปี ' + row.year_created) : '-'}</div>
@@ -2842,7 +2859,7 @@
 
     
     function copyHeaderRowToClipboard() {
-      const headers = "ID\tArtistName\tCountry\tArtworkTitle\tMedium\tDimensions\tYear\tPrice\tBio\tConcept";
+      const headers = "ID\tArtistName\tCountry\tArtworkTitle\tMedium\tDimensions\tYear\tPrice\tBio\tConcept\tEmail";
       navigator.clipboard.writeText(headers).then(() => {
         const toast = document.getElementById('copy-headers-toast');
         if (toast) {
