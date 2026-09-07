@@ -508,12 +508,15 @@
       </div>
 
       <form id="edit-event-form" class="space-y-4">
+        <input type="hidden" id="edit_original_event_id">
+
         <div>
-          <label class="block text-xs font-semibold text-[#171C1A] mb-1">
-            รหัส Event (event_id)
+          <label for="edit_event_id" class="block text-xs font-semibold text-[#171C1A] mb-1">
+            รหัส Event (event_id) <span class="text-rose-500">*</span>
           </label>
-          <input type="text" id="edit_event_id" readonly class="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF3E3]/40 border border-[#E8E0D2] text-[#64736C] font-mono text-xs cursor-not-allowed">
-          <p class="text-[10px] text-[#8C6D2D] mt-1">รหัส Event เป็น Primary Key สำหรับอ้างอิงฐานข้อมูลและห้องจัดแสดง 3D</p>
+          <input type="text" id="edit_event_id" required placeholder="เช่น 18pohchangartworkshop"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] font-mono text-xs focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+          <p class="text-[10px] text-[#8C6D2D] mt-1">💡 หากเปลี่ยนรหัส Event ระบบจะอัปเดตรหัสอ้างอิงและผลงานทั้งหมดในคลัง Master D1 ให้สอดคล้องกันโดยอัตโนมัติ</p>
         </div>
 
         <div>
@@ -529,8 +532,9 @@
             URL เว็บไซต์ของ Event (portal_url) <span class="text-rose-500">*</span>
           </label>
           <input type="url" id="edit_portal_url" required placeholder="https://18pohchangartworkshop.pages.dev"
-            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
-          <p class="text-[10px] text-[#64736C] mt-1">ใช้สำหรับเปิดเข้าชมเว็บนิทรรศการ และดึงข้อมูลผลงาน (Pull Artworks)</p>
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none"
+            oninput="syncCatalogUrlWithPortal(this.value)">
+          <p class="text-[10px] text-[#64736C] mt-1">ใช้สำหรับเปิดเข้าชมเว็บนิทรรศการ และเป็นต้นทางของระบบดึงผลงาน (Pull Artworks)</p>
         </div>
 
         <div>
@@ -539,7 +543,7 @@
           </label>
           <input type="url" id="edit_catalog_url" placeholder="https://18pohchangartworkshop.pages.dev/catalog.html"
             class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
-          <p class="text-[10px] text-[#64736C] mt-1">หากเว้นว่างไว้ ระบบจะใช้ค่าเริ่มต้น: portal_url + '/catalog.html'</p>
+          <p class="text-[10px] text-[#64736C] mt-1">ลิงก์เปิดอ่านรูปเล่มสูจิบัตร A4 สำหรับผู้ชมทั่วไปและปุ่มเปิดสูจิบัตร</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -774,6 +778,7 @@
         const saveBtnText = document.getElementById("btn-save-event-edit-text");
         const statusMsg = document.getElementById("edit-event-status-msg");
 
+        const originalEventId = document.getElementById("edit_original_event_id").value.trim();
         const eventId = document.getElementById("edit_event_id").value.trim();
         const eventTitle = document.getElementById("edit_event_title").value.trim();
         const portalUrl = document.getElementById("edit_portal_url").value.trim();
@@ -783,6 +788,7 @@
 
         const payload = {
           event_id: eventId,
+          old_event_id: originalEventId,
           event_title: eventTitle,
           portal_url: portalUrl,
           catalog_url: catalogUrl,
@@ -793,19 +799,19 @@
         }
 
         saveBtn.disabled = true;
-        saveBtnText.textContent = "กำลังบันทึก...";
+        saveBtnText.textContent = "กำลังบันทึกและปรับปรุงข้อมูล...";
         statusMsg.className = "text-xs font-mono p-3 rounded-xl bg-cyan-50 text-cyan-800 border border-cyan-200 block";
-        statusMsg.textContent = "กำลังส่งข้อมูลอัปเดต...";
+        statusMsg.textContent = "กำลังส่งข้อมูลและปรับปรุงการอ้างอิงทั้งหมด...";
 
         try {
           const res = await MasterPortalAPI.updateEvent(payload, adminKey);
           if (res.success) {
             statusMsg.className = "text-xs font-mono p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 block";
-            statusMsg.textContent = "✅ " + (res.message || "อัปเดตข้อมูลนิทรรศการสำเร็จ!");
+            statusMsg.textContent = "✅ " + (res.message || "อัปเดตข้อมูลนิทรรศการและส่วนที่เกี่ยวข้องสำเร็จ!");
             setTimeout(() => {
               closeEditEventModal();
               loadEventsTable();
-            }, 600);
+            }, 700);
           } else {
             statusMsg.className = "text-xs font-mono p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 block";
             statusMsg.textContent = "❌ " + (res.error || "เกิดข้อผิดพลาดในการบันทึก");
@@ -822,19 +828,32 @@
 
     let currentEventsCache = [];
 
+    function syncCatalogUrlWithPortal(newPortalUrl) {
+      const catInput = document.getElementById('edit_catalog_url');
+      const cleanUrl = (newPortalUrl || '').trim().replace(/\/+$/, '');
+      if (!catInput.value || catInput.value.includes('/catalog.html') || catInput.dataset.autoSynced === 'true') {
+        if (cleanUrl) {
+          catInput.value = `${cleanUrl}/catalog.html`;
+          catInput.dataset.autoSynced = 'true';
+        }
+      }
+    }
+
     function openEditEventModal(eventId) {
       const ev = currentEventsCache.find(e => e.event_id === eventId);
       if (!ev) {
         alert("ไม่พบข้อมูล Event: " + eventId);
         return;
       }
+      document.getElementById('edit_original_event_id').value = ev.event_id;
       document.getElementById('edit_event_id').value = ev.event_id;
       document.getElementById('edit_event_title').value = ev.event_title || '';
       document.getElementById('edit_portal_url').value = ev.portal_url || '';
       document.getElementById('edit_catalog_url').value = ev.catalog_url || '';
+      document.getElementById('edit_catalog_url').dataset.autoSynced = 'false';
       document.getElementById('edit_status').value = ev.status || 'active';
       document.getElementById('edit_secret_token').value = '';
-      document.getElementById('edit-event-sub').textContent = `Event ID: ${ev.event_id}`;
+      document.getElementById('edit-event-sub').textContent = `Original ID: ${ev.event_id}`;
 
       const msgEl = document.getElementById('edit-event-status-msg');
       msgEl.classList.add('hidden');

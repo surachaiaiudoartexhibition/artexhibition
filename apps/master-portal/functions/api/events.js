@@ -127,9 +127,12 @@ export async function onRequestPut(context) {
 
   try {
     const body = await request.json();
-    const { event_id, event_title, portal_url, secret_token, status, catalog_url } = body;
+    let { event_id, old_event_id, event_title, portal_url, secret_token, status, catalog_url } = body;
 
-    if (!event_id) {
+    const sourceEventId = (old_event_id || event_id || "").trim();
+    const targetEventId = (event_id || old_event_id || "").trim();
+
+    if (!sourceEventId) {
       return new Response(JSON.stringify({
         success: false,
         error: "Missing required field: event_id."
@@ -139,38 +142,96 @@ export async function onRequestPut(context) {
       });
     }
 
-    const existing = await env.DB.prepare("SELECT * FROM registered_events WHERE event_id = ?").bind(event_id.trim()).first();
+    const existing = await env.DB.prepare("SELECT * FROM registered_events WHERE event_id = ?").bind(sourceEventId).first();
     if (!existing) {
       return new Response(JSON.stringify({
         success: false,
-        error: `Event '${event_id}' not found.`
+        error: `Event '${sourceEventId}' not found.`
       }), {
         status: 404,
         headers: { "Content-Type": "application/json" }
       });
     }
 
+    const isRenamingId = targetEventId !== sourceEventId;
+
+    if (isRenamingId) {
+      const conflict = await env.DB.prepare("SELECT event_id FROM registered_events WHERE event_id = ?").bind(targetEventId).first();
+      if (conflict) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: `Event ID '${targetEventId}' already exists. Please choose a different ID.`
+        }), {
+          status: 409,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+    }
+
+    // Clean and normalize URLs
+    const oldPortalUrlClean = (existing.portal_url || "").trim().replace(/\/+$/, "");
+    let updatedUrl = portal_url !== undefined && portal_url !== null ? portal_url.trim().replace(/\/+$/, "") : oldPortalUrlClean;
+    const newPortalUrlClean = updatedUrl.replace(/\/+$/, "");
+
+    // Title, Token, Status
     const updatedTitle = event_title !== undefined && event_title !== null ? event_title.trim() : existing.event_title;
-    const updatedUrl = portal_url !== undefined && portal_url !== null ? portal_url.trim() : existing.portal_url;
     const updatedToken = secret_token && secret_token.trim() ? secret_token.trim() : existing.secret_token;
     const updatedStatus = status !== undefined && status !== null ? status.trim() : existing.status;
-    const updatedCatalog = catalog_url !== undefined ? (catalog_url ? catalog_url.trim() : null) : existing.catalog_url;
 
-    const stmt = env.DB.prepare(`
-      UPDATE registered_events
-      SET event_title = ?, portal_url = ?, secret_token = ?, status = ?, catalog_url = ?
-      WHERE event_id = ?
-    `).bind(updatedTitle, updatedUrl, updatedToken, updatedStatus, updatedCatalog, event_id.trim());
+    // Smart Catalog URL Resolution
+    let updatedCatalog = catalog_url !== undefined ? (catalog_url ? catalog_url.trim() : null) : existing.catalog_url;
+    if (updatedCatalog && oldPortalUrlClean && oldPortalUrlClean !== newPortalUrlClean) {
+      if (updatedCatalog.includes(oldPortalUrlClean)) {
+        updatedCatalog = updatedCatalog.replace(oldPortalUrlClean, newPortalUrlClean);
+      }
+    } else if (!updatedCatalog && newPortalUrlClean) {
+      updatedCatalog = `${newPortalUrlClean}/catalog.html`;
+    }
 
-    await stmt.run();
+    // Database updates:
+    if (isRenamingId) {
+      // 1. Insert new event record
+      await env.DB.prepare(`
+        INSERT INTO registered_events (event_id, event_title, portal_url, secret_token, status, catalog_url, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).bind(targetEventId, updatedTitle, newPortalUrlClean, updatedToken, updatedStatus, updatedCatalog, existing.created_at).run();
+
+      // 2. Cascade update to master_artworks (event_id and global_id prefix)
+      await env.DB.prepare(`
+        UPDATE master_artworks
+        SET event_id = ?,
+            global_id = ? || substr(global_id, length(?) + 1)
+        WHERE event_id = ?
+      `).bind(targetEventId, targetEventId, sourceEventId, sourceEventId).run();
+
+      // 3. Delete old registered_events record
+      await env.DB.prepare("DELETE FROM registered_events WHERE event_id = ?").bind(sourceEventId).run();
+    } else {
+      // Update existing registered_events record
+      await env.DB.prepare(`
+        UPDATE registered_events
+        SET event_title = ?, portal_url = ?, secret_token = ?, status = ?, catalog_url = ?
+        WHERE event_id = ?
+      `).bind(updatedTitle, newPortalUrlClean, updatedToken, updatedStatus, updatedCatalog, sourceEventId).run();
+    }
+
+    // 4. Propagate portal_url change to all artworks' deep links (event_page_url) in master_artworks
+    if (oldPortalUrlClean && newPortalUrlClean && oldPortalUrlClean !== newPortalUrlClean) {
+      await env.DB.prepare(`
+        UPDATE master_artworks
+        SET event_page_url = REPLACE(event_page_url, ?, ?)
+        WHERE event_id = ?
+      `).bind(oldPortalUrlClean, newPortalUrlClean, targetEventId).run();
+    }
 
     return new Response(JSON.stringify({
       success: true,
-      message: `Event '${event_id}' updated successfully.`,
+      message: `Event '${targetEventId}' and all associated artworks/links updated successfully.`,
       event: {
-        event_id: event_id.trim(),
+        event_id: targetEventId,
+        old_event_id: isRenamingId ? sourceEventId : undefined,
         event_title: updatedTitle,
-        portal_url: updatedUrl,
+        portal_url: newPortalUrlClean,
         status: updatedStatus,
         catalog_url: updatedCatalog
       }

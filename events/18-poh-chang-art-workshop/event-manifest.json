@@ -22,7 +22,7 @@
     "adminKey": "admin123"
   },
   "integration": {
-    "masterPortalUrl": "https://master-portal.pages.dev",
-    "eventPageBaseUrl": "https://18-poh-chang-art-workshop.pages.dev"
+    "masterPortalUrl": "https://artexhibition.pages.dev",
+    "eventPageBaseUrl": "https://18pohchangartworkshop.pages.dev"
   }
 }

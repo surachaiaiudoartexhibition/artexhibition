@@ -91,7 +91,7 @@ async function main() {
   let uploadPreset = cliArgs.preset;
   let d1Name = cliArgs.db;
   let d1Id = cliArgs.dbid;
-  let masterPortalUrl = cliArgs.master || 'https://master-portal.pages.dev';
+  let masterPortalUrl = cliArgs.master || 'https://artexhibition.pages.dev';
   let adminKey = cliArgs.adminkey;
   let secretToken = cliArgs.secret;
 

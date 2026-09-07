@@ -15,10 +15,10 @@ database_id = "039a77cf-6fda-4532-9712-ec4eca1844c8"
 EVENT_ID = "18-poh-chang-art-workshop"
 EVENT_TITLE = "18 Poh Chang art workshop"
 ADMIN_EMAIL = "surachai.ai.udo+artworkshop18@gmail.com"
-MASTER_PORTAL_URL = "https://master-portal.pages.dev"
+MASTER_PORTAL_URL = "https://artexhibition.pages.dev"
 SHARED_SECRET_TOKEN = "sec_18pohchangartworkshop_61045e6c340ecfdf25c2a3a3e2a2bce7"
 ADMIN_KEY = "admin123"
-EVENT_PAGE_BASE_URL = "https://18-poh-chang-art-workshop.pages.dev"
+EVENT_PAGE_BASE_URL = "https://18pohchangartworkshop.pages.dev"
 EVENT_THEME = "heritage"
 
 # Dedicated Cloudinary Storage Account for this Event

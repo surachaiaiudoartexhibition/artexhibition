@@ -88,7 +88,7 @@ async function syncAllEvents() {
         D1_DATABASE_NAME: manifest.accountIsolation?.cloudflare?.d1DatabaseName || `d1-${manifest.eventId}`,
         D1_DATABASE_ID: manifest.accountIsolation?.cloudflare?.d1DatabaseId || '',
         SHARED_SECRET_TOKEN: manifest.security?.sharedSecretToken || '',
-        MASTER_PORTAL_URL: manifest.integration?.masterPortalUrl || 'https://master-portal.pages.dev',
+        MASTER_PORTAL_URL: manifest.integration?.masterPortalUrl || 'https://artexhibition.pages.dev',
         ADMIN_KEY: manifest.security?.adminKey || 'admin123',
         EVENT_PAGE_BASE_URL: manifest.integration?.eventPageBaseUrl || `https://${manifest.eventId}.pages.dev`
       };
