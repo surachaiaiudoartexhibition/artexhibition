@@ -913,6 +913,34 @@
           return;
         }
       }
+      if ((e.code === 'KeyE' || e.key === 'e' || e.key === 'E') && !isInspecting) {
+        // Prevent trigger if typing in an input
+        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+          return;
+        }
+        if (hoveredArtwork) {
+          inspectArtwork(hoveredArtwork.artwork, hoveredArtwork.index);
+          return;
+        }
+        // Fallback: If not exact crosshair raycast, find nearest artwork within 4.5 meters in front of player
+        if (artworkMeshes.length > 0) {
+          let closest = null;
+          let minDist = 4.5;
+          const pPos = player.position;
+          for (let i = 0; i < artworkMeshes.length; i++) {
+            const item = artworkMeshes[i];
+            const dist = item.group.position.distanceTo(pPos);
+            if (dist < minDist) {
+              minDist = dist;
+              closest = item;
+            }
+          }
+          if (closest) {
+            inspectArtwork(closest.artwork, closest.index);
+            return;
+          }
+        }
+      }
       if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.forward = true;
       if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.backward = true;
       if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = true;
@@ -940,7 +968,27 @@
     });
     container.addEventListener('click', () => {
       if (isInspecting) return;
-      if (hoveredArtwork) inspectArtwork(hoveredArtwork.artwork, hoveredArtwork.index);
+      if (hoveredArtwork) {
+        inspectArtwork(hoveredArtwork.artwork, hoveredArtwork.index);
+        return;
+      }
+      // If clicked while near an artwork in view, inspect it
+      if (artworkMeshes.length > 0) {
+        let closest = null;
+        let minDist = 5.0;
+        const pPos = player.position;
+        for (let i = 0; i < artworkMeshes.length; i++) {
+          const item = artworkMeshes[i];
+          const dist = item.group.position.distanceTo(pPos);
+          if (dist < minDist) {
+            minDist = dist;
+            closest = item;
+          }
+        }
+        if (closest) {
+          inspectArtwork(closest.artwork, closest.index);
+        }
+      }
     });
   }
 
@@ -1059,20 +1107,36 @@
 
   function checkRaycastArtwork(currentTime) {
     const now = currentTime || performance.now();
-    // Throttle to 15 FPS (every 66ms) to save CPU cycles
-    if (now - lastRaycastTime < 66) return;
+    // Throttle to 20 FPS (every 50ms)
+    if (now - lastRaycastTime < 50) return;
     lastRaycastTime = now;
 
     const reticle = document.getElementById('reticle');
     const prompt = document.getElementById('interaction-prompt');
 
-    // Fast distance culling: only raycast against artwork hitboxes within 9.5 meters of player
+    // Fast distance culling: examine artworks within 10 meters of player
     const playerPos = player.position;
     const nearbyHitTargets = [];
+    let closestInView = null;
+    let closestDist = 7.5;
+
+    // Get camera forward direction in horizontal plane
+    camera.getWorldDirection(_vForward);
+
     for (let i = 0; i < artworkMeshes.length; i++) {
       const item = artworkMeshes[i];
-      if (item.group.position.distanceTo(playerPos) < 9.5) {
+      const dist = item.group.position.distanceTo(playerPos);
+      if (dist < 10.0) {
         nearbyHitTargets.push(item.hitMesh);
+
+        // Check angle between camera view and vector to artwork
+        _vTargetPos.subVectors(item.group.position, playerPos).normalize();
+        const dot = _vForward.dot(_vTargetPos);
+        // If artwork is within ~45 degrees of camera center and close enough
+        if (dot > 0.72 && dist < closestDist) {
+          closestDist = dist;
+          closestInView = item.hitMesh.userData;
+        }
       }
     }
 
@@ -1085,8 +1149,13 @@
 
     raycaster.setFromCamera(mouseCenter, camera);
     const intersects = raycaster.intersectObjects(nearbyHitTargets);
-    if (intersects.length > 0 && intersects[0].distance < 6.5) {
+    if (intersects.length > 0 && intersects[0].distance < 7.5) {
       hoveredArtwork = intersects[0].object.userData;
+      if (reticle) reticle.classList.add('active');
+      if (prompt) { prompt.classList.remove('opacity-0', 'translate-y-2'); prompt.classList.add('opacity-100', 'translate-y-0'); }
+    } else if (closestInView && closestDist < 5.5) {
+      // Soft-lock to closest artwork in view even if crosshair is slightly off
+      hoveredArtwork = closestInView;
       if (reticle) reticle.classList.add('active');
       if (prompt) { prompt.classList.remove('opacity-0', 'translate-y-2'); prompt.classList.add('opacity-100', 'translate-y-0'); }
     } else {
