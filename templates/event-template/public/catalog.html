@@ -405,51 +405,67 @@
   </div>
 
   <!-- Catalog Layout Studio Modal (Curator Admin) -->
-  <div id="catalog-studio-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md hidden no-print">
-    <div class="bg-[#13141f] border border-amber-500/40 rounded-sm w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+  <div id="catalog-studio-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm hidden no-print">
+    <div class="bg-[#FAF7F0] border border-[#C5A059]/50 rounded-lg w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden text-[#171C1A]">
       
       <!-- Studio Header -->
-      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-sm bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-base">
-            ⚙️
+      <div class="px-6 py-4 border-b border-[#E8E0D2] flex items-center justify-between bg-[#F4EFE6]">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-md bg-[#FAF7F0] border border-[#C5A059]/60 flex items-center justify-center text-[#8A6414] shadow-sm">
+            <svg class="w-5 h-5 text-[#8A6414]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
           </div>
           <div>
-            <h3 class="text-base font-bold text-white leading-tight" data-i18n="studio_modal_title">สตูดิโอจัดหน้าสูจิบัตร (Catalog Layout Studio)</h3>
-            <p class="text-xs text-amber-400/80" data-i18n="studio_modal_subtitle">กำหนดลำดับหน้า ปก คำนำ และธีมของสูจิบัตรสำหรับแสดงบนเว็บ</p>
+            <h3 class="text-base font-bold font-serif-luxury text-[#171C1A] leading-tight" data-i18n="studio_modal_title">สตูดิโอจัดหน้าสูจิบัตร (Catalog Layout Studio)</h3>
+            <p class="text-xs text-[#8A6414]" data-i18n="studio_modal_subtitle">กำหนดลำดับหน้า ปก คำนำ และการจัดวางของสูจิบัตรดิจิทัล</p>
           </div>
         </div>
-        <button onclick="closeCatalogStudio()" class="text-slate-400 hover:text-white text-2xl leading-none p-1 cursor-pointer">&times;</button>
+        <button onclick="closeCatalogStudio()" class="text-[#7A8B84] hover:text-[#171C1A] hover:bg-[#E8E0D2]/50 w-8 h-8 rounded-full flex items-center justify-center text-xl transition cursor-pointer" aria-label="Close">&times;</button>
       </div>
 
       <!-- Studio Tab Navigation -->
-      <div class="flex border-b border-slate-800 bg-[#090a0d]/50 px-6 gap-2 sm:gap-6 text-xs sm:text-sm overflow-x-auto">
-        <button id="studio-tab-btn-order" onclick="switchStudioTab('order')" class="py-3 font-semibold border-b-2 border-amber-400 text-amber-300 flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-          <span>📑</span>
+      <div class="flex border-b border-[#E8E0D2] bg-[#FAF7F0] px-6 gap-2 sm:gap-6 text-xs sm:text-sm overflow-x-auto select-none">
+        <button id="studio-tab-btn-order" onclick="switchStudioTab('order')" class="py-3 font-semibold border-b-2 border-[#C5A059] text-[#171C1A] flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition">
+          <svg class="w-4 h-4 text-[#8A6414]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
           <span data-i18n="studio_tab_order">ลำดับหน้าและเลือกผลงาน</span>
         </button>
-        <button id="studio-tab-btn-cover" onclick="switchStudioTab('cover')" class="py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-          <span>🎨</span>
+        <button id="studio-tab-btn-cover" onclick="switchStudioTab('cover')" class="py-3 font-medium border-b-2 border-transparent text-[#7A8B84] hover:text-[#171C1A] flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
           <span data-i18n="studio_tab_cover">หน้าปกสูจิบัตร</span>
         </button>
-        <button id="studio-tab-btn-foreword" onclick="switchStudioTab('foreword')" class="py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-          <span>✍️</span>
+        <button id="studio-tab-btn-foreword" onclick="switchStudioTab('foreword')" class="py-3 font-medium border-b-2 border-transparent text-[#7A8B84] hover:text-[#171C1A] flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
           <span data-i18n="studio_tab_foreword">สารจากภัณฑารักษ์</span>
         </button>
-        <button id="studio-tab-btn-layout" onclick="switchStudioTab('layout')" class="py-3 font-medium border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-          <span>📐</span>
+        <button id="studio-tab-btn-layout" onclick="switchStudioTab('layout')" class="py-3 font-medium border-b-2 border-transparent text-[#7A8B84] hover:text-[#171C1A] flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+          </svg>
           <span data-i18n="studio_tab_layout">รูปแบบและธีม</span>
         </button>
       </div>
 
       <!-- Studio Tab Content Area (Scrollable) -->
-      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+      <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-[#FDFCF9]">
         
         <!-- Tab 1: Page Order & Visibility -->
         <div id="studio-tab-order" class="space-y-4">
-          <div class="flex items-center justify-between bg-slate-900/60 p-3 rounded-sm border border-slate-800 text-xs text-neutral-300">
-            <span>💡 จัดลำดับการแสดงผลของผลงาน หรือซ่อนผลงานที่ไม่ต้องการรวมในเล่มสูจิบัตร</span>
-            <span id="studio-artworks-count" class="font-mono text-amber-300 font-bold">0 ชิ้น</span>
+          <div class="flex items-center justify-between bg-[#FAF7F0] p-3 rounded-md border border-[#E8E0D2] text-xs text-[#4A5852]">
+            <span class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-[#C5A059] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>จัดลำดับการแสดงผลของผลงาน หรือซ่อนผลงานที่ไม่ต้องการรวมในเล่มสูจิบัตร</span>
+            </span>
+            <span id="studio-artworks-count" class="font-mono text-[#8A6414] font-bold bg-[#FAF3E3] px-2.5 py-0.5 rounded border border-[#C5A059]/40">0 ชิ้น</span>
           </div>
 
           <div id="studio-artworks-list" class="space-y-2.5">
@@ -461,53 +477,53 @@
         <div id="studio-tab-cover" class="hidden space-y-4 text-xs">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_badge_th">ป้ายกำกับด้านบน (TH)</label>
-              <input type="text" id="studio-cover-badge-th" placeholder="สูจิบัตรทางการประจำนิทรรศการ" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_badge_th">ป้ายกำกับด้านบน (TH)</label>
+              <input type="text" id="studio-cover-badge-th" placeholder="สูจิบัตรทางการประจำนิทรรศการ" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_badge_en">ป้ายกำกับด้านบน (EN)</label>
-              <input type="text" id="studio-cover-badge-en" placeholder="OFFICIAL EXHIBITION CATALOG" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_badge_en">ป้ายกำกับด้านบน (EN)</label>
+              <input type="text" id="studio-cover-badge-en" placeholder="OFFICIAL EXHIBITION CATALOG" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
 
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_title1_th">ชื่องาน บรรทัดที่ 1 (TH)</label>
-              <input type="text" id="studio-cover-title-th" placeholder="นิทรรศการภาพพิมพ์ร่วมสมัยนานาชาติ" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_title1_th">ชื่องาน บรรทัดที่ 1 (TH)</label>
+              <input type="text" id="studio-cover-title-th" placeholder="นิทรรศการภาพพิมพ์ร่วมสมัยนานาชาติ" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_title1_en">ชื่องาน บรรทัดที่ 1 (EN)</label>
-              <input type="text" id="studio-cover-title-en" placeholder="INTERNATIONAL CONTEMPORARY" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_title1_en">ชื่องาน บรรทัดที่ 1 (EN)</label>
+              <input type="text" id="studio-cover-title-en" placeholder="INTERNATIONAL CONTEMPORARY" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_title_highlight">ชื่องาน บรรทัดไฮไลท์สีทอง (Title Line 2 / Highlight)</label>
-              <input type="text" id="studio-cover-title-highlight" placeholder="PRINTMAKING 2026" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-amber-300 font-bold font-serif text-sm focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_title_highlight">ชื่องาน บรรทัดไฮไลท์สีทอง (Title Line 2 / Highlight)</label>
+              <input type="text" id="studio-cover-title-highlight" placeholder="PRINTMAKING 2026" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#8A6414] font-bold font-serif-luxury text-sm focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
 
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_sub_th">คำโปรย / คำบรรยายสั้น (TH)</label>
-              <textarea id="studio-cover-sub-th" rows="2" placeholder="รวมผลงานภาพพิมพ์ชิ้นเอก..." class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400"></textarea>
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_sub_th">คำโปรย / คำบรรยายสั้น (TH)</label>
+              <textarea id="studio-cover-sub-th" rows="2" placeholder="รวมผลงานภาพพิมพ์ชิ้นเอก..." class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition"></textarea>
             </div>
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_sub_en">คำโปรย / คำบรรยายสั้น (EN)</label>
-              <textarea id="studio-cover-sub-en" rows="2" placeholder="A curated collection of exceptional..." class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400"></textarea>
-            </div>
-
-            <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_curator_th">ชื่อประธาน / ภัณฑารักษ์หลัก (TH)</label>
-              <input type="text" id="studio-cover-curator-th" placeholder="ศ.ดร. ธีรภัทร ชาญวิทย์" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
-            </div>
-            <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_curator_en">ชื่อประธาน / ภัณฑารักษ์หลัก (EN)</label>
-              <input type="text" id="studio-cover-curator-en" placeholder="Prof. Dr. Teerapat Chanwit" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_sub_en">คำโปรย / คำบรรยายสั้น (EN)</label>
+              <textarea id="studio-cover-sub-en" rows="2" placeholder="A curated collection of exceptional..." class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition"></textarea>
             </div>
 
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_edition_th">ข้อมูลฉบับพิมพ์ / ช่วงเวลานิทรรศการ (TH)</label>
-              <input type="text" id="studio-cover-edition-th" placeholder="ฉบับพิมพ์ครั้งที่ 1 • มีนาคม 2569" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_curator_th">ชื่อประธาน / ภัณฑารักษ์หลัก (TH)</label>
+              <input type="text" id="studio-cover-curator-th" placeholder="ศ.ดร. ธีรภัทร ชาญวิทย์" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_cover_edition_en">ข้อมูลฉบับพิมพ์ / ช่วงเวลานิทรรศการ (EN)</label>
-              <input type="text" id="studio-cover-edition-en" placeholder="First Edition • March 2026" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_curator_en">ชื่อประธาน / ภัณฑารักษ์หลัก (EN)</label>
+              <input type="text" id="studio-cover-curator-en" placeholder="Prof. Dr. Teerapat Chanwit" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
+            </div>
+
+            <div>
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_edition_th">ข้อมูลฉบับพิมพ์ / ช่วงเวลานิทรรศการ (TH)</label>
+              <input type="text" id="studio-cover-edition-th" placeholder="ฉบับพิมพ์ครั้งที่ 1 • มีนาคม 2569" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
+            </div>
+            <div>
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_cover_edition_en">ข้อมูลฉบับพิมพ์ / ช่วงเวลานิทรรศการ (EN)</label>
+              <input type="text" id="studio-cover-edition-en" placeholder="First Edition • March 2026" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
           </div>
         </div>
@@ -516,39 +532,39 @@
         <div id="studio-tab-foreword" class="hidden space-y-4 text-xs">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_foreword_title_th">หัวข้อสารจากภัณฑารักษ์ (TH)</label>
-              <input type="text" id="studio-foreword-title-th" placeholder="รอยสัมผัสแห่งหมึกพิมพ์และกาลเวลา" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_foreword_title_th">หัวข้อสารจากภัณฑารักษ์ (TH)</label>
+              <input type="text" id="studio-foreword-title-th" placeholder="รอยสัมผัสแห่งหมึกพิมพ์และกาลเวลา" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_foreword_title_en">หัวข้อสารจากภัณฑารักษ์ (EN)</label>
-              <input type="text" id="studio-foreword-title-en" placeholder="Impressions of Ink & Time" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
-            </div>
-
-            <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_foreword_p1_th">ย่อหน้าที่ 1 (TH)</label>
-              <textarea id="studio-foreword-p1-th" rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400"></textarea>
-            </div>
-            <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_foreword_p1_en">ย่อหน้าที่ 1 (EN)</label>
-              <textarea id="studio-foreword-p1-en" rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400"></textarea>
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_foreword_title_en">หัวข้อสารจากภัณฑารักษ์ (EN)</label>
+              <input type="text" id="studio-foreword-title-en" placeholder="Impressions of Ink & Time" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
 
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_foreword_p2_th">ย่อหน้าที่ 2 (TH)</label>
-              <textarea id="studio-foreword-p2-th" rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400"></textarea>
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_foreword_p1_th">ย่อหน้าที่ 1 (TH)</label>
+              <textarea id="studio-foreword-p1-th" rows="4" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition"></textarea>
             </div>
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_foreword_p2_en">ย่อหน้าที่ 2 (EN)</label>
-              <textarea id="studio-foreword-p2-en" rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400"></textarea>
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_foreword_p1_en">ย่อหน้าที่ 1 (EN)</label>
+              <textarea id="studio-foreword-p1-en" rows="4" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition"></textarea>
             </div>
 
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_foreword_committee_th">ลงชื่อคณะกรรมการ / ฝ่ายจัดงาน (TH)</label>
-              <input type="text" id="studio-foreword-committee-th" placeholder="คณะกรรมการจัดงานนิทรรศการภาพพิมพ์ร่วมสมัยนานาชาติ 2026" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_foreword_p2_th">ย่อหน้าที่ 2 (TH)</label>
+              <textarea id="studio-foreword-p2-th" rows="4" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition"></textarea>
             </div>
             <div>
-              <label class="block text-neutral-300 font-semibold mb-1" data-i18n="studio_foreword_committee_en">ลงชื่อคณะกรรมการ / ฝ่ายจัดงาน (EN)</label>
-              <input type="text" id="studio-foreword-committee-en" placeholder="Curatorial Committee, International Contemporary Printmaking 2026" class="w-full bg-slate-900 border border-slate-700 rounded-sm px-3 py-2 text-white text-xs focus:border-amber-400">
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_foreword_p2_en">ย่อหน้าที่ 2 (EN)</label>
+              <textarea id="studio-foreword-p2-en" rows="4" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_foreword_committee_th">ลงชื่อคณะกรรมการ / ฝ่ายจัดงาน (TH)</label>
+              <input type="text" id="studio-foreword-committee-th" placeholder="คณะกรรมการจัดงานนิทรรศการภาพพิมพ์ร่วมสมัยนานาชาติ 2026" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
+            </div>
+            <div>
+              <label class="block text-[#171C1A] font-semibold mb-1" data-i18n="studio_foreword_committee_en">ลงชื่อคณะกรรมการ / ฝ่ายจัดงาน (EN)</label>
+              <input type="text" id="studio-foreword-committee-en" placeholder="Curatorial Committee, International Contemporary Printmaking 2026" class="w-full bg-white border border-[#D1C7B7] rounded-md px-3 py-2 text-[#171C1A] text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
             </div>
           </div>
         </div>
@@ -557,77 +573,81 @@
         <div id="studio-tab-layout" class="hidden space-y-6 text-xs">
           
           <!-- Element Visibility Checklist (เลือกข้อมูลที่จะใส่) -->
-          <div class="bg-slate-900/60 p-4 rounded-sm border border-slate-800 space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span class="font-bold text-white text-sm flex items-center gap-2">
-                <span>📋</span>
+          <div class="bg-[#FAF7F0] p-4 rounded-md border border-[#E8E0D2] space-y-3">
+            <div class="flex items-center justify-between border-b border-[#E8E0D2] pb-2">
+              <span class="font-bold text-[#171C1A] text-sm flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#8A6414]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <span data-i18n="lbl_toggle_elements">เลือกข้อมูลที่จะแสดงในหน้าผลงาน (Field Visibility)</span>
               </span>
-              <span class="text-[11px] text-slate-400">เลือกเปิด-ปิดฟิลด์ข้อมูลได้ตามต้องการ ไร้กรอบข้อความ</span>
+              <span class="text-[11px] text-[#7A8B84]">เลือกเปิด-ปิดฟิลด์ข้อมูลได้ตามต้องการ</span>
             </div>
             
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 text-xs text-neutral-300">
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-title" class="accent-amber-500 cursor-pointer" checked>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 text-xs text-[#171C1A]">
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-title" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_title">ชื่อผลงาน</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-artist" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-artist" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_artist">ชื่อศิลปิน & ตำแหน่ง</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-flag" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-flag" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_flag">ธงชาติ / ประเทศ</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-technique" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-technique" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_technique">เทคนิค</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-dimensions" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-dimensions" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_dimensions">ขนาดผลงาน</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-year" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-year" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_year">ปีที่สร้างสรรค์</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-price" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-price" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_price">ราคาผลงาน</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-concept" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-concept" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_concept">แนวความคิด / คำบรรยาย</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-avatar" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-avatar" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_avatar">รูปภาพศิลปิน</span>
               </label>
-              <label class="flex items-center gap-2 cursor-pointer bg-[#090a0d]/60 px-3 py-2 rounded-sm border border-slate-800 hover:border-amber-500/40 transition">
-                <input type="checkbox" id="elem-show-pagenum" class="accent-amber-500 cursor-pointer" checked>
+              <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-md border border-[#E8E0D2] hover:border-[#C5A059] transition shadow-xs">
+                <input type="checkbox" id="elem-show-pagenum" class="accent-[#C5A059] cursor-pointer" checked>
                 <span data-i18n="toggle_show_page_num">เลขผลงานและเลขหน้า</span>
               </label>
             </div>
           </div>
 
           <!-- Freeform Grid Designer Canvas -->
-          <div class="bg-slate-900/60 p-4 rounded-sm border border-slate-800 space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div class="bg-[#FAF7F0] p-4 rounded-md border border-[#E8E0D2] space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#E8E0D2] pb-3">
               <div>
-                <h4 class="font-bold text-white text-sm flex items-center gap-2">
-                  <span>📐</span>
+                <h4 class="font-bold text-[#171C1A] text-sm flex items-center gap-2">
+                  <svg class="w-4 h-4 text-[#8A6414]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                  </svg>
                   <span data-i18n="studio_tab_grid">จัดวางตำแหน่งแบบอิสระบน Grid (Freeform Grid Designer)</span>
                 </h4>
-                <p class="text-[11px] text-amber-400/80" data-i18n="grid_instruction">คลิกและลากบล็อกบนหน้า A4 จำลองเพื่อจัดวางตำแหน่ง ระบบจะดูดจับตามเส้น Grid</p>
+                <p class="text-[11px] text-[#8A6414]" data-i18n="grid_instruction">คลิกและลากบล็อกบนหน้า A4 จำลองเพื่อจัดวางตำแหน่ง ระบบจะดูดจับตามเส้น Grid</p>
               </div>
 
               <div class="flex items-center gap-3">
-                <label class="flex items-center gap-1.5 text-xs text-neutral-300 cursor-pointer">
-                  <input type="checkbox" id="grid-toggle-lines" class="accent-amber-500 cursor-pointer" checked onchange="toggleCanvasGridLines(this.checked)">
+                <label class="flex items-center gap-1.5 text-xs text-[#4A5852] cursor-pointer">
+                  <input type="checkbox" id="grid-toggle-lines" class="accent-[#C5A059] cursor-pointer" checked onchange="toggleCanvasGridLines(this.checked)">
                   <span data-i18n="grid_toggle_show">แสดงเส้น Grid</span>
                 </label>
-                <label class="flex items-center gap-1.5 text-xs text-neutral-300 cursor-pointer">
-                  <input type="checkbox" id="grid-toggle-snap" class="accent-amber-500 cursor-pointer" checked>
+                <label class="flex items-center gap-1.5 text-xs text-[#4A5852] cursor-pointer">
+                  <input type="checkbox" id="grid-toggle-snap" class="accent-[#C5A059] cursor-pointer" checked>
                   <span data-i18n="grid_toggle_snap">ดูดจับเส้นตาราง (Snap)</span>
                 </label>
               </div>
@@ -635,104 +655,104 @@
 
             <!-- Quick Alignment Presets -->
             <div class="flex flex-wrap items-center gap-2 text-xs">
-              <span class="text-slate-400 font-semibold">พรีเซ็ตจัดวาง:</span>
-              <button type="button" onclick="applyGridPreset('split')" class="px-2.5 py-1 rounded-sm bg-slate-800 hover:bg-amber-500/20 text-amber-100/90 hover:text-amber-300 border border-slate-700 transition cursor-pointer">
+              <span class="text-[#7A8B84] font-semibold">พรีเซ็ตจัดวาง:</span>
+              <button type="button" onclick="applyGridPreset('split')" class="px-2.5 py-1 rounded bg-white hover:bg-[#FAF3E3] text-[#171C1A] border border-[#D1C7B7] hover:border-[#C5A059] transition cursor-pointer shadow-2xs font-medium">
                 ซ้ายภาพ ขวาข้อมูล (Split)
               </button>
-              <button type="button" onclick="applyGridPreset('hero')" class="px-2.5 py-1 rounded-sm bg-slate-800 hover:bg-amber-500/20 text-amber-100/90 hover:text-amber-300 border border-slate-700 transition cursor-pointer">
+              <button type="button" onclick="applyGridPreset('hero')" class="px-2.5 py-1 rounded bg-white hover:bg-[#FAF3E3] text-[#171C1A] border border-[#D1C7B7] hover:border-[#C5A059] transition cursor-pointer shadow-2xs font-medium">
                 ภาพเด่นบน ข้อมูลล่าง (Hero Top)
               </button>
-              <button type="button" onclick="applyGridPreset('center')" class="px-2.5 py-1 rounded-sm bg-slate-800 hover:bg-amber-500/20 text-amber-100/90 hover:text-amber-300 border border-slate-700 transition cursor-pointer">
+              <button type="button" onclick="applyGridPreset('center')" class="px-2.5 py-1 rounded bg-white hover:bg-[#FAF3E3] text-[#171C1A] border border-[#D1C7B7] hover:border-[#C5A059] transition cursor-pointer shadow-2xs font-medium">
                 ภาพกึ่งกลาง (Minimal Center)
               </button>
-              <button type="button" onclick="applyGridPreset('editorial')" class="px-2.5 py-1 rounded-sm bg-slate-800 hover:bg-amber-500/20 text-amber-100/90 hover:text-amber-300 border border-slate-700 transition cursor-pointer">
+              <button type="button" onclick="applyGridPreset('editorial')" class="px-2.5 py-1 rounded bg-white hover:bg-[#FAF3E3] text-[#171C1A] border border-[#D1C7B7] hover:border-[#C5A059] transition cursor-pointer shadow-2xs font-medium">
                 สไตล์นิตยสาร (Editorial)
               </button>
             </div>
 
             <!-- The A4 Canvas Designer Workspace -->
-            <div class="flex justify-center p-4 bg-[#090a0d]/80 rounded-sm border border-slate-800/80 overflow-hidden">
-              <div id="grid-canvas" class="relative w-[340px] sm:w-[420px] aspect-[1/1.414] bg-[#14151f] rounded-sm border border-amber-500/30 shadow-2xl overflow-hidden select-none touch-none">
+            <div class="flex justify-center p-4 bg-[#EFE9DC] rounded-md border border-[#D1C7B7] overflow-hidden">
+              <div id="grid-canvas" class="relative w-[340px] sm:w-[420px] aspect-[1/1.414] bg-[#FBF9F4] rounded border-2 border-[#C5A059]/60 shadow-xl overflow-hidden select-none touch-none">
                 <!-- 12-Column Grid Lines Layer -->
-                <div id="canvas-grid-overlay" class="absolute inset-0 pointer-events-none grid grid-cols-12 divide-x divide-amber-500/10 opacity-70">
+                <div id="canvas-grid-overlay" class="absolute inset-0 pointer-events-none grid grid-cols-12 divide-x divide-[#C5A059]/20 opacity-70">
                   <div class="h-full"></div><div class="h-full"></div><div class="h-full"></div>
                   <div class="h-full"></div><div class="h-full"></div><div class="h-full"></div>
                   <div class="h-full"></div><div class="h-full"></div><div class="h-full"></div>
                   <div class="h-full"></div><div class="h-full"></div><div class="h-full"></div>
                 </div>
                 <!-- Horizontal Guide Lines Layer -->
-                <div id="canvas-horizontal-overlay" class="absolute inset-0 pointer-events-none flex flex-col justify-between divide-y divide-amber-500/10 opacity-70">
+                <div id="canvas-horizontal-overlay" class="absolute inset-0 pointer-events-none flex flex-col justify-between divide-y divide-[#C5A059]/20 opacity-70">
                   <div class="w-full"></div><div class="w-full"></div><div class="w-full"></div>
                   <div class="w-full"></div><div class="w-full"></div><div class="w-full"></div>
                   <div class="w-full"></div><div class="w-full"></div><div class="w-full"></div>
                 </div>
 
                 <!-- Draggable Block 1: Image -->
-                <div id="canvas-block-image" class="absolute bg-blue-500/25 border-2 border-blue-400 text-blue-200 rounded-sm p-1.5 cursor-move flex flex-col justify-center items-center text-center shadow-lg transition-shadow hover:ring-2 hover:ring-blue-300 select-none" style="left: 6%; top: 10%; width: 50%; height: 72%;">
+                <div id="canvas-block-image" class="absolute bg-sky-50 border-2 border-sky-500 text-sky-900 rounded p-1.5 cursor-move flex flex-col justify-center items-center text-center shadow-md transition-shadow hover:ring-2 hover:ring-sky-400 select-none" style="left: 6%; top: 10%; width: 50%; height: 72%;">
                   <span class="text-xs font-bold block leading-none">🖼️ รูปผลงาน</span>
-                  <span class="text-[9px] text-blue-300 font-mono mt-0.5">(Artwork Image)</span>
-                  <span id="coord-block-image" class="text-[8px] font-mono bg-black/50 px-1 rounded mt-1 text-white">X:6% Y:10%</span>
+                  <span class="text-[9px] text-sky-700 font-mono mt-0.5">(Artwork Image)</span>
+                  <span id="coord-block-image" class="text-[8px] font-mono bg-sky-100/90 border border-sky-300 px-1 rounded mt-1 text-sky-900">X:6% Y:10%</span>
                 </div>
 
                 <!-- Draggable Block 2: Title & Metadata -->
-                <div id="canvas-block-meta" class="absolute bg-amber-500/25 border-2 border-amber-400 text-amber-200 rounded-sm p-1.5 cursor-move flex flex-col justify-center items-center text-center shadow-lg transition-shadow hover:ring-2 hover:ring-amber-300 select-none" style="left: 60%; top: 12%; width: 34%; height: 28%;">
+                <div id="canvas-block-meta" class="absolute bg-amber-50 border-2 border-[#C5A059] text-amber-950 rounded p-1.5 cursor-move flex flex-col justify-center items-center text-center shadow-md transition-shadow hover:ring-2 hover:ring-amber-400 select-none" style="left: 60%; top: 12%; width: 34%; height: 28%;">
                   <span class="text-xs font-bold block leading-none">📋 ชื่อ & ข้อมูล</span>
-                  <span class="text-[9px] text-amber-300 font-mono mt-0.5">(Title & Specs)</span>
-                  <span id="coord-block-meta" class="text-[8px] font-mono bg-black/50 px-1 rounded mt-1 text-white">X:60% Y:12%</span>
+                  <span class="text-[9px] text-amber-800 font-mono mt-0.5">(Title & Specs)</span>
+                  <span id="coord-block-meta" class="text-[8px] font-mono bg-amber-100/90 border border-amber-300 px-1 rounded mt-1 text-amber-950">X:60% Y:12%</span>
                 </div>
 
                 <!-- Draggable Block 3: Concept Statement -->
-                <div id="canvas-block-concept" class="absolute bg-emerald-500/25 border-2 border-emerald-400 text-emerald-200 rounded-sm p-1.5 cursor-move flex flex-col justify-center items-center text-center shadow-lg transition-shadow hover:ring-2 hover:ring-emerald-300 select-none" style="left: 60%; top: 44%; width: 34%; height: 24%;">
+                <div id="canvas-block-concept" class="absolute bg-emerald-50 border-2 border-emerald-600 text-emerald-950 rounded p-1.5 cursor-move flex flex-col justify-center items-center text-center shadow-md transition-shadow hover:ring-2 hover:ring-emerald-400 select-none" style="left: 60%; top: 44%; width: 34%; height: 24%;">
                   <span class="text-xs font-bold block leading-none">💬 แนวความคิด</span>
-                  <span class="text-[9px] text-emerald-300 font-mono mt-0.5">(Concept)</span>
-                  <span id="coord-block-concept" class="text-[8px] font-mono bg-black/50 px-1 rounded mt-1 text-white">X:60% Y:44%</span>
+                  <span class="text-[9px] text-emerald-800 font-mono mt-0.5">(Concept)</span>
+                  <span id="coord-block-concept" class="text-[8px] font-mono bg-emerald-100/90 border border-emerald-300 px-1 rounded mt-1 text-emerald-950">X:60% Y:44%</span>
                 </div>
 
                 <!-- Draggable Block 4: Artist & Flag -->
-                <div id="canvas-block-artist" class="absolute bg-purple-500/25 border-2 border-purple-400 text-purple-200 rounded-sm p-1.5 cursor-move flex flex-col justify-center items-center text-center shadow-lg transition-shadow hover:ring-2 hover:ring-purple-300 select-none" style="left: 60%; top: 72%; width: 34%; height: 16%;">
+                <div id="canvas-block-artist" class="absolute bg-purple-50 border-2 border-purple-600 text-purple-950 rounded p-1.5 cursor-move flex flex-col justify-center items-center text-center shadow-md transition-shadow hover:ring-2 hover:ring-purple-400 select-none" style="left: 60%; top: 72%; width: 34%; height: 16%;">
                   <span class="text-xs font-bold block leading-none">👤 ศิลปิน & ธงชาติ</span>
-                  <span class="text-[9px] text-purple-300 font-mono mt-0.5">(Artist Profile)</span>
-                  <span id="coord-block-artist" class="text-[8px] font-mono bg-black/50 px-1 rounded mt-1 text-white">X:60% Y:72%</span>
+                  <span class="text-[9px] text-purple-800 font-mono mt-0.5">(Artist Profile)</span>
+                  <span id="coord-block-artist" class="text-[8px] font-mono bg-purple-100/90 border border-purple-300 px-1 rounded mt-1 text-purple-950">X:60% Y:72%</span>
                 </div>
               </div>
             </div>
 
             <!-- Block Width Adjuster Tool -->
-            <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-[#090a0d]/40 rounded-sm border border-slate-800 text-xs text-neutral-300">
-              <span class="text-slate-400 font-medium">ปรับความกว้างบล็อกที่เลือก (<span id="selected-block-name" class="text-amber-300">รูปผลงาน</span>):</span>
+            <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-white rounded-md border border-[#E8E0D2] text-xs text-[#171C1A]">
+              <span class="text-[#4A5852] font-medium">ปรับความกว้างบล็อกที่เลือก (<span id="selected-block-name" class="text-[#8A6414] font-bold">รูปผลงาน</span>):</span>
               <div class="flex items-center gap-1.5 font-mono">
-                <button type="button" onclick="adjustSelectedBlockWidth(30)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer">30%</button>
-                <button type="button" onclick="adjustSelectedBlockWidth(40)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer">40%</button>
-                <button type="button" onclick="adjustSelectedBlockWidth(50)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer">50%</button>
-                <button type="button" onclick="adjustSelectedBlockWidth(65)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer">65%</button>
-                <button type="button" onclick="adjustSelectedBlockWidth(88)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer">88%</button>
+                <button type="button" onclick="adjustSelectedBlockWidth(30)" class="px-2 py-0.5 rounded bg-[#FAF7F0] hover:bg-[#FAF3E3] border border-[#D1C7B7] text-[#171C1A] cursor-pointer">30%</button>
+                <button type="button" onclick="adjustSelectedBlockWidth(40)" class="px-2 py-0.5 rounded bg-[#FAF7F0] hover:bg-[#FAF3E3] border border-[#D1C7B7] text-[#171C1A] cursor-pointer">40%</button>
+                <button type="button" onclick="adjustSelectedBlockWidth(50)" class="px-2 py-0.5 rounded bg-[#FAF7F0] hover:bg-[#FAF3E3] border border-[#D1C7B7] text-[#171C1A] cursor-pointer">50%</button>
+                <button type="button" onclick="adjustSelectedBlockWidth(65)" class="px-2 py-0.5 rounded bg-[#FAF7F0] hover:bg-[#FAF3E3] border border-[#D1C7B7] text-[#171C1A] cursor-pointer">65%</button>
+                <button type="button" onclick="adjustSelectedBlockWidth(88)" class="px-2 py-0.5 rounded bg-[#FAF7F0] hover:bg-[#FAF3E3] border border-[#D1C7B7] text-[#171C1A] cursor-pointer">88%</button>
               </div>
             </div>
           </div>
 
           <!-- Theme Selection -->
-          <div class="bg-slate-900/60 p-4 rounded-sm border border-slate-800 space-y-2">
-            <label class="block text-sm font-bold text-white mb-2" data-i18n="studio_theme_title">โทนสีและธีมของสูจิบัตร (Catalog Theme)</label>
+          <div class="bg-[#FAF7F0] p-4 rounded-md border border-[#E8E0D2] space-y-2">
+            <label class="block text-sm font-bold text-[#171C1A] mb-2" data-i18n="studio_theme_title">โทนสีและธีมของสูจิบัตร (Catalog Theme)</label>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label class="cursor-pointer border border-amber-500/60 rounded-sm p-3.5 bg-slate-900/80 hover:border-amber-400 transition flex items-start gap-3">
-                <input type="radio" name="studio-layout-theme" value="heritage" class="mt-1 text-amber-500" checked>
+              <label class="cursor-pointer border-2 border-[#C5A059] rounded-md p-3.5 bg-[#FAF7F0] hover:border-[#8A6414] transition flex items-start gap-3 shadow-xs">
+                <input type="radio" name="studio-layout-theme" value="heritage" class="mt-1 accent-[#C5A059]" checked>
                 <div>
-                  <span class="font-bold text-amber-300 block text-sm" data-i18n="studio_theme_heritage_name">🏛️ เพาะช่าง เฮอริเทจ (Heritage)</span>
-                  <p class="text-slate-400 text-xs mt-1" data-i18n="studio_theme_heritage_desc">กระดาษสีงาช้างนวลตา ขอบทองคำโบราณ สไตล์วิทยาลัยเพาะช่าง (ค่าเริ่มต้น)</p>
+                  <span class="font-bold text-[#8A6414] block text-sm" data-i18n="studio_theme_heritage_name">🏛️ เพาะช่าง เฮอริเทจ (Heritage)</span>
+                  <p class="text-[#4A5852] text-xs mt-1 leading-relaxed" data-i18n="studio_theme_heritage_desc">กระดาษสีงาช้างนวลตา ขอบทองคำโบราณ สไตล์วิทยาลัยเพาะช่าง (ค่าเริ่มต้น)</p>
                 </div>
               </label>
-              <label class="cursor-pointer border border-slate-700 rounded-sm p-3.5 bg-slate-900/70 hover:border-amber-500/60 transition flex items-start gap-3">
-                <input type="radio" name="studio-layout-theme" value="fine-white" class="mt-1 text-amber-500">
+              <label class="cursor-pointer border border-[#D1C7B7] rounded-md p-3.5 bg-white hover:border-[#C5A059] transition flex items-start gap-3 shadow-xs">
+                <input type="radio" name="studio-layout-theme" value="fine-white" class="mt-1 accent-[#C5A059]">
                 <div>
-                  <span class="font-bold text-slate-100 block text-sm" data-i18n="studio_theme_white_name">Fine Art White (ขาวบริสุทธิ์)</span>
-                  <p class="text-slate-400 text-xs mt-1" data-i18n="studio_theme_white_desc">พื้นหลังสีขาวนวล สไตล์พิพิธภัณฑ์ศิลปะสากล สะอาดตา</p>
+                  <span class="font-bold text-[#171C1A] block text-sm" data-i18n="studio_theme_white_name">Fine Art White (ขาวบริสุทธิ์)</span>
+                  <p class="text-[#7A8B84] text-xs mt-1 leading-relaxed" data-i18n="studio_theme_white_desc">พื้นหลังสีขาวนวล สไตล์พิพิธภัณฑ์ศิลปะสากล สะอาดตา</p>
                 </div>
               </label>
-              <label class="cursor-pointer border border-slate-700 rounded-sm p-3.5 bg-slate-900/70 hover:border-amber-500/60 transition flex items-start gap-3">
-                <input type="radio" name="studio-layout-theme" value="luxury-dark" class="mt-1 text-amber-500">
+              <label class="cursor-pointer border border-neutral-700 rounded-md p-3.5 bg-[#171C1A] text-white hover:border-[#C5A059] transition flex items-start gap-3 shadow-xs">
+                <input type="radio" name="studio-layout-theme" value="luxury-dark" class="mt-1 accent-[#C5A059]">
                 <div>
-                  <span class="font-bold text-slate-300 block text-sm" data-i18n="studio_theme_dark_name">Luxury Dark (รัตติกาลทองคำ)</span>
-                  <p class="text-slate-400 text-xs mt-1" data-i18n="studio_theme_dark_desc">พื้นหลังดำสนิท ขอบสีทอง ผสมผสานความร่วมสมัย สง่างาม</p>
+                  <span class="font-bold text-[#C5A059] block text-sm" data-i18n="studio_theme_dark_name">Luxury Dark (รัตติกาลทองคำ)</span>
+                  <p class="text-neutral-400 text-xs mt-1 leading-relaxed" data-i18n="studio_theme_dark_desc">พื้นหลังดำสนิท ขอบสีทอง ผสมผสานความร่วมสมัย สง่างาม</p>
                 </div>
               </label>
             </div>
@@ -742,18 +762,18 @@
       </div>
 
       <!-- Studio Footer Toolbar -->
-      <div class="px-6 py-4 border-t border-slate-800 bg-slate-900/90 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="px-6 py-4 border-t border-[#E8E0D2] bg-[#F4EFE6] flex flex-wrap items-center justify-between gap-3 text-xs">
         <div class="flex items-center gap-2">
-          <span class="text-slate-400" data-i18n="admin_key_label">Admin Key:</span>
-          <input type="password" id="studio-admin-key" value="admin123" class="bg-[#090a0d] border border-slate-700 rounded-sm px-2.5 py-1 text-white font-mono w-28 text-xs focus:border-amber-400">
-          <span id="studio-status-msg" class="text-xs"></span>
+          <span class="text-[#4A5852] font-medium" data-i18n="admin_key_label">Admin Key:</span>
+          <input type="password" id="studio-admin-key" value="admin123" class="bg-white border border-[#D1C7B7] rounded-md px-2.5 py-1 text-[#171C1A] font-mono w-32 text-xs focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] focus:outline-none transition">
+          <span id="studio-status-msg" class="text-xs font-medium"></span>
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="closeCatalogStudio()" class="px-4 py-2 rounded-sm border border-slate-700 hover:bg-white/5 text-neutral-300 transition cursor-pointer" data-i18n="btn_cancel">
+          <button onclick="closeCatalogStudio()" class="px-4 py-2 rounded-md border border-[#D1C7B7] bg-white hover:bg-[#FAF7F0] text-[#4A5852] hover:text-[#171C1A] transition cursor-pointer shadow-2xs font-medium" data-i18n="btn_cancel">
             ยกเลิก
           </button>
-          <button id="studio-save-btn" onclick="saveCatalogStudio()" class="px-5 py-2 rounded-sm bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold shadow-lg shadow-amber-500/20 flex items-center gap-1.5 transition cursor-pointer">
+          <button id="studio-save-btn" onclick="saveCatalogStudio()" class="px-5 py-2 rounded-md bg-gradient-to-r from-[#C5A059] to-[#8A6414] hover:brightness-105 text-white font-bold shadow-md shadow-[#C5A059]/20 flex items-center gap-1.5 transition cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
@@ -1934,12 +1954,12 @@
         const btn = document.getElementById(`studio-tab-btn-${t}`);
         const panel = document.getElementById(`studio-tab-${t}`);
         if (t === tab) {
-          btn.classList.add('border-amber-400', 'text-amber-300');
-          btn.classList.remove('border-transparent', 'text-slate-400');
+          btn.classList.add('border-[#C5A059]', 'text-[#171C1A]', 'font-semibold');
+          btn.classList.remove('border-transparent', 'text-[#7A8B84]', 'font-medium');
           panel.classList.remove('hidden');
         } else {
-          btn.classList.remove('border-amber-400', 'text-amber-300');
-          btn.classList.add('border-transparent', 'text-slate-400');
+          btn.classList.remove('border-[#C5A059]', 'text-[#171C1A]', 'font-semibold');
+          btn.classList.add('border-transparent', 'text-[#7A8B84]', 'font-medium');
           panel.classList.add('hidden');
         }
       });
@@ -1978,40 +1998,40 @@
         const technique = window.getField(item, 'technique') || 'Printmaking';
 
         const row = document.createElement('div');
-        row.className = `flex items-center justify-between p-3 rounded-sm border transition ${
+        row.className = `flex items-center justify-between p-3 rounded-md border transition ${
           isExcluded
-            ? 'bg-slate-900/40 border-slate-800/60 opacity-60'
-            : 'bg-slate-900 border-slate-700/80 hover:border-amber-500/40'
+            ? 'bg-[#F4EFE6]/60 border-[#D1C7B7]/60 opacity-60'
+            : 'bg-white border-[#E8E0D2] hover:border-[#C5A059] shadow-xs'
         }`;
 
         row.innerHTML = `
           <div class="flex items-center gap-3 min-w-0">
-            <span class="w-6 text-center font-mono text-xs font-bold text-amber-400">#${index + 1}</span>
-            <img src="${item.thumbnail_url || item.image_url}" alt="" class="w-12 h-12 rounded-sm object-cover border border-slate-700 shrink-0">
+            <span class="w-7 text-center font-mono text-xs font-bold text-[#8A6414] bg-[#FAF3E3] py-1 rounded border border-[#C5A059]/30">#${index + 1}</span>
+            <img src="${item.thumbnail_url || item.image_url}" alt="" class="w-12 h-12 rounded object-cover border border-[#E8E0D2] shrink-0 bg-[#FAF7F0]">
             <div class="min-w-0">
-              <h4 class="text-xs font-bold text-white truncate">${title}</h4>
-              <p class="text-[11px] text-slate-400 truncate">${artist} • <span class="text-amber-300/80">${technique}</span></p>
+              <h4 class="text-xs font-bold text-[#171C1A] truncate">${title}</h4>
+              <p class="text-[11px] text-[#4A5852] truncate">${artist} • <span class="text-[#8A6414] font-medium">${technique}</span></p>
             </div>
           </div>
 
           <div class="flex items-center gap-2 shrink-0 ml-3">
             <!-- Include / Exclude Toggle -->
-            <label class="flex items-center gap-1.5 cursor-pointer text-xs px-2.5 py-1 rounded-sm ${
-              isExcluded ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs px-2.5 py-1.5 rounded font-medium transition ${
+              isExcluded ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
             }">
-              <input type="checkbox" class="accent-amber-500 cursor-pointer" ${!isExcluded ? 'checked' : ''} onchange="toggleStudioArtwork(${item.id})">
-              <span>${!isExcluded ? window.t('studio_item_included') : window.t('studio_item_excluded')}</span>
+              <input type="checkbox" class="accent-[#C5A059] cursor-pointer" ${!isExcluded ? 'checked' : ''} onchange="toggleStudioArtwork(${item.id})">
+              <span>${!isExcluded ? (window.t('studio_item_included') || 'รวมในเล่ม') : (window.t('studio_item_excluded') || 'ไม่แสดงในเล่ม')}</span>
             </label>
 
             <!-- Move Up -->
-            <button onclick="moveStudioArtwork(${index}, -1)" ${index === 0 ? 'disabled' : ''} class="p-1.5 rounded-sm bg-slate-800 hover:bg-slate-700 text-neutral-300 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition cursor-pointer" title="ขยับขึ้น">
+            <button onclick="moveStudioArtwork(${index}, -1)" ${index === 0 ? 'disabled' : ''} class="p-1.5 rounded bg-[#FAF7F0] hover:bg-[#E8E0D2] text-[#171C1A] border border-[#D1C7B7] disabled:opacity-25 disabled:cursor-not-allowed transition cursor-pointer" title="ขยับขึ้น">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
               </svg>
             </button>
 
             <!-- Move Down -->
-            <button onclick="moveStudioArtwork(${index}, 1)" ${index === ordered.length - 1 ? 'disabled' : ''} class="p-1.5 rounded-sm bg-slate-800 hover:bg-slate-700 text-neutral-300 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition cursor-pointer" title="ขยับลง">
+            <button onclick="moveStudioArtwork(${index}, 1)" ${index === ordered.length - 1 ? 'disabled' : ''} class="p-1.5 rounded bg-[#FAF7F0] hover:bg-[#E8E0D2] text-[#171C1A] border border-[#D1C7B7] disabled:opacity-25 disabled:cursor-not-allowed transition cursor-pointer" title="ขยับลง">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
@@ -2240,7 +2260,7 @@
 
       saveBtn.disabled = true;
       saveBtn.innerHTML = `
-        <div class="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         <span>กำลังบันทึก...</span>
       `;
 
