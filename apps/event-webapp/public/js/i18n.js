@@ -87,6 +87,11 @@ const I18N_DICTIONARY = {
     btn_print_pdf: "พิมพ์ / บันทึก PDF",
     btn_view_all_pages: "ดูทุกหน้าเรียงกัน",
     btn_single_reader: "เปิดโหมดอ่านทีละหน้า",
+    sort_catalog_ph: "เรียงหน้า:",
+    sort_catalog_custom: "ลำดับที่จัดไว้ (Saved)",
+    sort_catalog_title: "ชื่อผลงาน (A-Z)",
+    sort_catalog_artist: "ชื่อศิลปิน (A-Z)",
+    sort_catalog_country: "ประเทศ / สัญชาติ (A-Z)",
 
     // Submit / Intake Form
     submit_badge: "🎨 ARTIST & ARTWORK INTAKE FORM",
@@ -399,6 +404,11 @@ const I18N_DICTIONARY = {
     studio_theme_dark_name: "Luxury Dark (รัตติกาลทองคำ)",
     studio_theme_dark_desc: "พื้นหลังดำสนิท ขอบสีทอง ผสมผสานความร่วมสมัย สง่างาม",
     studio_btn_save: "บันทึกการจัดหน้า (Save Layout)",
+    studio_sort_order_label: "จัดเรียงลำดับด่วน:",
+    studio_sort_default: "ลำดับที่บันทึกไว้ (Custom)",
+    studio_sort_title_asc: "ตามชื่อผลงาน (A-Z / ก-ฮ)",
+    studio_sort_artist_asc: "ตามชื่อศิลปิน (A-Z / ก-ฮ)",
+    studio_sort_country_asc: "ตามสัญชาติ / ประเทศ (A-Z)",
     footer_sub: "วิทยาลัยเพาะช่าง มทร.รัตนโกสินทร์",
     nav_curator_desk: "เข้าสู่ระบบผู้ดูแล (Curator Desk)"
   },
@@ -486,6 +496,11 @@ const I18N_DICTIONARY = {
     btn_print_pdf: "Print / Save PDF",
     btn_view_all_pages: "View All Pages",
     btn_single_reader: "Single Page Reader",
+    sort_catalog_ph: "Sort Pages:",
+    sort_catalog_custom: "Curated Order",
+    sort_catalog_title: "Artwork Title (A-Z)",
+    sort_catalog_artist: "Artist Name (A-Z)",
+    sort_catalog_country: "Country / Origin (A-Z)",
 
     // Submit / Intake Form
     submit_badge: "🎨 ARTIST & ARTWORK INTAKE FORM",
@@ -798,6 +813,11 @@ const I18N_DICTIONARY = {
     studio_theme_dark_name: "Luxury Dark (Obsidian & Gold)",
     studio_theme_dark_desc: "Deep obsidian black backdrop with warm champagne bronze accents",
     studio_btn_save: "Save Layout",
+    studio_sort_order_label: "Quick Sort:",
+    studio_sort_default: "Custom Saved Order",
+    studio_sort_title_asc: "By Artwork Title (A-Z)",
+    studio_sort_artist_asc: "By Artist Name (A-Z)",
+    studio_sort_country_asc: "By Country / Nationality (A-Z)",
     footer_sub: "Poh-Chang Academy of Arts, RMUTR",
     nav_curator_desk: "Curator Desk"
   },

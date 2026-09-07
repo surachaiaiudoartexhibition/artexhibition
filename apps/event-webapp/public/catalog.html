@@ -334,7 +334,20 @@
       </div>
 
       <!-- Right: Continuous Scroll Toggle, Studio & Print -->
-      <div class="flex items-center gap-1.5 sm:gap-2">
+        <!-- Catalog Quick Sorting for Viewer & Print -->
+        <div class="hidden sm:flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-6 px-2 py-1 text-xs">
+          <svg class="w-3.5 h-3.5 text-[var(--color-accent-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+          </svg>
+          <span class="text-[11px] text-[var(--text-muted)] font-medium" data-i18n="sort_catalog_ph">เรียงหน้า:</span>
+          <select id="catalog-sort-filter" onchange="applyCatalogViewerSort(this.value)" class="bg-transparent text-[var(--text-main)] font-semibold text-xs border-none outline-none cursor-pointer pr-1">
+            <option value="custom" class="bg-[var(--bg-surface-solid)] text-[var(--text-main)]" data-i18n="sort_catalog_custom">ลำดับที่จัดไว้ (Saved)</option>
+            <option value="title_asc" class="bg-[var(--bg-surface-solid)] text-[var(--text-main)]" data-i18n="sort_catalog_title">ชื่อผลงาน (A-Z)</option>
+            <option value="artist_asc" class="bg-[var(--bg-surface-solid)] text-[var(--text-main)]" data-i18n="sort_catalog_artist">ชื่อศิลปิน (A-Z)</option>
+            <option value="country_asc" class="bg-[var(--bg-surface-solid)] text-[var(--text-main)]" data-i18n="sort_catalog_country">ประเทศ / สัญชาติ (A-Z)</option>
+          </select>
+        </div>
+
         <!-- Mode Toggle: Single Page vs Continuous Scroll -->
         <button id="mode-toggle-btn" class="hidden sm:flex items-center gap-1 px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition cursor-pointer" title="สลับโหมดอ่านหน้าเดียว / ดูทุกหน้าเรียงกัน">
           <span>📜</span>
@@ -458,14 +471,45 @@
         
         <!-- Tab 1: Page Order & Visibility -->
         <div id="studio-tab-order" class="space-y-4">
-          <div class="flex items-center justify-between bg-[#FAF7F0] p-3 rounded-md border border-[#E8E0D2] text-xs text-[#4A5852]">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-[#FAF7F0] p-3 rounded-md border border-[#E8E0D2] text-xs text-[#4A5852]">
             <span class="flex items-center gap-1.5">
               <svg class="w-4 h-4 text-[#C5A059] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>จัดลำดับการแสดงผลของผลงาน หรือซ่อนผลงานที่ไม่ต้องการรวมในเล่มสูจิบัตร</span>
             </span>
-            <span id="studio-artworks-count" class="font-mono text-[#8A6414] font-bold bg-[#FAF3E3] px-2.5 py-0.5 rounded border border-[#C5A059]/40">0 ชิ้น</span>
+            <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+              <span id="studio-artworks-count" class="font-mono text-[#8A6414] font-bold bg-[#FAF3E3] px-2.5 py-0.5 rounded border border-[#C5A059]/40">0 ชิ้น</span>
+            </div>
+          </div>
+
+          <!-- Quick Sorting Controls -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5 bg-white p-2.5 rounded-md border border-[#E8E0D2] text-xs">
+            <div class="flex items-center gap-1.5 text-[#171C1A] font-medium">
+              <svg class="w-4 h-4 text-[#8A6414]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+              </svg>
+              <span data-i18n="studio_sort_order_label">จัดเรียงลำดับด่วน:</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" onclick="sortStudioArtworks('title_asc')" class="flex items-center gap-1 px-2.5 py-1 rounded bg-[#FAF7F0] hover:bg-[#FAF3E3] text-[#171C1A] border border-[#D1C7B7] hover:border-[#C5A059] transition cursor-pointer font-medium shadow-2xs" title="เรียงตามชื่อผลงาน (A-Z / ก-ฮ)">
+                <span>🔤</span>
+                <span data-i18n="studio_sort_title_asc">ตามชื่อผลงาน</span>
+              </button>
+              <button type="button" onclick="sortStudioArtworks('artist_asc')" class="flex items-center gap-1 px-2.5 py-1 rounded bg-[#FAF7F0] hover:bg-[#FAF3E3] text-[#171C1A] border border-[#D1C7B7] hover:border-[#C5A059] transition cursor-pointer font-medium shadow-2xs" title="เรียงตามชื่อศิลปิน (A-Z / ก-ฮ)">
+                <span>👨‍🎨</span>
+                <span data-i18n="studio_sort_artist_asc">ตามชื่อศิลปิน</span>
+              </button>
+              <button type="button" onclick="sortStudioArtworks('country_asc')" class="flex items-center gap-1 px-2.5 py-1 rounded bg-[#FAF7F0] hover:bg-[#FAF3E3] text-[#171C1A] border border-[#D1C7B7] hover:border-[#C5A059] transition cursor-pointer font-medium shadow-2xs" title="เรียงตามประเทศ / สัญชาติ (A-Z)">
+                <span>🌍</span>
+                <span data-i18n="studio_sort_country_asc">ตามประเทศ</span>
+              </button>
+              <button type="button" onclick="resetStudioArtworkOrder()" class="flex items-center gap-1 px-2.5 py-1 rounded bg-white hover:bg-[#FAF7F0] text-[#7A8B84] hover:text-[#171C1A] border border-dashed border-[#D1C7B7] transition cursor-pointer" title="คืนค่าลำดับเริ่มต้นเดิม">
+                <span>↺</span>
+                <span>ค่าเริ่มต้น</span>
+              </button>
+            </div>
           </div>
 
           <div id="studio-artworks-list" class="space-y-2.5">
@@ -798,6 +842,7 @@
     let currentPageIndex = 0;
     let viewMode = 'single'; // 'single' (reader mode) or 'all' (scroll all pages)
     let totalPages = 0;
+    let activeCatalogSort = 'custom'; // 'custom', 'title_asc', 'artist_asc', 'country_asc'
 
     async function loadCatalogData() {
       try {
@@ -850,6 +895,11 @@
       }
     }
 
+    function applyCatalogViewerSort(sortValue) {
+      activeCatalogSort = sortValue || 'custom';
+      renderCatalog();
+    }
+
     function getCuratedSubmissions() {
       const orderList = catalogConfig.artworkOrder || [];
       const excluded = new Set(catalogConfig.excludedIds || []);
@@ -868,6 +918,37 @@
           ordered.push(s);
         }
       }
+
+      if (activeCatalogSort === 'title_asc') {
+        const isTh = (window.i18n && window.i18n.getLang() === 'th');
+        const locale = isTh ? 'th' : 'en';
+        ordered.sort((a, b) => {
+          const tA = (window.getField(a, 'title') || a.title || '').trim();
+          const tB = (window.getField(b, 'title') || b.title || '').trim();
+          return tA.localeCompare(tB, locale, { sensitivity: 'base', numeric: true });
+        });
+      } else if (activeCatalogSort === 'artist_asc') {
+        const isTh = (window.i18n && window.i18n.getLang() === 'th');
+        const locale = isTh ? 'th' : 'en';
+        ordered.sort((a, b) => {
+          const nA = (window.getArtistFullName(a) || a.artist_name || '').trim();
+          const nB = (window.getArtistFullName(b) || b.artist_name || '').trim();
+          return nA.localeCompare(nB, locale, { sensitivity: 'base', numeric: true });
+        });
+      } else if (activeCatalogSort === 'country_asc') {
+        const isTh = (window.i18n && window.i18n.getLang() === 'th');
+        const locale = isTh ? 'th' : 'en';
+        ordered.sort((a, b) => {
+          const cA = (window.getCountryDisplayName(a.nationality, isTh ? 'th' : 'en') || a.nationality || '').trim();
+          const cB = (window.getCountryDisplayName(b.nationality, isTh ? 'th' : 'en') || b.nationality || '').trim();
+          const cmp = cA.localeCompare(cB, locale, { sensitivity: 'base', numeric: true });
+          if (cmp !== 0) return cmp;
+          const tA = (window.getField(a, 'title') || a.title || '').trim();
+          const tB = (window.getField(b, 'title') || b.title || '').trim();
+          return tA.localeCompare(tB, locale, { sensitivity: 'base', numeric: true });
+        });
+      }
+
       return ordered;
     }
 
@@ -2062,6 +2143,48 @@
         set.add(id);
       }
       studioTempConfig.excludedIds = Array.from(set);
+      renderStudioArtworksList();
+    }
+
+    function sortStudioArtworks(criterion) {
+      if (!studioTempConfig || !Array.isArray(studioTempConfig.artworkOrder)) return;
+      const subMap = new Map(allSubmissions.map(s => [s.id, s]));
+      const items = studioTempConfig.artworkOrder.map(id => subMap.get(id)).filter(Boolean);
+      const isTh = (window.i18n && window.i18n.getLang() === 'th');
+      const locale = isTh ? 'th' : 'en';
+
+      if (criterion === 'title_asc') {
+        items.sort((a, b) => {
+          const tA = (window.getField(a, 'title') || a.title || '').trim();
+          const tB = (window.getField(b, 'title') || b.title || '').trim();
+          return tA.localeCompare(tB, locale, { sensitivity: 'base', numeric: true });
+        });
+      } else if (criterion === 'artist_asc') {
+        items.sort((a, b) => {
+          const nA = (window.getArtistFullName(a) || a.artist_name || '').trim();
+          const nB = (window.getArtistFullName(b) || b.artist_name || '').trim();
+          return nA.localeCompare(nB, locale, { sensitivity: 'base', numeric: true });
+        });
+      } else if (criterion === 'country_asc') {
+        items.sort((a, b) => {
+          const cA = (window.getCountryDisplayName(a.nationality, isTh ? 'th' : 'en') || a.nationality || '').trim();
+          const cB = (window.getCountryDisplayName(b.nationality, isTh ? 'th' : 'en') || b.nationality || '').trim();
+          const cmp = cA.localeCompare(cB, locale, { sensitivity: 'base', numeric: true });
+          if (cmp !== 0) return cmp;
+          // Sub-sort by title
+          const tA = (window.getField(a, 'title') || a.title || '').trim();
+          const tB = (window.getField(b, 'title') || b.title || '').trim();
+          return tA.localeCompare(tB, locale, { sensitivity: 'base', numeric: true });
+        });
+      }
+
+      studioTempConfig.artworkOrder = items.map(s => s.id);
+      renderStudioArtworksList();
+    }
+
+    function resetStudioArtworkOrder() {
+      if (!studioTempConfig) return;
+      studioTempConfig.artworkOrder = allSubmissions.map(s => s.id);
       renderStudioArtworksList();
     }
 
