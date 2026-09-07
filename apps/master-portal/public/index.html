@@ -410,15 +410,15 @@
   </div>
 
   <!-- Museum Artwork Detail In-Portal Lightbox Modal (ดึงข้อมูลมาแสดงโดยตรงในสไตล์หอศิลป์) -->
-  <div id="artwork-detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-art-title" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm transition-all" onclick="if(event.target === this) closeArtworkDetailModal()">
-    <div class="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-3xl bg-[#FCFAF7] border border-[#C5A059]/60 shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+  <div id="artwork-detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-art-title" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md transition-all" onclick="if(event.target === this) closeArtworkDetailModal()">
+    <div class="relative w-full max-w-[96vw] xl:max-w-7xl 2xl:max-w-[1500px] max-h-[96vh] flex flex-col rounded-3xl bg-[#FCFAF7] border border-[#C5A059]/60 shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
       <!-- Modal Header (Deep Celadon Lacquer) -->
-      <div class="p-4 sm:px-6 py-3.5 bg-[#1A2822] text-white border-b border-[#355246] flex items-center justify-between gap-4">
+      <div class="px-4 sm:px-6 py-3 bg-[#1A2822] text-white border-b border-[#355246] flex items-center justify-between gap-4 shrink-0">
         <div class="flex items-center gap-2.5 min-w-0">
-          <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/40 shrink-0" data-i18n="modal_artwork_badge">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-[#C5A059]/20 text-[#E8C87A] border border-[#C5A059]/40 shrink-0" data-i18n="modal_artwork_badge">
             Curated Artwork Dossier
           </span>
-          <span id="detail-art-zone-badge" class="px-2.5 py-1 rounded-full text-[10px] font-medium bg-[#243830] text-[#C8DBD2] border border-[#355246] truncate max-w-[220px] hidden sm:inline-block"></span>
+          <span id="detail-art-zone-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#243830] text-[#C8DBD2] border border-[#355246] truncate max-w-[220px] hidden sm:inline-block"></span>
         </div>
 
         <button onclick="closeArtworkDetailModal()" class="p-1.5 rounded-xl bg-[#243830] hover:bg-rose-900/60 text-[#C8DBD2] hover:text-white border border-[#355246] transition cursor-pointer" title="ปิดหน้าต่าง (Esc)">
@@ -429,16 +429,16 @@
       </div>
 
       <!-- Modal Body (Scrollable) -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-7 bg-[#FCFAF7]">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-          <!-- Artwork Display Stage (Col 7) - Clean Light Curatorial Display -->
-          <div class="lg:col-span-7 space-y-3">
-            <div class="relative aspect-[4/3] bg-[#F7F4EC] rounded-2xl p-4 sm:p-6 flex items-center justify-center border border-[#E8E0D2] overflow-hidden">
+      <div class="flex-1 overflow-y-auto p-3 sm:p-6 bg-[#FCFAF7]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
+          <!-- Artwork Display Stage (Col 7 / Col 8 on xl) - Expansive Curatorial Exhibition Stage -->
+          <div class="lg:col-span-7 xl:col-span-8 flex flex-col space-y-3">
+            <div class="relative w-full h-[52vh] sm:h-[65vh] lg:h-[76vh] bg-[#F2EDE2]/90 rounded-2xl p-2 sm:p-4 flex items-center justify-center border border-[#E2DACB] shadow-inner overflow-hidden">
               <img id="detail-art-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3' fill='%23F7F4EC'/%3E" alt="Exhibition Artwork" 
-                   class="max-h-full max-w-full object-contain drop-shadow-[0_4px_20px_rgba(0,0,0,0.12)] rounded-lg transition duration-500" loading="lazy">
+                   class="max-h-full max-w-full w-auto h-auto object-contain drop-shadow-[0_10px_35px_rgba(0,0,0,0.18)] rounded-md transition duration-500 hover:scale-[1.01]" loading="lazy">
             </div>
 
-            <div class="flex items-center justify-between px-1 text-xs">
+            <div class="flex items-center justify-between px-2 text-xs">
               <span id="detail-art-stage-dim" class="font-mono text-[#64736C] text-[11px]"></span>
               <a id="detail-art-raw-link" href="#" target="_blank" rel="noopener"
                  class="text-[#9A7833] hover:text-[#6D531F] transition flex items-center gap-1.5 font-medium text-[11px]">
@@ -450,8 +450,8 @@
             </div>
           </div>
 
-          <!-- Museum Plaque & Artist Dossier (Col 5) -->
-          <div class="lg:col-span-5 space-y-5">
+          <!-- Museum Plaque & Artist Dossier (Col 5 / Col 4 on xl) -->
+          <div class="lg:col-span-5 xl:col-span-4 space-y-4">
             <!-- Title & Info Plaque -->
             <div>
               <span class="text-[10px] font-mono uppercase tracking-widest text-[#9A7833] block mb-1" data-i18n="modal_artwork_badge">ผลงานในนิทรรศการ</span>
