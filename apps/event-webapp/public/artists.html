@@ -229,11 +229,11 @@
             </svg>
             <span data-i18n="modal_open_catalog_btn">เปิดดูผลงานในสูจิบัตรดิจิทัล</span>
           </a>
-            <button id="btn-modal-edit-artist" class="inline-flex items-center gap-1.5 text-[var(--color-accent-light)] hover:text-white font-medium px-2.5 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] transition cursor-pointer">
+            <button id="btn-modal-edit-artist" class="hidden inline-flex items-center gap-1.5 text-[var(--color-accent-light)] hover:text-white font-medium px-2.5 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] transition cursor-pointer">
               <span>✏️</span>
               <span>แก้ไขข้อมูลศิลปิน</span>
             </button>
-            <button id="btn-modal-delete-artist" class="inline-flex items-center gap-1.5 text-rose-400 hover:text-rose-300 font-medium px-2.5 py-1.5 corner-cut-6 bg-rose-950/40 border border-rose-800/40 hover:bg-rose-900/60 transition cursor-pointer">
+            <button id="btn-modal-delete-artist" class="hidden inline-flex items-center gap-1.5 text-rose-400 hover:text-rose-300 font-medium px-2.5 py-1.5 corner-cut-6 bg-rose-950/40 border border-rose-800/40 hover:bg-rose-900/60 transition cursor-pointer">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
@@ -406,8 +406,18 @@
   <script>
     let allArtists = [];
     let currentView = 'card';
+    let isCuratorAdmin = false;
+
+    function checkAdminAuth() {
+      const params = new URLSearchParams(window.location.search);
+      const urlAdmin = params.get('admin') === 'true' || Boolean(params.get('adminKey') || params.get('key'));
+      const storedKey = localStorage.getItem('curator_admin_key') || sessionStorage.getItem('curator_admin_key');
+      isCuratorAdmin = Boolean(urlAdmin || (storedKey && storedKey.trim().length > 0));
+      return isCuratorAdmin;
+    }
 
     async function loadArtists() {
+      checkAdminAuth();
       try {
         const res = await fetch('/api/artists');
         const data = await res.json();
@@ -641,11 +651,13 @@
                 <button onclick="openArtistModal('${encodeURIComponent(artist.artist_name)}')" class="px-3 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] hover:brightness-110 text-[var(--color-accent-light)] border border-[var(--border-accent)] text-xs font-semibold transition cursor-pointer">
                   ${window.t('btn_open_profile')}
                 </button>
-                <button onclick="deleteArtistByName('${encodeURIComponent(artist.artist_name)}', ${artist.artworks_count || (artist.artworks ? artist.artworks.length : 0)})" class="p-1.5 corner-cut-6 text-rose-400/80 hover:text-rose-300 hover:bg-rose-950/50 border border-rose-800/30 transition cursor-pointer" title="ลบศิลปินและผลงานทั้งหมด">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                ${isCuratorAdmin ? `
+                  <button onclick="deleteArtistByName('${encodeURIComponent(artist.artist_name)}', ${artist.artworks_count || (artist.artworks ? artist.artworks.length : 0)})" class="p-1.5 corner-cut-6 text-rose-400/80 hover:text-rose-300 hover:bg-rose-950/50 border border-rose-800/30 transition cursor-pointer" title="ลบศิลปินและผลงานทั้งหมด">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                ` : ''}
               </div>
             </td>
           </tr>
@@ -708,12 +720,22 @@
       
       const editBtn = document.getElementById('btn-modal-edit-artist');
       if (editBtn) {
-        editBtn.onclick = () => openEditArtistModal(artist);
+        if (isCuratorAdmin) {
+          editBtn.classList.remove('hidden');
+          editBtn.onclick = () => openEditArtistModal(artist);
+        } else {
+          editBtn.classList.add('hidden');
+        }
       }
 
       const deleteBtn = document.getElementById('btn-modal-delete-artist');
       if (deleteBtn) {
-        deleteBtn.onclick = () => deleteArtistByName(artist.artist_name, artist.artworks_count || (artist.artworks ? artist.artworks.length : 0));
+        if (isCuratorAdmin) {
+          deleteBtn.classList.remove('hidden');
+          deleteBtn.onclick = () => deleteArtistByName(artist.artist_name, artist.artworks_count || (artist.artworks ? artist.artworks.length : 0));
+        } else {
+          deleteBtn.classList.add('hidden');
+        }
       }
 
       modal.classList.remove('hidden');
