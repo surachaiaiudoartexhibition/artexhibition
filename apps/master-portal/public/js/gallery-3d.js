@@ -83,6 +83,10 @@
   let activeArtwork = null;
   let activeArtworkIndex = 0;
   let isPointerLocked = false;
+  let isMouseDown = false;
+  let isMouseDragging = false;
+  let mouseStartPos = { x: 0, y: 0 };
+  let lastMousePos = { x: 0, y: 0 };
   let isInspecting = false;
   let isGuidedTour = false;
   let guidedTourTimer = null;
@@ -92,6 +96,15 @@
   let isAudioPlaying = false;
   let activeDirectoryZone = 'all';
   let registeredEventsList = [];
+
+  function applyCameraRotation() {
+    const maxPitch = Math.PI / 2.2;
+    player.rotation.pitch = Math.max(-maxPitch, Math.min(maxPitch, player.rotation.pitch));
+    if (camera) {
+      camera.rotation.y = player.rotation.yaw;
+      camera.rotation.x = player.rotation.pitch;
+    }
+  }
 
   // Player & Movement Physics
   const player = {
@@ -952,22 +965,85 @@
       if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = false;
       if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = false;
     });
+    // Mouse Look & Drag-to-Look Controls
+    container.addEventListener('mousedown', (e) => {
+      if (isInspecting || isGuidedTour) return;
+      if (e.button !== 0 && e.button !== 2) return;
+      isMouseDown = true;
+      isMouseDragging = false;
+      mouseStartPos.x = e.clientX;
+      mouseStartPos.y = e.clientY;
+      lastMousePos.x = e.clientX;
+      lastMousePos.y = e.clientY;
+    });
+
+    // Prevent context menu when dragging with right-click
+    container.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isInspecting || isGuidedTour) return;
+
+      if (isPointerLocked) {
+        // Mode A: FPS Pointer Lock
+        const sensitivity = 0.0022;
+        player.rotation.yaw -= e.movementX * sensitivity;
+        player.rotation.pitch -= e.movementY * sensitivity;
+        applyCameraRotation();
+      } else if (isMouseDown) {
+        // Mode B: Drag-to-Look (Fallback & Trackpad friendly)
+        const dx = e.clientX - lastMousePos.x;
+        const dy = e.clientY - lastMousePos.y;
+        lastMousePos.x = e.clientX;
+        lastMousePos.y = e.clientY;
+
+        const totalDist = Math.hypot(e.clientX - mouseStartPos.x, e.clientY - mouseStartPos.y);
+        if (totalDist > 4) {
+          isMouseDragging = true;
+        }
+
+        const dragSensitivity = 0.0035;
+        player.rotation.yaw -= dx * dragSensitivity;
+        player.rotation.pitch -= dy * dragSensitivity;
+        applyCameraRotation();
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isMouseDown = false;
+      // Delay resetting isMouseDragging briefly so upcoming click handler knows dragging occurred
+      setTimeout(() => { isMouseDragging = false; }, 60);
+    });
+
     document.addEventListener('pointerlockchange', () => {
-      isPointerLocked = document.pointerLockElement === container || document.pointerLockElement === renderer.domElement;
-      if (!isPointerLocked && !isInspecting) document.getElementById('start-overlay').classList.remove('hidden');
+      isPointerLocked = (
+        document.pointerLockElement === container ||
+        (renderer && document.pointerLockElement === renderer.domElement)
+      );
+      // NOTE: Do not re-show start-overlay on pointer lock release!
+      // This allows users to smoothly continue exploring using drag-to-look or click.
     });
-    document.addEventListener('mousemove', (e) => {
-      if (!isPointerLocked || isInspecting || isGuidedTour) return;
-      const sensitivity = 0.0022;
-      player.rotation.yaw -= e.movementX * sensitivity;
-      player.rotation.pitch -= e.movementY * sensitivity;
-      const maxPitch = Math.PI / 2.2;
-      player.rotation.pitch = Math.max(-maxPitch, Math.min(maxPitch, player.rotation.pitch));
-      camera.rotation.y = player.rotation.yaw;
-      camera.rotation.x = player.rotation.pitch;
-    });
+
     container.addEventListener('click', () => {
-      if (isInspecting) return;
+      if (isInspecting || isGuidedTour) return;
+      if (isMouseDragging) {
+        // User was dragging to rotate view, do not trigger inspect
+        return;
+      }
+
+      // If user clicked canvas and pointer is not locked, attempt to lock pointer
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (!isMobile && !isPointerLocked) {
+        try {
+          const target = (renderer && renderer.domElement) ? renderer.domElement : container;
+          if (target && target.requestPointerLock) {
+            const p = target.requestPointerLock();
+            if (p && p.catch) p.catch(() => {});
+          }
+        } catch (err) {}
+      }
+
       if (hoveredArtwork) {
         inspectArtwork(hoveredArtwork.artwork, hoveredArtwork.index);
         return;
@@ -1025,6 +1101,7 @@
             const sensitivity = 0.005;
             player.rotation.yaw -= dx * sensitivity;
             player.rotation.pitch -= dy * sensitivity;
+            applyCameraRotation();
           }
         }
       }, { passive: false });
@@ -1088,6 +1165,8 @@
       }
     }
     camera.position.copy(player.position);
+    camera.rotation.y = player.rotation.yaw;
+    camera.rotation.x = player.rotation.pitch;
     checkRaycastArtwork(currentTime);
   }
 
@@ -1549,9 +1628,20 @@
   // 12. UI Helpers & Modals
   // ==========================================
   function enterGallery() {
-    document.getElementById('start-overlay').classList.add('hidden');
+    const overlay = document.getElementById('start-overlay');
+    if (overlay) overlay.classList.add('hidden');
     const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    if (!isMobile && container.requestPointerLock) container.requestPointerLock();
+    if (!isMobile) {
+      try {
+        const el = (renderer && renderer.domElement) ? renderer.domElement : container;
+        if (el && el.requestPointerLock) {
+          const res = el.requestPointerLock();
+          if (res && res.catch) res.catch(() => {});
+        }
+      } catch (err) {
+        // Pointer lock not permitted or rejected, user can use drag-to-look seamlessly
+      }
+    }
   }
   function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); else if (document.exitFullscreen) document.exitFullscreen(); }
   function toggleHelpModal() { document.getElementById('help-modal').classList.toggle('hidden'); }
