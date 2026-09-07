@@ -151,6 +151,13 @@ const I18N_DICTIONARY = {
     empty_gallery: "ไม่พบผลงานที่ตรงกับเงื่อนไขการค้นหา",
     btn_submit_cta: "ส่งผลงานเข้าร่วมนิทรรศการ",
     btn_view_art: "ชม",
+    gallery_sort_default: "ลำดับการจัดแสดง (Curated Order)",
+    gallery_sort_title_asc: "ชื่อผลงาน (A - Z / ก - ฮ)",
+    gallery_sort_artist_asc: "ชื่อศิลปิน (A - Z / ก - ฮ)",
+    gallery_sort_country_asc: "ตามประเทศ / สัญชาติ (A - Z)",
+    gallery_sort_price_desc: "ราคาผลงาน (มากไปน้อย)",
+    gallery_sort_price_asc: "ราคาผลงาน (น้อยไปมาก)",
+    gallery_sort_year_desc: "ปีที่สร้างสรรค์ (ใหม่สุด)",
 
     // Artwork Detail
     artwork_breadcrumb_home: "หน้าแรก",
@@ -507,6 +514,13 @@ const I18N_DICTIONARY = {
     empty_gallery: "No artworks match your search query",
     btn_submit_cta: "Submit an Artwork to Exhibition",
     btn_view_art: "View",
+    gallery_sort_default: "Curated Exhibition Order",
+    gallery_sort_title_asc: "Artwork Title (A - Z)",
+    gallery_sort_artist_asc: "Artist Name (A - Z)",
+    gallery_sort_country_asc: "Country / Nationality (A - Z)",
+    gallery_sort_price_desc: "Artwork Price (High to Low)",
+    gallery_sort_price_asc: "Artwork Price (Low to High)",
+    gallery_sort_year_desc: "Year Created (Newest)",
 
     // Artwork Detail
     artwork_breadcrumb_home: "Home",

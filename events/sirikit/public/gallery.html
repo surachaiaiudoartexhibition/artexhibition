@@ -75,18 +75,40 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2.5">
         <!-- Search Input -->
-        <div class="relative w-full sm:w-72">
+        <div class="relative w-full sm:w-64">
           <input type="text" id="search-input" placeholder="ค้นหาชื่อผลงาน หรือ ศิลปิน..." data-i18n-placeholder="search_art_ph"
-            class="w-full pl-9 pr-4 py-2 rounded-sm bg-white/[0.03] border border-white/10 text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:border-[#c5a059] transition">
-          <svg class="w-4 h-4 text-[#c5a059] absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="w-full pl-9 pr-4 py-2 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs sm:text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent)] transition">
+          <svg class="w-4 h-4 text-[var(--color-accent-gold)] absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0118 0z" />
           </svg>
         </div>
 
-        <a href="/catalog.html" class="px-4 py-2 rounded-sm bg-white/[0.04] border border-[#c5a059]/30 text-[#f5e6c8] hover:bg-[#c5a059]/15 text-xs tracking-wider uppercase transition flex items-center gap-2">
-          <svg class="w-4 h-4 text-[#c5a059]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Nationality Filter -->
+        <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-2 corner-cut-8 text-xs">
+          <span class="text-sm">🌐</span>
+          <select id="country-filter" class="bg-transparent text-xs text-[var(--text-main)] focus:outline-none cursor-pointer font-medium">
+            <option value="all" data-i18n="filter_all_countries">ทุกประเทศ (All Countries)</option>
+          </select>
+        </div>
+
+        <!-- Sort Filter -->
+        <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-2 corner-cut-8 text-xs">
+          <span class="text-sm">↕️</span>
+          <select id="sort-filter" class="bg-transparent text-xs text-[var(--text-main)] focus:outline-none cursor-pointer font-medium">
+            <option value="default" data-i18n="gallery_sort_default">ลำดับการจัดแสดง (Curated Order)</option>
+            <option value="artist_asc" data-i18n="gallery_sort_artist_asc">ชื่อศิลปิน (A - Z / ก - ฮ)</option>
+            <option value="title_asc" data-i18n="gallery_sort_title_asc">ชื่อผลงาน (A - Z / ก - ฮ)</option>
+            <option value="country_asc" data-i18n="gallery_sort_country_asc">ตามประเทศ / สัญชาติ (A - Z)</option>
+            <option value="price_desc" data-i18n="gallery_sort_price_desc">ราคาผลงาน (มากไปน้อย)</option>
+            <option value="price_asc" data-i18n="gallery_sort_price_asc">ราคาผลงาน (น้อยไปมาก)</option>
+            <option value="year_desc" data-i18n="gallery_sort_year_desc">ปีที่สร้างสรรค์ (ใหม่สุด)</option>
+          </select>
+        </div>
+
+        <a href="/catalog.html" class="px-3.5 py-2 corner-cut-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-accent)] text-[var(--color-accent-light)] hover:brightness-110 text-xs tracking-wider uppercase transition flex items-center gap-2">
+          <svg class="w-4 h-4 text-[var(--color-accent-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
           <span data-i18n="btn_open_catalog">สูจิบัตรดิจิทัล</span>
@@ -155,13 +177,64 @@
         filterAndRender();
       });
 
+      const countryFilter = document.getElementById("country-filter");
+      if (countryFilter) {
+        countryFilter.addEventListener("change", () => {
+          filterAndRender();
+        });
+      }
+
+      const sortFilter = document.getElementById("sort-filter");
+      if (sortFilter) {
+        sortFilter.addEventListener("change", () => {
+          filterAndRender();
+        });
+      }
+
       window.addEventListener('languageChanged', () => {
         window.i18n.apply();
+        setupFilters();
         filterAndRender();
       });
     });
 
     let isJuryEnabled = false;
+
+    function parsePrice(art) {
+      if (!art || !art.price) return null;
+      const str = String(art.price).replace(/,/g, '');
+      const match = str.match(/\d+(\.\d+)?/);
+      return match ? parseFloat(match[0]) : null;
+    }
+
+    function formatPriceDisplay(priceVal) {
+      if (priceVal == null) return '-';
+      return '฿' + Number(priceVal).toLocaleString('th-TH');
+    }
+
+    function setupFilters() {
+      const countrySelect = document.getElementById('country-filter');
+      if (!countrySelect) return;
+      const currentCountryVal = countrySelect.value || 'all';
+
+      countrySelect.innerHTML = `<option value="all" data-i18n="filter_all_countries">${window.t('filter_all_countries')}</option>`;
+
+      const countries = new Set();
+      allArtworks.forEach(a => {
+        if (a.nationality && a.nationality.trim() !== '' && a.nationality !== '-') {
+          countries.add(a.nationality.trim());
+        }
+      });
+
+      Array.from(countries).sort().forEach(country => {
+        const opt = document.createElement('option');
+        opt.value = country;
+        const displayName = window.getCountryDisplayName(country);
+        opt.textContent = displayName;
+        if (country === currentCountryVal) opt.selected = true;
+        countrySelect.appendChild(opt);
+      });
+    }
 
     async function loadArtworks() {
       try {
@@ -174,6 +247,7 @@
         } catch (e) {}
         const res = await EventAPI.getSubmissions("approved");
         allArtworks = res.submissions || [];
+        setupFilters();
         filterAndRender();
       } catch (err) {
         console.error("Failed to load artworks", err);
@@ -186,24 +260,80 @@
     }
 
     function filterAndRender() {
-      const searchTerm = document.getElementById("search-input").value.toLowerCase().trim();
+      const searchTerm = (document.getElementById("search-input").value || '').toLowerCase().trim();
+      const country = (document.getElementById("country-filter") && document.getElementById("country-filter").value) || 'all';
+      const sortVal = (document.getElementById("sort-filter") && document.getElementById("sort-filter").value) || 'default';
       const container = document.getElementById("artworks-grid");
       container.innerHTML = "";
 
-      const filtered = allArtworks.filter(art => {
+      let filtered = allArtworks.filter(art => {
+        const artistCode = window.resolveCountryCode(art.nationality);
+        const filterCode = window.resolveCountryCode(country);
+        const matchCountry = country === 'all' || 
+                             (art.nationality || '').toLowerCase() === country.toLowerCase() ||
+                             (artistCode && filterCode && artistCode === filterCode);
+        if (!matchCountry) return false;
+
         if (!searchTerm) return true;
         const title = window.getField(art, 'title').toLowerCase();
         const artistName = window.getField(art, 'artist_name').toLowerCase();
         const tech = window.getField(art, 'technique').toLowerCase();
+        const natDisplay = (window.getCountryDisplayName(art.nationality, 'th') + ' ' + window.getCountryDisplayName(art.nationality, 'en')).toLowerCase();
         return title.includes(searchTerm) || artistName.includes(searchTerm) || tech.includes(searchTerm) ||
+               natDisplay.includes(searchTerm) ||
                (art.title && art.title.toLowerCase().includes(searchTerm)) ||
                (art.artist_name && art.artist_name.toLowerCase().includes(searchTerm));
       });
 
+      // Sorting logic
+      if (sortVal === 'artist_asc') {
+        filtered.sort((a, b) => {
+          const nameA = window.getArtistFullName(a) || a.artist_name || '';
+          const nameB = window.getArtistFullName(b) || b.artist_name || '';
+          return nameA.localeCompare(nameB, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'title_asc') {
+        filtered.sort((a, b) => {
+          const titleA = window.getField(a, 'title') || a.title || '';
+          const titleB = window.getField(b, 'title') || b.title || '';
+          return titleA.localeCompare(titleB, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'country_asc') {
+        filtered.sort((a, b) => {
+          const cA = window.getCountryDisplayName(a.nationality) || a.nationality || '';
+          const cB = window.getCountryDisplayName(b.nationality) || b.nationality || '';
+          return cA.localeCompare(cB, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'price_desc') {
+        filtered.sort((a, b) => {
+          const pA = parsePrice(a);
+          const pB = parsePrice(b);
+          if (pA === null && pB === null) return 0;
+          if (pA === null) return 1;
+          if (pB === null) return -1;
+          return pB - pA;
+        });
+      } else if (sortVal === 'price_asc') {
+        filtered.sort((a, b) => {
+          const pA = parsePrice(a);
+          const pB = parsePrice(b);
+          if (pA === null && pB === null) return 0;
+          if (pA === null) return 1;
+          if (pB === null) return -1;
+          return pA - pB;
+        });
+      } else if (sortVal === 'year_desc') {
+        filtered.sort((a, b) => {
+          const yA = parseInt(a.year_created, 10) || 0;
+          const yB = parseInt(b.year_created, 10) || 0;
+          return yB - yA;
+        });
+      }
+
       const badge = document.getElementById("gallery-count-badge");
       if (badge) {
         const isTh = window.i18n ? window.i18n.getLang() === 'th' : true;
-        if (searchTerm) {
+        if (searchTerm || country !== 'all' || sortVal !== 'default') {
           badge.textContent = isTh ? `พบ ${filtered.length} / ${allArtworks.length} ผลงาน` : `${filtered.length} / ${allArtworks.length} Artworks`;
         } else {
           badge.textContent = isTh ? `ทั้งหมด ${allArtworks.length} ผลงาน` : `Total ${allArtworks.length} Artworks`;
@@ -229,6 +359,7 @@
         const artistName = window.getArtistFullName(art);
         const technique = window.getField(art, 'technique') || (isTh ? 'ภาพพิมพ์ร่วมสมัย' : 'Contemporary Printmaking');
         const hasAvatar = Boolean(art.artist_avatar_url && art.artist_avatar_url.trim() && !art.artist_avatar_url.includes('unsplash.com'));
+        const artPrice = parsePrice(art);
         const card = document.createElement("div");
         card.className = "gallery-surface rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[var(--border-subtle)]";
         card.innerHTML = `
@@ -245,6 +376,16 @@
                 </div>
               </div>
             ` : ''}
+
+            <!-- Price Tag Overlay (if artwork has price) -->
+            ${artPrice !== null ? `
+              <div class="absolute bottom-2.5 right-2.5 z-20 pointer-events-none">
+                <span class="px-2 py-0.5 corner-cut-6 bg-black/80 backdrop-blur-md border border-[#C5A059]/50 text-[11px] font-mono font-bold text-[var(--color-accent-gold)] shadow-md">
+                  ${formatPriceDisplay(artPrice)}
+                </span>
+              </div>
+            ` : ''}
+
             <a href="/artwork.html?id=${art.id}" class="w-full h-full flex items-center justify-center">
               <img src="${art.thumbnail_url || art.image_url}" alt="${title}" 
                    class="max-h-full max-w-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.06)] group-hover:scale-[1.03] transition duration-500 ease-out" loading="lazy">
@@ -254,12 +395,24 @@
           <!-- Card Museum Plaque Content -->
           <div class="p-5 flex-1 flex flex-col justify-between space-y-3 bg-[var(--bg-surface-solid)]">
             <div>
-              <a href="/artwork.html?id=${art.id}" class="block group/title">
-                <h3 class="font-serif-luxury text-lg text-[var(--text-main)] group-hover/title:text-[#9A7833] transition truncate leading-snug">
-                  ${title}
-                </h3>
-              </a>
-              <p class="text-[11px] text-[var(--text-muted)] truncate mt-1 font-light">${technique}</p>
+              <div class="flex items-start justify-between gap-2">
+                <a href="/artwork.html?id=${art.id}" class="block group/title flex-1 min-w-0">
+                  <h3 class="font-serif-luxury text-lg text-[var(--text-main)] group-hover/title:text-[#9A7833] transition truncate leading-snug">
+                    ${title}
+                  </h3>
+                </a>
+                ${artPrice !== null ? `
+                  <span class="text-xs font-mono font-bold text-[var(--color-accent-gold)] shrink-0">
+                    ${formatPriceDisplay(artPrice)}
+                  </span>
+                ` : ''}
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-[var(--text-muted)] mt-1 font-light gap-2">
+                <span class="truncate">${technique}</span>
+                ${art.nationality && art.nationality !== '-' ? `
+                  <span class="shrink-0 font-mono">${window.getCountryFlagBadge(art.nationality, { size: 'sm', showName: false })}</span>
+                ` : ''}
+              </div>
             </div>
 
             <!-- Artist Badge -->
