@@ -74,6 +74,8 @@
         <span data-i18n="artists_badge">ARTISTS & CREATORS DIRECTORY</span>
         <span class="text-[var(--text-subtle)]">•</span>
         <span id="total-artists-badge" class="font-mono text-[var(--color-accent-light)] font-bold">0 ท่าน</span>
+        <span class="text-[var(--text-subtle)]">•</span>
+        <span id="total-artworks-badge" class="font-mono text-[var(--color-accent-gold)] font-bold">0 ผลงาน</span>
       </div>
       <h1 class="font-serif-luxury text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-main)] leading-tight">
         <span data-i18n="artists_title_1">ทำเนียบศิลปินและ</span><span class="gold-gradient-text" data-i18n="artists_title_2">ผลงานสร้างสรรค์</span>
@@ -415,7 +417,12 @@
         }
 
         allArtists = data.artists;
+        const totalArts = allArtists.reduce((sum, a) => sum + (a.artworks_count || (a.artworks ? a.artworks.length : 0)), 0);
         document.getElementById('total-artists-badge').textContent = `${allArtists.length} ${window.t('artists_count_unit')}`;
+        const totalArtsBadge = document.getElementById('total-artworks-badge');
+        if (totalArtsBadge) {
+          totalArtsBadge.textContent = `${totalArts} ${window.i18n.getLang() === 'th' ? 'ผลงาน' : 'Artworks'}`;
+        }
 
         setupFilters();
         render();

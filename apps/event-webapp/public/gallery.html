@@ -67,7 +67,12 @@
         <h1 class="text-3xl sm:text-4xl font-serif-luxury font-normal text-white tracking-tight">
           <span data-i18n="gallery_title_1">ห้องจัดแสดง</span><span class="text-[#e2c792] italic ml-2" data-i18n="gallery_title_2">ผลงานนิทรรศการ</span>
         </h1>
-        <p class="text-stone-400 text-xs sm:text-sm mt-1.5 font-light" data-i18n="gallery_desc">ผลงานศิลปะที่ผ่านการคัดสรรจากคณะกรรมการและภัณฑารักษ์</p>
+        <div class="flex items-center gap-3 mt-1.5 flex-wrap">
+          <p class="text-stone-400 text-xs sm:text-sm font-light" data-i18n="gallery_desc">ผลงานศิลปะที่ผ่านการคัดสรรจากคณะกรรมการและภัณฑารักษ์</p>
+          <span id="gallery-count-badge" class="px-2.5 py-0.5 corner-cut-6 text-xs font-mono font-semibold bg-[#C5A059]/15 text-[#f5e6c8] border border-[#C5A059]/30">
+            กำลังโหลด...
+          </span>
+        </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
@@ -194,6 +199,16 @@
                (art.title && art.title.toLowerCase().includes(searchTerm)) ||
                (art.artist_name && art.artist_name.toLowerCase().includes(searchTerm));
       });
+
+      const badge = document.getElementById("gallery-count-badge");
+      if (badge) {
+        const isTh = window.i18n ? window.i18n.getLang() === 'th' : true;
+        if (searchTerm) {
+          badge.textContent = isTh ? `พบ ${filtered.length} / ${allArtworks.length} ผลงาน` : `${filtered.length} / ${allArtworks.length} Artworks`;
+        } else {
+          badge.textContent = isTh ? `ทั้งหมด ${allArtworks.length} ผลงาน` : `Total ${allArtworks.length} Artworks`;
+        }
+      }
 
       if (filtered.length === 0) {
         container.innerHTML = `

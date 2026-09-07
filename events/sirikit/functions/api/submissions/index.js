@@ -6,7 +6,8 @@ export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const statusParam = url.searchParams.get("status");
-  const limit = Math.min(parseInt(url.searchParams.get("limit") || "50", 10), 100);
+  const rawLimit = url.searchParams.get("limit");
+  const limit = rawLimit ? Math.min(parseInt(rawLimit, 10), 1000) : 500;
   const offset = Math.max(parseInt(url.searchParams.get("offset") || "0", 10), 0);
 
   const adminKey = request.headers.get("x-admin-key");

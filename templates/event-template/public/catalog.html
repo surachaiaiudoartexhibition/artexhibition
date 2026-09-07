@@ -688,7 +688,7 @@
       try {
         const t = Date.now();
         const [subRes, confRes] = await Promise.all([
-          fetch('/api/submissions?_t=' + t),
+          fetch('/api/submissions?limit=500&_t=' + t),
           EventAPI.getCatalogConfig().catch(() => null)
         ]);
 

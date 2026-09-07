@@ -18,12 +18,16 @@ const EventAPI = {
     }
   },
 
-  async getSubmissions(status = "approved", adminKey = null) {
+  async getSubmissions(status = "approved", adminKey = null, limit = 500) {
     const headers = {};
     if (adminKey) {
       headers["x-admin-key"] = adminKey;
     }
-    const query = status ? `?status=${encodeURIComponent(status)}` : "";
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    if (limit) params.set("limit", limit);
+    params.set("_t", Date.now());
+    const query = params.toString() ? `?${params.toString()}` : "";
     const res = await fetch(`/api/submissions${query}`, { headers });
     return await res.json();
   },
