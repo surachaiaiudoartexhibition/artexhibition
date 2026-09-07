@@ -851,7 +851,7 @@
       `;
 
       try {
-        const res = await MasterPortalAPI.getArtworks({ event_id: eventId });
+        const res = await MasterPortalAPI.getArtworks({ event_id: eventId, limit: 500 });
         currentEventArtworks = res.artworks || [];
 
         // Auto-pull fallback: If master cache has 0 artworks for this active event, trigger sync from event source

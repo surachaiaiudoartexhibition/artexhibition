@@ -60,7 +60,7 @@ export async function onRequestPost(context) {
       };
 
       try {
-        const fetchUrl = `${ev.portal_url.replace(/\/+$/, "")}/api/submissions?status=approved`;
+        const fetchUrl = `${ev.portal_url.replace(/\/+$/, "")}/api/submissions?status=approved&limit=500&_t=${Date.now()}`;
         const res = await fetch(fetchUrl, {
           headers: {
             "Accept": "application/json",

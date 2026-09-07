@@ -7,7 +7,8 @@ export async function onRequestGet(context) {
 
   const eventId = url.searchParams.get("event_id");
   const queryTerm = url.searchParams.get("q");
-  const limit = Math.min(parseInt(url.searchParams.get("limit") || "40", 10), 100);
+  const rawLimit = url.searchParams.get("limit");
+  const limit = rawLimit ? Math.min(parseInt(rawLimit, 10), 500) : 200;
   const offset = Math.max(parseInt(url.searchParams.get("offset") || "0", 10), 0);
 
   try {
