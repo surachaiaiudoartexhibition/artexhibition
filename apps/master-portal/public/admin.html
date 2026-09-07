@@ -84,7 +84,7 @@
           ระบบควบคุมและสร้าง Web Event อัตโนมัติ
         </h1>
         <p class="text-[#C8DBD2] text-sm sm:text-base mt-2 max-w-3xl leading-relaxed font-light">
-          สร้างนิทรรศการใหม่แบบแยกบัญชีคลาวด์ 100% ฟรีตลอดชีพ (0 บาท) เพียงป้อนข้อมูลอีเมล sub-address, โทเค็น Cloudflare, Cloudinary และ GitHub ทาง Master Portal จะดำเนินการสร้างระบบฐานข้อมูล D1, ติดตั้งโค้ดโปรเจกต์ และเชื่อมต่อเข้าสู่หอศิลป์ 3D ทันที
+          สร้างนิทรรศการใหม่แบบแยกพื้นที่จัดเก็บ 100% (1 งาน ต่อ 1 Cloudinary Storage ฟรี) บันทึกอีเมลผู้ดูแลกำกับไว้ป้องกันการหลงลืม ระบบเบื้องหลังจัดการโครงสร้างโฟลเดอร์ ฐานข้อมูล D1 และเชื่อมต่อเข้าสู่หอศิลป์เสมือนจริง 3D ให้อัตโนมัติ
         </p>
 
         <!-- Process Flow Steps Indicator -->
@@ -92,29 +92,29 @@
           <div class="p-3.5 rounded-2xl bg-[#243830] border border-[#355246] flex items-start gap-3">
             <div class="w-7 h-7 rounded-xl bg-[#C5A059]/20 text-[#E8C87A] flex items-center justify-center font-bold text-xs shrink-0">1</div>
             <div>
-              <div class="text-xs font-semibold text-white">Email Sub-addressing</div>
-              <div class="text-[11px] text-[#C8DBD2] mt-0.5">ใช้ mail+event@gmail.com สมัครบัญชีฟรีแยกงาน</div>
+              <div class="text-xs font-semibold text-white">Event & Admin Record</div>
+              <div class="text-[11px] text-[#C8DBD2] mt-0.5">ระบุรหัสงาน ชื่อ และอีเมลที่ใช้สมัครไว้เป็นประวัติ</div>
             </div>
           </div>
           <div class="p-3.5 rounded-2xl bg-[#243830] border border-[#355246] flex items-start gap-3">
             <div class="w-7 h-7 rounded-xl bg-[#C5A059]/20 text-[#E8C87A] flex items-center justify-center font-bold text-xs shrink-0">2</div>
             <div>
-              <div class="text-xs font-semibold text-white">Cloudflare & Cloudinary</div>
-              <div class="text-[11px] text-[#C8DBD2] mt-0.5">รับ Account ID, Token และ Preset ฟรี</div>
+              <div class="text-xs font-semibold text-white">Dedicated Cloudinary</div>
+              <div class="text-[11px] text-[#C8DBD2] mt-0.5">ระบุ Cloud Name & Upload Preset ประจำงาน</div>
             </div>
           </div>
           <div class="p-3.5 rounded-2xl bg-[#243830] border border-[#355246] flex items-start gap-3">
             <div class="w-7 h-7 rounded-xl bg-[#C5A059]/20 text-[#E8C87A] flex items-center justify-center font-bold text-xs shrink-0">3</div>
             <div>
-              <div class="text-xs font-semibold text-white">1-Click Auto Provisioning</div>
-              <div class="text-[11px] text-slate-400 mt-0.5">กดปุ่มสร้าง Portal สั่งการ D1 และเขียนโค้ดเว็บ</div>
+              <div class="text-xs font-semibold text-white">1-Click Auto Provision</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">ระบบจัดการโครงสร้างโปรเจกต์ D1 และ Web App</div>
             </div>
           </div>
           <div class="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800 flex items-start gap-3">
             <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">4</div>
             <div>
               <div class="text-xs font-semibold text-white">Ready for 3D Virtual Hall</div>
-              <div class="text-[11px] text-slate-400 mt-0.5">ผลงานซิงค์อัตโนมัติ พร้อมจัดแสดงในห้อง 3D</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">ผลงานเชื่อมต่อพร้อมจัดแสดงในห้อง 3D ทันที</div>
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@
               </h2>
             </div>
             <p class="text-xs sm:text-sm text-[#64736C] mt-1">
-              กรอกข้อมูลบัญชีที่ลงทะเบียนแยกไว้ ระบบจะสร้าง D1 Database, เจนเนอเรตโค้ดใน <code class="text-[#9A7833] font-mono bg-[#FAF3E3] px-1 py-0.5 rounded">events/{event_id}</code> และเชื่อมต่ออัตโนมัติ
+              สร้างนิทรรศการใหม่ กำหนด Cloudinary ประจำงาน และบันทึกอีเมลผู้ดูแล ระบบจะตั้งค่าโฟลเดอร์ <code class="text-[#9A7833] font-mono bg-[#FAF3E3] px-1 py-0.5 rounded">events/{event_id}</code> และเชื่อมต่อ 3D ทันที
             </p>
           </div>
 
@@ -178,7 +178,7 @@
               <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
-              <span>เติมข้อมูลตัวอย่าง (Digital Art 2026)</span>
+              <span>เติมข้อมูลตัวอย่าง (Digital Art)</span>
             </button>
             <button type="button" onclick="fillDemoProvisionForm('fashion-design')" class="min-h-[44px] px-3.5 py-2 rounded-xl bg-[#EBF2EE] hover:bg-[#DEEBE4] text-[#243830] border border-[#355246]/30 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer">
               <svg class="w-3.5 h-3.5 text-[#243830]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,36 +196,24 @@
             <div class="p-5 rounded-2xl bg-[#FBF9F4] border border-[#E8E0D2] space-y-4">
               <div class="flex items-center gap-2 text-[#9A7833] text-xs font-bold uppercase tracking-wider">
                 <span class="w-2 h-2 rounded-full bg-[#C5A059]"></span>
-                <span>ส่วนที่ 1: ข้อมูลนิทรรศการและอีเมลแยกบัญชี</span>
+                <span>ส่วนที่ 1: ข้อมูลนิทรรศการและการแสดงผล</span>
               </div>
 
               <div>
                 <label for="prov_event_id" class="block text-xs font-semibold text-[#171C1A] mb-1">
                   รหัสเฉพาะของงาน (Event ID / Slug) <span class="text-rose-500">*</span>
                 </label>
-                <input type="text" id="prov_event_id" required placeholder="เช่น digital-art-2026"
+                <input type="text" id="prov_event_id" required placeholder="เช่น ceramics-2026"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
-                <p class="text-[11px] text-[#64736C] mt-1">ใช้ตัวพิมพ์เล็ก ขีดกลาง เช่น <code class="text-[#9A7833]">digital-art-2026</code> (ใช้ตั้งชื่อโฟลเดอร์และ URL)</p>
+                <p class="text-[11px] text-[#64736C] mt-1">ใช้ตัวพิมพ์เล็กและขีดกลาง เช่น <code class="text-[#9A7833]">sirikit</code> หรือ <code class="text-[#9A7833]">ceramics-2026</code></p>
               </div>
 
               <div>
                 <label for="prov_event_title" class="block text-xs font-semibold text-[#171C1A] mb-1">
                   ชื่อนิทรรศการ (Event Title) <span class="text-rose-500">*</span>
                 </label>
-                <input type="text" id="prov_event_title" required placeholder="เช่น International Digital Art Biennial 2026"
+                <input type="text" id="prov_event_title" required placeholder="เช่น นิทรรศการประติมากรรมเซรามิกแห่งชาติ 2569"
                   class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
-              </div>
-
-              <div>
-                <label for="prov_admin_email" class="block text-xs font-semibold text-[#171C1A] mb-1 flex items-center justify-between">
-                  <span>อีเมลแยกบัญชี (Sub-addressing) <span class="text-[#9A7833]">*</span></span>
-                  <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">กลยุทธ์ 0 บาทตลอดชีพ</span>
-                </label>
-                <input type="email" id="prov_admin_email" required placeholder="เช่น artorg+digital2026@gmail.com"
-                  class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
-                <p class="text-[11px] text-[#64736C] mt-1 leading-relaxed">
-                  💡 ใช้เมลหลักของคุณเติมเครื่องหมาย <code class="text-[#9A7833] font-mono bg-[#FAF3E3] px-1 py-0.5 rounded">+ชื่อนิทรรศการ</code> ไม่ต้องเปิดกล่องจดหมายใหม่ ได้รับจดหมายยืนยันตัวตนใน inbox เดิมทันที
-                </p>
               </div>
 
               <div>
@@ -238,65 +226,71 @@
                   <option value="minimal-monochrome">Minimal Monochrome (มินิมอล โมโนโครม คอนเทมโพรารี)</option>
                 </select>
               </div>
+
+              <div>
+                <label for="prov_catalog_url" class="block text-xs font-semibold text-[#171C1A] mb-1">
+                  ลิงก์สูจิบัตรดิจิทัล (Catalog URL / PDF) <span class="text-[10px] text-[#64736C] font-normal">(ไม่บังคับ)</span>
+                </label>
+                <input type="url" id="prov_catalog_url" placeholder="https://.../catalog หรือ /catalog.html"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                <p class="text-[11px] text-[#64736C] mt-1">ปล่อยว่างได้ ระบบจะสร้างหน้าสูจิบัตรมาตรฐานให้โดยอัตโนมัติ</p>
+              </div>
             </div>
 
-            <!-- Section 2: Cloud Infrastructure & Repos -->
+            <!-- Section 2: Dedicated Cloudinary Storage & Admin Record -->
             <div class="p-5 rounded-2xl bg-[#FBF9F4] border border-[#E8E0D2] space-y-4">
               <div class="flex items-center gap-2 text-[#243830] text-xs font-bold uppercase tracking-wider">
                 <span class="w-2 h-2 rounded-full bg-[#243830]"></span>
-                <span>ส่วนที่ 2: ค่า Config จาก Cloudflare, Cloudinary และ GitHub</span>
+                <span>ส่วนที่ 2: บันทึกบัญชีผู้ดูแล & ที่จัดเก็บรูปภาพ (1 งาน ต่อ 1 Storage)</span>
               </div>
 
-              <!-- GitHub Section -->
+              <!-- Admin Email Record -->
               <div>
-                <label for="prov_github_repo" class="block text-xs font-semibold text-[#171C1A] mb-1">
-                  GitHub Repository (Repo ที่สร้างขึ้นสำหรับงานนี้)
+                <label for="prov_admin_email" class="block text-xs font-semibold text-[#171C1A] mb-1 flex items-center justify-between">
+                  <span>อีเมลผู้ดูแล / อีเมลที่ใช้สมัคร (Admin Email) <span class="text-rose-500">*</span></span>
+                  <span class="text-[10px] text-[#8C6D2D] font-semibold bg-[#FAF3E3] px-2 py-0.5 rounded-full border border-[#C5A059]/30">บันทึกประวัติ</span>
                 </label>
-                <input type="text" id="prov_github_repo" placeholder="เช่น myartorg/digital-art-2026"
-                  class="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
-                <p class="text-[11px] text-[#64736C] mt-1">ผูกกับ GitHub Actions หรือ Cloudflare Pages Git Integration เพื่อ Auto Deploy</p>
+                <input type="email" id="prov_admin_email" required placeholder="เช่น artorg+ceramics2026@gmail.com"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+                <p class="text-[11px] text-[#64736C] mt-1 leading-relaxed">
+                  💡 บันทึกไว้เป็นประวัติอ้างอิง เพื่อไม่ให้หลงลืมว่านิทรรศการนี้ลงทะเบียนสมัคร Cloudinary ด้วยอีเมลใด
+                </p>
               </div>
 
-              <!-- Cloudflare Section -->
-              <div class="pt-2 border-t border-[#E8E0D2] space-y-3">
+              <!-- Cloudinary Dedicated Storage -->
+              <div class="pt-3 border-t border-[#E8E0D2] space-y-3">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-[#171C1A]">Cloudflare Account & API</span>
-                  <span class="text-[10px] text-[#64736C] font-mono">(Pages & D1 SQL)</span>
+                  <span class="text-xs font-semibold text-[#171C1A]">Cloudinary Dedicated Storage</span>
+                  <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">1 งาน 1 คลังแยกอิสระ</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label for="prov_cf_account_id" class="block text-[11px] text-[#64736C] mb-1">Account ID</label>
-                    <input type="text" id="prov_cf_account_id" placeholder="เช่น 9f8a3c4..."
+                    <label for="prov_cloud_name" class="block text-[11px] text-[#64736C] mb-1">
+                      Cloud Name <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" id="prov_cloud_name" required placeholder="เช่น art-ceramics-2026"
                       class="w-full px-3 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
                   </div>
                   <div>
-                    <label for="prov_cf_api_token" class="block text-[11px] text-[#64736C] mb-1">API Token (สิทธิ์ D1 Edit)</label>
-                    <input type="password" id="prov_cf_api_token" placeholder="ใส่ Token หรือปล่อยว่างโหมด Local"
+                    <label for="prov_upload_preset" class="block text-[11px] text-[#64736C] mb-1">
+                      Upload Preset (Unsigned) <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" id="prov_upload_preset" required placeholder="เช่น ceramics_submissions"
                       class="w-full px-3 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
                   </div>
                 </div>
+                <p class="text-[11px] text-[#64736C] leading-relaxed">
+                  รูปภาพผลงานทั้งหมดของงานนี้จะถูกอัปโหลดเข้า Storage นี้โดยตรง แยกโควตาและ Bandwidth ชัดเจน ไม่ปะปนกับงานอื่น
+                </p>
               </div>
 
-              <!-- Cloudinary Section -->
-              <div class="pt-2 border-t border-[#E8E0D2] space-y-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-[#171C1A]">Cloudinary (คลังรูปภาพและเอกสาร)</span>
-                  <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">ฟรี 25GB ตลอดชีพ</span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label for="prov_cloud_name" class="block text-[11px] text-[#64736C] mb-1">Cloud Name</label>
-                    <input type="text" id="prov_cloud_name" placeholder="เช่น art-digital-2026"
-                      class="w-full px-3 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
-                  </div>
-                  <div>
-                    <label for="prov_upload_preset" class="block text-[11px] text-[#64736C] mb-1">Upload Preset (Unsigned)</label>
-                    <input type="text" id="prov_upload_preset" placeholder="เช่น art_submissions"
-                      class="w-full px-3 py-2 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-xs font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
-                  </div>
-                </div>
+              <!-- System Notice -->
+              <div class="p-3 rounded-xl bg-[#EBF2EE]/60 border border-[#355246]/20 text-[11px] text-[#243830] flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>ระบบ Cloudflare Pages & D1 Database ส่วนกลางจะสร้างและผูกเข้าโปรเจกต์ให้อัตโนมัติ</span>
               </div>
 
             </div>
@@ -534,21 +528,19 @@
       if (type === 'digital-art') {
         document.getElementById('prov_event_id').value = 'digital-art-2026';
         document.getElementById('prov_event_title').value = 'International Digital Art Biennial 2026';
-        document.getElementById('prov_admin_email').value = 'artgallery+digital2026@gmail.com';
         document.getElementById('prov_theme').value = 'modern-cyber';
-        document.getElementById('prov_github_repo').value = 'myartgallery/digital-art-2026';
-        document.getElementById('prov_cf_account_id').value = 'cf_acc_demo_882910';
-        document.getElementById('prov_cf_api_token').value = 'demo_token_preview_xyz';
+        const catEl = document.getElementById('prov_catalog_url');
+        if (catEl) catEl.value = 'https://digital-art-2026.pages.dev/catalog';
+        document.getElementById('prov_admin_email').value = 'artgallery+digital2026@gmail.com';
         document.getElementById('prov_cloud_name').value = 'art-digital-2026';
         document.getElementById('prov_upload_preset').value = 'digital_art_submissions';
       } else if (type === 'fashion-design') {
         document.getElementById('prov_event_id').value = 'fashion-design-2026';
         document.getElementById('prov_event_title').value = 'Contemporary Textile & Fashion Showcase 2026';
-        document.getElementById('prov_admin_email').value = 'artgallery+fashion2026@gmail.com';
         document.getElementById('prov_theme').value = 'heritage';
-        document.getElementById('prov_github_repo').value = 'myartgallery/fashion-design-2026';
-        document.getElementById('prov_cf_account_id').value = 'cf_acc_demo_882910';
-        document.getElementById('prov_cf_api_token').value = 'demo_token_preview_xyz';
+        const catEl = document.getElementById('prov_catalog_url');
+        if (catEl) catEl.value = '';
+        document.getElementById('prov_admin_email').value = 'artgallery+fashion2026@gmail.com';
         document.getElementById('prov_cloud_name').value = 'fashion-2026-cloud';
         document.getElementById('prov_upload_preset').value = 'fashion_submissions';
       }
@@ -576,14 +568,13 @@
         const terminalBadge = document.getElementById("terminal-badge");
         const successActions = document.getElementById("provision-success-actions");
 
+        const catEl = document.getElementById("prov_catalog_url");
         const payload = {
           event_id: document.getElementById("prov_event_id").value.trim(),
           event_title: document.getElementById("prov_event_title").value.trim(),
-          admin_email: document.getElementById("prov_admin_email").value.trim(),
           theme: document.getElementById("prov_theme").value,
-          github_repo: document.getElementById("prov_github_repo").value.trim(),
-          cloudflare_account_id: document.getElementById("prov_cf_account_id").value.trim(),
-          cloudflare_api_token: document.getElementById("prov_cf_api_token").value.trim(),
+          catalog_url: catEl ? catEl.value.trim() : '',
+          admin_email: document.getElementById("prov_admin_email").value.trim(),
           cloudinary_cloud_name: document.getElementById("prov_cloud_name").value.trim(),
           cloudinary_upload_preset: document.getElementById("prov_upload_preset").value.trim(),
           portal_url: `http://localhost:8787` // In dev mode, point to local event port
