@@ -2355,9 +2355,16 @@
 
     function extractNumPrefix(name) {
       const base = name.split('.')[0];
-      const m = base.match(/^0*(\d+)/);
-      return m ? parseInt(m[1], 10) : null;
+      // Priority: last 3-digit group in filename (handles PC18_001, 18001, artwork_001, etc.)
+      const allNums = [...base.matchAll(/\d+/g)];
+      if (allNums.length === 0) return null;
+      // Use the LAST numeric group, padded/trimmed to integer
+      const lastNum = allNums[allNums.length - 1][0];
+      // Yield the last 3 chars if numeric suffix is long, else full number
+      const trimmed = lastNum.length > 3 ? lastNum.slice(-3) : lastNum;
+      return parseInt(trimmed, 10);
     }
+
 
     function normalizeStr(str) {
       if (!str) return '';
@@ -2744,9 +2751,12 @@
       let tbodyHtml = '';
 
       storeTableRecords.forEach((row, idx) => {
-        const rowIdNum = parseInt(row.id || (idx + 1), 10);
+        // Normalize row ID: use last-3-digit extraction same as file names
+        const rawId = String(row.id || (idx + 1));
+        const rowIdNum = extractNumPrefix(rawId + '.x') ?? (idx + 1);
         const normArtist = normalizeStr(row.artist_name);
         const normTitle = normalizeStr(row.title);
+
 
         // A. Match Artist Portrait
         let matchedArtist = null;
