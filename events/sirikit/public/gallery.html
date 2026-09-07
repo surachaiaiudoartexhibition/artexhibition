@@ -101,9 +101,9 @@
             <option value="artist_asc" data-i18n="gallery_sort_artist_asc">ชื่อศิลปิน (A - Z / ก - ฮ)</option>
             <option value="title_asc" data-i18n="gallery_sort_title_asc">ชื่อผลงาน (A - Z / ก - ฮ)</option>
             <option value="country_asc" data-i18n="gallery_sort_country_asc">ตามประเทศ / สัญชาติ (A - Z)</option>
+            <option value="year_desc" data-i18n="gallery_sort_year_desc">ปีที่สร้างสรรค์ (ใหม่สุด)</option>
             <option value="price_desc" data-i18n="gallery_sort_price_desc">ราคาผลงาน (มากไปน้อย)</option>
             <option value="price_asc" data-i18n="gallery_sort_price_asc">ราคาผลงาน (น้อยไปมาก)</option>
-            <option value="year_desc" data-i18n="gallery_sort_year_desc">ปีที่สร้างสรรค์ (ใหม่สุด)</option>
           </select>
         </div>
 
@@ -377,15 +377,6 @@
               </div>
             ` : ''}
 
-            <!-- Price Tag Overlay (if artwork has price) -->
-            ${artPrice !== null ? `
-              <div class="absolute bottom-2.5 right-2.5 z-20 pointer-events-none">
-                <span class="px-2 py-0.5 corner-cut-6 bg-black/80 backdrop-blur-md border border-[#C5A059]/50 text-[11px] font-mono font-bold text-[var(--color-accent-gold)] shadow-md">
-                  ${formatPriceDisplay(artPrice)}
-                </span>
-              </div>
-            ` : ''}
-
             <a href="/artwork.html?id=${art.id}" class="w-full h-full flex items-center justify-center">
               <img src="${art.thumbnail_url || art.image_url}" alt="${title}" 
                    class="max-h-full max-w-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.06)] group-hover:scale-[1.03] transition duration-500 ease-out" loading="lazy">
@@ -401,14 +392,15 @@
                     ${title}
                   </h3>
                 </a>
-                ${artPrice !== null ? `
-                  <span class="text-xs font-mono font-bold text-[var(--color-accent-gold)] shrink-0">
-                    ${formatPriceDisplay(artPrice)}
-                  </span>
-                ` : ''}
               </div>
               <div class="flex items-center justify-between text-[11px] text-[var(--text-muted)] mt-1 font-light gap-2">
-                <span class="truncate">${technique}</span>
+                <div class="truncate flex items-center gap-1.5">
+                  <span>${technique}</span>
+                  ${artPrice !== null ? `
+                    <span class="text-[var(--text-subtle)] opacity-40">&bull;</span>
+                    <span class="font-mono text-[10px] text-[var(--text-subtle)] font-normal">${formatPriceDisplay(artPrice)}</span>
+                  ` : ''}
+                </div>
                 ${art.nationality && art.nationality !== '-' ? `
                   <span class="shrink-0 font-mono">${window.getCountryFlagBadge(art.nationality, { size: 'sm', showName: false })}</span>
                 ` : ''}
