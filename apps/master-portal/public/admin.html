@@ -569,15 +569,21 @@
         const successActions = document.getElementById("provision-success-actions");
 
         const catEl = document.getElementById("prov_catalog_url");
+        const rawEventId = document.getElementById("prov_event_id").value.trim();
+        // Create URL-safe slug (e.g. "18 Poh Chang art workshop" -> "18-poh-chang-art-workshop")
+        const safeEventId = rawEventId.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9_-]/g, '') || rawEventId;
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const targetPortalUrl = isLocal ? 'http://localhost:8787' : `https://${safeEventId}.pages.dev`;
+
         const payload = {
-          event_id: document.getElementById("prov_event_id").value.trim(),
+          event_id: safeEventId,
           event_title: document.getElementById("prov_event_title").value.trim(),
           theme: document.getElementById("prov_theme").value,
           catalog_url: catEl ? catEl.value.trim() : '',
           admin_email: document.getElementById("prov_admin_email").value.trim(),
           cloudinary_cloud_name: document.getElementById("prov_cloud_name").value.trim(),
           cloudinary_upload_preset: document.getElementById("prov_upload_preset").value.trim(),
-          portal_url: `http://localhost:8787` // In dev mode, point to local event port
+          portal_url: targetPortalUrl
         };
 
         // UI Loading state
@@ -617,14 +623,14 @@
 
             terminalLogs.innerHTML += `
               <div class="text-slate-500 mt-2">------------------------------------------------------------</div>
-              <div class="text-emerald-300 font-bold">✨ [OK] Event '${payload.event_id}' has been fully provisioned and linked to Master Portal!</div>
+              <div class="text-emerald-300 font-bold">✨ [OK] Event '${res.event?.event_id || payload.event_id}' has been fully provisioned and linked to Master Portal!</div>
             `;
 
             // Configure Quick Action Buttons
-            document.getElementById("success-event-title").textContent = `Web Event: ${payload.event_title}`;
-            document.getElementById("success-event-detail").textContent = `สร้างโฟลเดอร์โครงการที่ ${res.event.folder} และเปิดใช้งานในห้อง 3D เรียบร้อย`;
-            document.getElementById("btn-view-3d").href = `/gallery-3d.html?event_id=${payload.event_id}`;
-            document.getElementById("btn-view-event").href = `http://localhost:8787`;
+            document.getElementById("success-event-title").textContent = `Web Event: ${res.event?.event_title || payload.event_title}`;
+            document.getElementById("success-event-detail").textContent = `ลงทะเบียนโครงการ ${res.event?.folder || `events/${payload.event_id}`} และเปิดใช้งานในห้อง 3D เรียบร้อย`;
+            document.getElementById("btn-view-3d").href = `/gallery-3d.html?event_id=${res.event?.event_id || payload.event_id}`;
+            document.getElementById("btn-view-event").href = res.event?.portal_url || targetPortalUrl;
 
             successActions.classList.remove("hidden");
             loadEventsTable();

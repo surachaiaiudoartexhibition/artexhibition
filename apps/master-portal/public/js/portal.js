@@ -33,15 +33,24 @@ const MasterPortalAPI = {
   },
 
   async provisionEvent(data, adminKey) {
-    const res = await fetch("/api/events/provision", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-key": adminKey
-      },
-      body: JSON.stringify(data)
-    });
-    return await res.json();
+    try {
+      const res = await fetch("/api/events/provision", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-key": adminKey
+        },
+        body: JSON.stringify(data)
+      });
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (parseErr) {
+        return { success: false, error: `Server returned non-JSON response (${res.status}): ${text.slice(0, 100) || res.statusText}` };
+      }
+    } catch (netErr) {
+      return { success: false, error: `Network connection error: ${netErr.message}` };
+    }
   },
 
   async pullArtworks(eventId = null) {
