@@ -1298,7 +1298,7 @@
               <span class="text-sm font-semibold text-[var(--text-main)]">${sub.artist_name_th || sub.artist_name}</span>
               <span class="text-xs text-[var(--text-muted)] font-sans">(${(sub.academic_title_en ? sub.academic_title_en + ' ' : '')}${sub.artist_name_en || sub.artist_name})</span>
               <span>${window.getCountryFlagBadge(sub.nationality || 'Thailand', { size: 'sm', showName: true })}</span>
-              ${sub.artist_email ? `<span class="text-xs text-[var(--text-subtle)] font-mono">• ✉️ ${sub.artist_email}</span>` : ''}
+              ${(sub.artist_email && sub.artist_email !== '-') ? `<span class="text-xs text-[var(--text-subtle)] font-mono">• ✉️ ${sub.artist_email}</span>` : ''}
               <button onclick="deleteArtistByName('${encodeURIComponent(sub.artist_name)}')" class="text-[10px] text-rose-400 hover:text-rose-200 border border-rose-800/40 hover:bg-rose-900/60 px-2 py-0.5 corner-cut-4 ml-1 transition cursor-pointer" title="ลบศิลปินท่านนี้พร้อมทุกผลงาน">
                 <span>🗑️ ลบศิลปิน</span>
               </button>
@@ -1996,7 +1996,7 @@
 
           <div class="mt-3.5 pt-3 border-t border-[var(--border-subtle)] space-y-3">
             <p class="text-[11px] text-[var(--text-muted)] leading-relaxed">
-              จัดเรียงลำดับคอลัมน์ใน Excel จากซ้ายไปขวาตาม 10 คอลัมน์หลักนี้ หรือใช้ชื่อหัวตาราง (Header) ตามที่กำหนด ระบบจะทำการดึงข้อมูลและประกบคู่กับภาพในช่องที่ 1 และ 2 ให้อัตโนมัติ:
+              จัดเรียงลำดับคอลัมน์ใน Excel จากซ้ายไปขวาตาม 11 คอลัมน์มาตรฐานนี้ หรือใช้ชื่อหัวตาราง (Header) ตามที่กำหนด ระบบจะทำการดึงข้อมูลและประกบคู่กับภาพในช่องที่ 1 และ 2 ให้อัตโนมัติ:
             </p>
 
             <!-- Column Order Table -->
@@ -2354,7 +2354,7 @@
                      "002,เฉลิมชัย โฆษิตพิพัฒน์,Thailand,พระพุทธเมตตาบารมี,สีอะคริลิคปิดทอง,120 x 100 cm.,2005,2000000,ผู้สร้างวัดร่องขุน,ความสว่างไสวแห่งปัญญา,chalerm@example.com\n" +
                      "003,Claude Monet,France,Water Lilies Harmony,Oil on Canvas,100 x 100 cm.,1916,5000000,French Impressionist master,Light and reflections,monet@example.com\n" +
                      "004,ศิลปินใหม่ทดสอบ,Japan,ซากุระราตรี,สีน้ำและหมึกญี่ปุ่น,80 x 60 cm.,2024,120000,ศิลปินร่วมสมัย,ความงามอันร่วงโรยและเกิดใหม่,\n";
-      const blob = new Blob([sample], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob(["\uFEFF" + sample], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -2598,58 +2598,139 @@
       if (!rawText) return [];
       let text = rawText.trim();
       if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-      const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
-      if (lines.length < 2) return [];
 
-      const isTab = lines[0].includes('\t');
-      const parseRow = (rowStr) => {
-        if (isTab) return rowStr.split('\t').map(c => c.trim().replace(/^"|"$/g, ''));
-        const res = [];
-        let inQuotes = false;
-        let cur = '';
-        for (let i = 0; i < rowStr.length; i++) {
-          const ch = rowStr[i];
-          if (ch === '"') inQuotes = !inQuotes;
-          else if (ch === ',' && !inQuotes) {
-            res.push(cur.trim());
-            cur = '';
-          } else cur += ch;
+      const firstNewline = text.indexOf('\n');
+      const firstLine = firstNewline !== -1 ? text.slice(0, firstNewline) : text;
+      const isTab = firstLine.includes('\t');
+
+      const rows = [];
+      let row = [];
+      let cell = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const nextCh = text[i + 1];
+
+        if (ch === '"') {
+          if (inQuotes && nextCh === '"') {
+            cell += '"';
+            i++; // skip escaped quote
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (!inQuotes && ((isTab && ch === '\t') || (!isTab && ch === ','))) {
+          row.push(cell.trim());
+          cell = '';
+        } else if (!inQuotes && (ch === '\r' || ch === '\n')) {
+          if (ch === '\r' && nextCh === '\n') i++;
+          row.push(cell.trim());
+          if (row.some(c => c !== '')) rows.push(row);
+          row = [];
+          cell = '';
+        } else {
+          cell += ch;
         }
-        res.push(cur.trim());
-        return res;
-      };
+      }
+      if (cell !== '' || row.length > 0) {
+        row.push(cell.trim());
+        if (row.some(c => c !== '')) rows.push(row);
+      }
+
+      if (rows.length === 0) return [];
 
       const cleanDash = (v) => (!v || String(v).trim() === '' || String(v).trim() === '-') ? '-' : String(v).trim();
 
-      const rawHeaders = parseRow(lines[0]);
-      const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9\u0E00-\u0E7F]/g, ''));
-      
-      // Smart detection: check if first line is indeed a header
-      const knownKeywords = ['id', 'no', 'ลำดับ', 'รหัส', 'artist', 'ศิลปิน', 'name', 'title', 'ผลงาน', 'ชื่องาน', 'medium', 'เทคนิค', 'dimensions', 'ขนาด', 'year', 'ปี', 'price', 'ราคา', 'bio', 'concept', 'ประเทศ', 'country'];
-      const isHeaderRow = headers.some(h => knownKeywords.some(kw => h.includes(kw)));
+      function isGenuineHeaderRow(r) {
+        if (!r || r.length === 0) return false;
+        const firstCell = String(r[0]).trim();
+        if (/^\d+$/.test(firstCell)) return false;
+
+        const norm = r.map(h => String(h).toLowerCase().replace(/[\s\-_/()[\]]/g, '').replace(/[^a-z0-9\u0E00-\u0E7F]/g, ''));
+        const headerKeywords = [
+          'id', 'no', 'number', 'code', 'ลำดับ', 'รหัส', 'ลำดับที่',
+          'artistname', 'artist', 'creator', 'ศิลปิน', 'ชื่อศิลปิน', 'ชื่อนามสกุล', 'นามสกุล', 'ชื่อสกุล', 'ผู้สร้างสรรค์',
+          'artworktitle', 'artworkname', 'artwork', 'title', 'ชื่องาน', 'ชื่อผลงาน', 'ผลงาน', 'ชื่อภาพ',
+          'medium', 'technique', 'เทคนิค', 'วัสดุ',
+          'dimensions', 'dimension', 'size', 'ขนาด',
+          'year', 'yearcreated', 'ปี', 'ปีที่สร้าง',
+          'price', 'ราคา',
+          'bio', 'biography', 'artistbio', 'ประวัติ', 'ประวัติศิลปิน',
+          'concept', 'description', 'แนวคิด', 'คำอธิบาย',
+          'country', 'nationality', 'ประเทศ', 'สัญชาติ',
+          'email', 'อีเมล', 'อีเมล์', 'mail'
+        ];
+
+        let matches = 0;
+        for (const c of norm) {
+          if (!c) continue;
+          if (headerKeywords.some(kw => c === kw || c === kw + 's' || (c.length <= 25 && c.includes(kw)))) {
+            matches++;
+          }
+        }
+        return matches >= (r.length <= 2 ? 1 : 2);
+      }
+
+      const isHeaderRow = isGenuineHeaderRow(rows[0]);
+      const rawHeaders = isHeaderRow ? rows[0] : [];
+      const headers = rawHeaders.map(h => String(h).toLowerCase().replace(/[\s\-_/()[\]]/g, '').replace(/[^a-z0-9\u0E00-\u0E7F]/g, ''));
 
       const items = [];
       const startIdx = isHeaderRow ? 1 : 0;
 
-      for (let i = startIdx; i < lines.length; i++) {
-        const vals = parseRow(lines[i]);
+      for (let i = startIdx; i < rows.length; i++) {
+        const vals = rows[i];
         const obj = {};
 
         if (isHeaderRow) {
           // Mode A: Dynamic Column Matching by Header Names
           headers.forEach((h, idx) => {
             const val = vals[idx] !== undefined ? cleanDash(vals[idx]) : '-';
-            if (['id', 'no', 'ลำดับ', 'รหัส'].some(k => h.includes(k))) obj.id = val;
-            else if (['artistname', 'artist', 'ชื่อศิลปิน', 'ศิลปิน', 'creator', 'name'].some(k => h.includes(k))) obj.artist_name = val;
-            else if (['country', 'nationality', 'ประเทศ', 'สัญชาติ'].some(k => h.includes(k))) obj.nationality = val;
-            else if (['artworktitle', 'title', 'ชื่องาน', 'ชื่อผลงาน', 'ผลงาน'].some(k => h.includes(k))) obj.title = val;
-            else if (['medium', 'technique', 'เทคนิค', 'วัสดุ'].some(k => h.includes(k))) obj.technique = val;
-            else if (['dimensions', 'dimension', 'size', 'ขนาด'].some(k => h.includes(k))) obj.dimensions = val;
-            else if (['year', 'yearcreated', 'ปี', 'ปีที่สร้าง'].some(k => h.includes(k))) obj.year_created = val;
-            else if (['price', 'ราคา'].some(k => h.includes(k))) obj.price = val;
-            else if (['bio', 'ประวัติ', 'ประวัติศิลปิน'].some(k => h.includes(k))) obj.artist_bio = val;
-            else if (['concept', 'description', 'แนวคิด', 'คำอธิบาย'].some(k => h.includes(k))) obj.description = val;
-            else if (['email', 'อีเมล', 'อีเมล์', 'mail', 'e-mail'].some(k => h.includes(k))) obj.email = val;
+
+            // 1. Email
+            if (['email', 'e-mail', 'mail', 'อีเมล', 'อีเมล์'].some(k => h === k || h.includes(k))) {
+              obj.email = val;
+            }
+            // 2. ID / ลำดับ / รหัส
+            else if (['id', 'no', 'number', 'code', 'ลำดับ', 'รหัส', 'ลำดับที่', 'รหัสผลงาน'].some(k => h === k || h.startsWith(k))) {
+              obj.id = val;
+            }
+            // 3. Artwork Title (checked BEFORE artist name so 'artworkname' or 'ชื่อผลงาน' is assigned to title)
+            else if (['artworktitle', 'artworkname', 'artwork', 'title', 'ชื่องาน', 'ชื่อผลงาน', 'ผลงาน', 'ชื่อภาพ', 'ชื่อชิ้นงาน', 'ชิ้นงาน'].some(k => h === k || h.includes(k))) {
+              obj.title = val;
+            }
+            // 4. Artist Name
+            else if (['artistname', 'artist', 'creator', 'ชื่อศิลปิน', 'ศิลปิน', 'ชื่อนามสกุล', 'นามสกุล', 'ชื่อสกุล', 'ผู้สร้างสรรค์', 'ผู้จัดทำ', 'name', 'ชื่อ'].some(k => h === k || h.includes(k))) {
+              obj.artist_name = val;
+            }
+            // 5. Country / Nationality
+            else if (['country', 'nationality', 'nation', 'ประเทศ', 'สัญชาติ', 'ชาติ'].some(k => h === k || h.includes(k))) {
+              obj.nationality = val;
+            }
+            // 6. Medium / Technique
+            else if (['medium', 'technique', 'เทคนิค', 'วัสดุ', 'เทคนิควัสดุ', 'เทคนิคและวัสดุ', 'วัสดุอุปกรณ์'].some(k => h === k || h.includes(k))) {
+              obj.technique = val;
+            }
+            // 7. Dimensions / Size
+            else if (['dimensions', 'dimension', 'size', 'ขนาด', 'ขนาดผลงาน', 'มิติ', 'กว้างยาว'].some(k => h === k || h.includes(k))) {
+              obj.dimensions = val;
+            }
+            // 8. Year
+            else if (['year', 'yearcreated', 'ปี', 'ปีที่สร้าง', 'ปีคศ', 'ปีพศ', 'พศ', 'คศ'].some(k => h === k || h.includes(k))) {
+              obj.year_created = val;
+            }
+            // 9. Price
+            else if (['price', 'ราคา', 'ราคาจำหน่าย', 'ราคาขาย', 'มูลค่า'].some(k => h === k || h.includes(k))) {
+              obj.price = val;
+            }
+            // 10. Bio
+            else if (['bio', 'biography', 'artistbio', 'ประวัติ', 'ประวัติศิลปิน', 'ประวัติย่อ'].some(k => h === k || h.includes(k))) {
+              obj.artist_bio = val;
+            }
+            // 11. Concept / Description
+            else if (['concept', 'description', 'statement', 'แนวคิด', 'แนวความคิด', 'คำอธิบาย', 'แรงบันดาลใจ', 'คำอธิบายผลงาน'].some(k => h === k || h.includes(k))) {
+              obj.description = val;
+            }
           });
 
           // Ensure any missing standard fields default to '-'
@@ -2658,7 +2739,7 @@
             if (!obj[f] || obj[f] === '') obj[f] = '-';
           });
         } else {
-          // Mode B: Headerless Fallback (Standard 10-Column Sequence)
+          // Mode B: Headerless Fallback (Standard 11-Column Sequence)
           if (vals.length === 2) {
             obj.title = cleanDash(vals[0]);
             obj.artist_name = cleanDash(vals[1]);
@@ -2669,6 +2750,7 @@
             obj.price = '-';
             obj.artist_bio = '-';
             obj.description = '-';
+            obj.email = '-';
           } else {
             obj.id = cleanDash(vals[0]);
             obj.artist_name = cleanDash(vals[1]);
@@ -2680,6 +2762,7 @@
             obj.price = cleanDash(vals[7]);
             obj.artist_bio = cleanDash(vals[8]);
             obj.description = cleanDash(vals[9]);
+            obj.email = vals[10] !== undefined ? cleanDash(vals[10]) : '-';
           }
         }
 
@@ -2802,7 +2885,7 @@
         } else if (matchedArtwork) {
           statusBadge = '<span class="px-2 py-0.5 corner-cut-4 bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-bold">🟡 มีรูปผลงาน</span>';
         } else {
-          statusBadge = '<span class="px-2 py-0.5 corner-cut-4 bg-slate-800 text-slate-400 border border-slate-700 text-[10px]">⚪ ภาพจำลอง</span>';
+          statusBadge = '<span class="px-2 py-0.5 corner-cut-4 bg-slate-800 text-slate-400 border border-slate-700 text-[10px]">⚪ รอแนบรูปภาพ</span>';
         }
 
         pairedDataList.push({
@@ -2907,6 +2990,7 @@
         description: cleanDash(item.description),
         artist_bio: cleanDash(item.artist_bio),
         nationality: cleanDash(item.nationality),
+        artist_email: item.email && item.email !== '-' ? item.email.trim() : '',
         status: statusChoice,
         image_data_url: item.matchedArtworkFile ? item.matchedArtworkFile.dataUrl : undefined,
         artist_avatar_data_url: item.matchedArtistFile ? item.matchedArtistFile.dataUrl : undefined

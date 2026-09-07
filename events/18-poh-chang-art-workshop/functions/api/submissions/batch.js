@@ -85,7 +85,7 @@ export async function onRequestPost(context) {
         nationality, technique, dimensions,
         year_created, price, status, display_order,
         title_th, artist_name_th, artist_bio_th,
-        technique_th, description_th
+        technique_th, description_th, artist_email
       ) VALUES (
         ?, ?, ?,
         ?, ?, ?,
@@ -93,7 +93,7 @@ export async function onRequestPost(context) {
         ?, ?, ?,
         ?, ?, ?, ?,
         ?, ?, ?,
-        ?, ?
+        ?, ?, ?
       )
     `);
 
@@ -138,6 +138,9 @@ export async function onRequestPost(context) {
       const pr = cleanDash(item.price || item.ราคา);
       const stat = item.status || defaultStatus;
 
+      let emailRaw = item.artist_email || item.email || item.อีเมล || item.อีเมล์ || '';
+      let emailVal = (emailRaw && String(emailRaw).trim() !== '-' && String(emailRaw).includes('@')) ? String(emailRaw).trim() : '';
+
       batchStatements.push(
         insertStmt.bind(
           title, artist, desc,
@@ -146,7 +149,7 @@ export async function onRequestPost(context) {
           nat, tech, dims,
           yr, pr, stat, currentOrder,
           title, artist, bio,
-          tech, desc
+          tech, desc, emailVal
         )
       );
     }
