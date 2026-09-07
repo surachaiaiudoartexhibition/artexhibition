@@ -9,7 +9,7 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "d1-18-poh-chang-art-workshop"
-database_id = "placeholder-18-poh-chang-art-workshop"
+database_id = "039a77cf-6fda-4532-9712-ec4eca1844c8"
 
 [vars]
 EVENT_ID = "18-poh-chang-art-workshop"
