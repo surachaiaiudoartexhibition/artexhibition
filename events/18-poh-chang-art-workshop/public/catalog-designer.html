@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalog Designer Studio | สตูดิโอจัดหน้าสูจิบัตรอิสระ (Admin Only)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Maitree:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+    .font-serif-art { font-family: 'Maitree', serif; }
+    .font-cinzel { font-family: 'Cinzel', serif; }
+    
+    .studio-grid-dots {
+      background-image: radial-gradient(var(--border-subtle) 1.2px, transparent 1.2px);
+      background-size: 20px 20px;
+    }
+    
+    .canvas-grid-overlay {
+      background-image: 
+        linear-gradient(to right, rgba(212, 175, 55, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(212, 175, 55, 0.15) 1px, transparent 1px);
+      background-size: 8.333% 5%;
+    }
+
+    .resize-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ffffff;
+      border: 2px solid var(--color-accent-gold);
+      border-radius: 2px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      z-index: 60;
+    }
+    .handle-nw { top: -5px; left: -5px; cursor: nwse-resize; }
+    .handle-n  { top: -5px; left: calc(50% - 5px); cursor: ns-resize; }
+    .handle-ne { top: -5px; right: -5px; cursor: nesw-resize; }
+    .handle-e  { top: calc(50% - 5px); right: -5px; cursor: ew-resize; }
+    .handle-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+    .handle-s  { bottom: -5px; left: calc(50% - 5px); cursor: ns-resize; }
+    .handle-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+    .handle-w  { top: calc(50% - 5px); left: -5px; cursor: ew-resize; }
+
+    .studio-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .studio-scrollbar::-webkit-scrollbar-track { background: var(--bg-surface); }
+    .studio-scrollbar::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 4px; }
+    .studio-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--color-accent-gold); }
+  </style>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/api.js"></script>
+  <link rel="stylesheet" href="/css/themes.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body class="h-full flex flex-col overflow-hidden bg-[var(--bg-base)] text-[var(--text-main)] selection:bg-[var(--color-accent)] selection:text-white">
+
+  <!-- 🔒 ADMIN SECURITY LOCK SCREEN -->
+  <div id="admin-auth-shield" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl hidden">
+    <div class="max-w-md w-full bg-[var(--bg-surface-solid)] border border-[var(--border-accent)] corner-cut-16 p-6 sm:p-8 shadow-2xl text-center space-y-5">
+      <div class="w-16 h-16 corner-cut-10 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-gold)] mx-auto flex items-center justify-center text-3xl shadow-inner font-serif-luxury font-bold">
+        พ.ช.
+      </div>
+      <div>
+        <h2 class="text-lg font-bold font-serif-luxury text-[var(--text-main)] tracking-wide" data-i18n="designer_admin_lock">ระบบความปลอดภัย: เฉพาะผู้ดูแลระบบ (Admin Only)</h2>
+        <p class="text-xs text-[var(--text-muted)] mt-2 leading-relaxed" data-i18n="designer_enter_key">
+          สตูดิโอนี้ใช้สำหรับภัณฑารักษ์ในการจัดวางเลย์เอาต์สูจิบัตร กรุณาระบุรหัส Admin Key เพื่อเข้าใช้งาน
+        </p>
+      </div>
+      <div class="space-y-3">
+        <input type="password" id="auth-admin-key-input" placeholder="ใส่รหัส Admin Key (เช่น admin123)" class="w-full px-4 py-2.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] focus:border-[var(--border-accent)] corner-cut-6 text-center font-mono text-[var(--text-main)] text-sm focus:outline-none transition" />
+        <p id="auth-error-msg" class="text-rose-400 text-xs hidden" data-i18n="designer_auth_failed">รหัส Admin Key ไม่ถูกต้อง</p>
+        <button onclick="handleVerifyAdminKey()" class="w-full py-2.5 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-black font-bold text-xs shadow-md transition cursor-pointer">
+          🔓 ยืนยันสิทธิ์เข้าใช้งานสตูดิโอ
+        </button>
+        <a href="/admin.html" class="block text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition">← กลับหน้าแดชบอร์ดแอดมิน</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🚀 LEVEL 1: STUDIO TOP NAVIGATION BAR (Clean, Non-Cluttered 3-Zone Layout) -->
+  <header class="h-14 bg-[var(--bg-surface)] backdrop-blur-md border-b border-[var(--border-subtle)] px-4 flex items-center justify-between z-40 shrink-0 select-none shadow-sm gap-2">
+    
+    <!-- Left Zone: Brand Emblem & Back to Admin -->
+    <div class="flex items-center gap-2.5 shrink-0">
+      <a href="/admin.html" class="flex items-center gap-2 group" title="กลับหน้าแดชบอร์ดแอดมิน">
+        <div class="w-8 h-8 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-gold)] flex items-center justify-center font-bold text-xs font-serif-luxury shadow-inner">
+          พ.ช.
+        </div>
+        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition">
+          <span>←</span>
+          <span data-i18n="designer_back_to_admin">แดชบอร์ดแอดมิน</span>
+        </div>
+      </a>
+
+      <div class="h-5 w-px bg-[var(--border-subtle)] hidden md:block"></div>
+
+      <!-- Studio Title Badge -->
+      <div class="hidden lg:flex items-center gap-1.5">
+        <span class="text-xs font-bold text-[var(--text-main)] tracking-wide font-serif-luxury" data-i18n="designer_studio_title">Catalog Designer Studio</span>
+        <span class="text-[9px] uppercase font-mono px-1.5 py-0.2 corner-cut-4 bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] font-semibold">Admin</span>
+      </div>
+    </div>
+
+    <!-- Center Zone: Artwork Navigator & Page Switcher -->
+    <div class="flex items-center gap-1.5 shrink-0">
+      <!-- Pager Pill -->
+      <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-2 py-1 corner-cut-6 text-xs shadow-inner">
+        <button onclick="changeArtworkSample(-1)" class="w-6 h-6 corner-cut-4 hover:bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition flex items-center justify-center cursor-pointer" title="ผลงานก่อนหน้า (Previous)">
+          ◀
+        </button>
+        <span id="artwork-sample-badge" class="font-mono text-[var(--color-accent-gold)] font-bold px-1">#1</span>
+        <span id="artwork-sample-title" class="text-[var(--text-main)] truncate max-w-[110px] sm:max-w-[180px] font-medium text-xs">กำลังโหลด...</span>
+        <button onclick="changeArtworkSample(1)" class="w-6 h-6 corner-cut-4 hover:bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition flex items-center justify-center cursor-pointer" title="ผลงานถัดไป (Next)">
+          ▶
+        </button>
+      </div>
+
+      <!-- Drawer Button: View All Pages -->
+      <button onclick="togglePagesDrawer()" class="flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition cursor-pointer" title="พรีวิวทุกหน้าผลงาน">
+        <span>📚</span>
+        <span class="hidden sm:inline" data-i18n="designer_preview_all">ทุกหน้า</span>
+        <span id="total-artworks-badge" class="px-1.5 py-0.2 corner-cut-4 bg-[var(--bg-surface)] text-[10px] text-[var(--color-accent-gold)] font-mono">0</span>
+      </button>
+    </div>
+
+    <!-- Right Zone: Mode Override, View Catalog, Save & Language -->
+    <div class="flex items-center gap-2 shrink-0">
+      <!-- Page Override Mode Controls -->
+      <div id="page-override-controls" class="flex items-center gap-1.5">
+        <button id="btn-toggle-override" onclick="toggleCurrentPageOverride()" class="flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-semibold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)]">
+          <span id="override-icon">🔓</span>
+          <span id="override-text" class="hidden md:inline" data-i18n="designer_unlock_page">ปลดล็อคจัดเฉพาะหน้านี้</span>
+        </button>
+        <button id="btn-revert-master" onclick="revertCurrentPageToMaster()" class="text-[11px] text-[var(--text-muted)] hover:text-rose-400 hover:underline transition hidden cursor-pointer" data-i18n="designer_reset_master" title="ยกเลิกจัดเฉพาะหน้า คืนค่าแม่แบบหลัก">
+          คืนค่าแม่แบบหลัก
+        </button>
+      </div>
+
+      <!-- View Actual Catalog Link -->
+      <a href="/catalog.html" target="_blank" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition" title="เปิดดูสูจิบัตรจริงในแท็บใหม่">
+        <span>👁️</span>
+        <span class="hidden lg:inline">ดูสูจิบัตร</span>
+      </a>
+
+      <!-- Save Button (Primary Action) -->
+      <button onclick="saveDesignerLayout()" class="flex items-center gap-1.5 px-3.5 py-1.5 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-black text-xs font-bold shadow-md transition cursor-pointer">
+        <span>💾</span>
+        <span data-i18n="designer_save_btn">บันทึกเลย์เอาต์</span>
+      </button>
+
+      <div class="h-5 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
+
+      <!-- Language Switcher -->
+      <div id="lang-switcher"></div>
+    </div>
+  </header>
+
+  <!-- 🛠️ LEVEL 2: DOCKED STUDIO SUB-TOOLBAR (Docked Below Header, Eliminating Canvas Clutter) -->
+  <div class="h-11 bg-[var(--bg-surface-solid)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between text-xs shrink-0 select-none z-30 gap-2">
+    
+    <!-- Group A: Add Element & Layout Presets Dropdowns -->
+    <div class="flex items-center gap-2 shrink-0">
+      <!-- Add Element Dropdown -->
+      <div class="relative">
+        <button onclick="toggleDropdown('add-block-dropdown')" class="flex items-center gap-1.5 px-3 py-1 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)] font-semibold transition hover:brightness-110 cursor-pointer shadow-sm">
+          <span>+</span>
+          <span data-i18n="designer_add_element">เพิ่มองค์ประกอบ</span>
+          <span class="text-[9px] opacity-70">▼</span>
+        </button>
+        <div id="add-block-dropdown" class="absolute left-0 mt-2 w-64 bg-[var(--bg-surface-solid)] border border-[var(--border-accent)] corner-cut-8 p-1.5 shadow-2xl hidden z-50 space-y-0.5 text-xs max-h-80 overflow-y-auto studio-scrollbar">
+          <div class="px-2.5 py-1 text-[10px] font-bold text-[var(--color-accent-gold)] uppercase tracking-wider">เลือกบล็อกเพื่อวางในหน้า</div>
+          <button onclick="addBlockElement('artwork_image')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>🖼️</span> <span>ภาพถ่ายผลงาน (Artwork Image)</span>
+          </button>
+          <button onclick="addBlockElement('artwork_title')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>📝</span> <span>ชื่อผลงาน (Artwork Title)</span>
+          </button>
+          <button onclick="addBlockElement('artist_name')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>👨‍🎨</span> <span>ชื่อศิลปิน & ตำแหน่ง (Artist)</span>
+          </button>
+          <button onclick="addBlockElement('artist_photo')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>👤</span> <span>ภาพถ่ายศิลปิน (Artist Photo)</span>
+          </button>
+          <button onclick="addBlockElement('country_flag')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>🚩</span> <span>ธงชาติประเทศ (Country Flag)</span>
+          </button>
+          <button onclick="addBlockElement('technique')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>🎨</span> <span>เทคนิค / วัสดุ (Medium)</span>
+          </button>
+          <button onclick="addBlockElement('dimensions')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>📐</span> <span>ขนาดผลงาน (Dimensions)</span>
+          </button>
+          <button onclick="addBlockElement('year_created')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>📅</span> <span>ปีที่สร้างสรรค์ (Year Created)</span>
+          </button>
+          <button onclick="addBlockElement('price')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>💰</span> <span>ราคาผลงาน (Price)</span>
+          </button>
+          <button onclick="addBlockElement('concept')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>💬</span> <span>แนวคิด / คำบรรยาย (Concept)</span>
+          </button>
+          <button onclick="addBlockElement('qr_code')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>📱</span> <span>QR Code ชม 3D Gallery</span>
+          </button>
+          <button onclick="addBlockElement('page_number')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>🔢</span> <span>เลขหน้าผลงาน (Page Number)</span>
+          </button>
+          <button onclick="addBlockElement('custom_text')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>🔤</span> <span>ข้อความอิสระ (Custom Text)</span>
+          </button>
+          <button onclick="addBlockElement('divider_line')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-2 text-[var(--text-main)]">
+            <span>➖</span> <span>เส้นคั่นแบ่งส่วน (Divider Line)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Presets Dropdown -->
+      <div class="relative">
+        <button onclick="toggleDropdown('preset-dropdown')" class="flex items-center gap-1.5 px-2.5 py-1 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-[var(--text-main)] transition cursor-pointer shadow-sm">
+          <span>📐</span>
+          <span class="hidden sm:inline" data-i18n="designer_preset">ชุดจัดหน้า</span>
+          <span class="text-[9px] opacity-70">▼</span>
+        </button>
+        <div id="preset-dropdown" class="absolute left-0 mt-2 w-56 bg-[var(--bg-surface-solid)] border border-[var(--border-accent)] corner-cut-8 p-1.5 shadow-2xl hidden z-50 space-y-0.5 text-xs">
+          <div class="px-2.5 py-1 text-[10px] font-bold text-[var(--color-accent-gold)] uppercase tracking-wider">เลือกสไตล์สำเร็จรูป</div>
+          <button onclick="applyPresetStyle('split')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center justify-between text-[var(--text-main)]">
+            <span>🏛️ Classic Split (ภาพซ้าย/ข้อมูลขวา)</span>
+          </button>
+          <button onclick="applyPresetStyle('hero')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center justify-between text-[var(--text-main)]">
+            <span>🖼️ Hero Showcase (ภาพเด่นบน)</span>
+          </button>
+          <button onclick="applyPresetStyle('minimal')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center justify-between text-[var(--text-main)]">
+            <span>🕊️ Minimal Center (กึ่งกลางสะอาดตา)</span>
+          </button>
+          <button onclick="applyPresetStyle('editorial')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center justify-between text-[var(--text-main)]">
+            <span>📰 Editorial Asymmetric (นิตยสาร)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group B: Canvas View Helpers (Zoom, Grid, Snap, Margins, Paper Tone) -->
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      
+      <!-- Zoom Controls -->
+      <div class="flex items-center gap-1 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-1.5 py-0.5 corner-cut-6">
+        <button onclick="setZoom(-10)" class="w-5 h-5 corner-cut-4 hover:bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center justify-center font-bold cursor-pointer">-</button>
+        <span id="zoom-level-display" class="font-mono text-[11px] text-[var(--color-accent-gold)] w-10 text-center font-bold">100%</span>
+        <button onclick="setZoom(10)" class="w-5 h-5 corner-cut-4 hover:bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center justify-center font-bold cursor-pointer">+</button>
+        <button onclick="resetZoom()" class="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-main)] px-1 py-0.5 corner-cut-4 hover:bg-[var(--bg-surface)] transition">Fit</button>
+      </div>
+
+      <div class="h-4 w-px bg-[var(--border-subtle)]"></div>
+
+      <!-- Visual Helpers: Grid, Snap, Margin Chips -->
+      <div class="flex items-center gap-1.5">
+        <label class="flex items-center gap-1 px-2 py-0.5 corner-cut-4 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] cursor-pointer text-[11px] text-[var(--text-muted)] hover:text-[var(--text-main)] select-none">
+          <input type="checkbox" id="toggle-grid-chk" checked onchange="toggleGridDisplay(this.checked)" class="accent-[var(--color-accent-gold)] cursor-pointer w-3 h-3" />
+          <span data-i18n="designer_show_grid">Grid</span>
+        </label>
+
+        <label class="flex items-center gap-1 px-2 py-0.5 corner-cut-4 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] cursor-pointer text-[11px] text-[var(--text-muted)] hover:text-[var(--text-main)] select-none">
+          <input type="checkbox" id="toggle-snap-chk" checked class="accent-[var(--color-accent-gold)] cursor-pointer w-3 h-3" />
+          <span data-i18n="designer_snap_grid">Snap</span>
+        </label>
+
+        <label class="flex items-center gap-1 px-2 py-0.5 corner-cut-4 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] cursor-pointer text-[11px] text-[var(--text-muted)] hover:text-[var(--text-main)] select-none">
+          <input type="checkbox" id="toggle-margin-chk" checked onchange="toggleMarginDisplay(this.checked)" class="accent-[var(--color-accent-gold)] cursor-pointer w-3 h-3" />
+          <span data-i18n="designer_show_margins">Margin</span>
+        </label>
+      </div>
+
+      <div class="h-4 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
+
+      <!-- Paper Tone Selection -->
+      <div class="hidden sm:flex items-center gap-1">
+        <span class="text-[10px] text-[var(--text-subtle)] font-mono mr-1">กระดาษ:</span>
+        <button onclick="setCanvasBackground('#FFFFFF', '#1F1C17')" class="w-4 h-4 corner-cut-2 bg-white border border-slate-400 hover:scale-110 transition shadow-sm" title="Fine Art White"></button>
+        <button onclick="setCanvasBackground('#0d0f17', '#F3F4F6')" class="w-4 h-4 corner-cut-2 bg-[#0d0f17] border border-[var(--border-accent)] hover:scale-110 transition shadow-sm" title="Luxury Dark"></button>
+      </div>
+    </div>
+
+    <!-- Group C: Mode Status Badge & Shortcut Hints -->
+    <div class="hidden lg:flex items-center gap-2 shrink-0">
+      <div id="canvas-mode-indicator" class="corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)]">
+        🌐 MASTER TEMPLATE
+      </div>
+      <span class="text-[10px] font-mono text-[var(--text-subtle)] hidden xl:inline">Ctrl+S เซฟ • Del ลบ • Ctrl+D ก๊อปปี้</span>
+    </div>
+
+  </div>
+
+  <!-- 🛠️ LEVEL 3: UNOBSTRUCTED WORKSPACE & A4 CANVAS -->
+  <div class="flex-1 relative flex overflow-hidden studio-grid-dots">
+
+    <!-- MAIN CANVAS CONTAINER -->
+    <main id="viewport-container" class="flex-1 overflow-auto flex items-center justify-center p-6 sm:p-8 studio-scrollbar select-none" onclick="deselectAllBlocks()">
+      
+      <div id="canvas-zoom-wrapper" class="transition-transform duration-150 ease-out my-auto">
+        
+        <!-- Dimensions & Title Tag -->
+        <div class="flex justify-between items-center text-[10px] font-mono text-[var(--text-subtle)] mb-2 px-1">
+          <span>A4 PORTRAIT (210 × 297 mm)</span>
+          <span class="text-[9px] uppercase tracking-wider text-[var(--color-accent-gold)]">Freeform Layout Canvas</span>
+          <span>8.27" × 11.69"</span>
+        </div>
+
+        <!-- Simulated A4 Paper (Aspect Ratio 1 : 1.414) -->
+        <div id="designer-canvas" 
+             class="relative w-[500px] sm:w-[580px] md:w-[650px] aspect-[1/1.414] bg-white text-slate-900 rounded-[2px] shadow-2xl overflow-hidden select-none touch-none border border-[var(--border-subtle)]"
+             style="box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--border-subtle);">
+          
+          <!-- Margin Guide Lines -->
+          <div id="canvas-margin-guide" class="absolute inset-[5%] border border-dashed border-[var(--border-accent)] pointer-events-none z-10">
+            <span class="absolute top-1 left-1.5 text-[8px] font-mono text-[var(--color-accent-gold)] uppercase opacity-80">Margin 5%</span>
+          </div>
+
+          <!-- 12-Column Grid Lines Overlay -->
+          <div id="canvas-grid-overlay" class="absolute inset-0 pointer-events-none z-10 canvas-grid-overlay opacity-60"></div>
+
+          <!-- Dynamic Blocks Container -->
+          <div id="canvas-blocks-layer" class="absolute inset-0 z-20"></div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- 🎛️ LEVEL 4: DOCKED CONTEXTUAL INSPECTOR (Clean, Grouped, Appears Only on Selection) -->
+    <div id="block-inspector-bar" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 bg-[var(--bg-surface-solid)]/98 backdrop-blur-2xl border border-[var(--border-accent)] corner-cut-12 p-2 px-4 shadow-2xl flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs text-[var(--text-main)] max-w-[96vw] overflow-x-auto studio-scrollbar hidden select-none">
+      
+      <!-- Group 1: Block Label & Operations -->
+      <div class="flex items-center gap-1.5 pr-2.5 border-r border-[var(--border-subtle)]">
+        <span id="inspector-block-label" class="font-bold text-[var(--color-accent-gold)] font-mono text-xs">Block</span>
+        <button onclick="duplicateSelectedBlock()" class="p-1 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition" title="ทำสำเนาบล็อก (Ctrl+D)">
+          📋
+        </button>
+        <button onclick="deleteSelectedBlock()" class="p-1 corner-cut-4 hover:bg-rose-500/20 text-[var(--text-muted)] hover:text-rose-400 transition" title="ลบบล็อก (Delete)">
+          🗑️
+        </button>
+      </div>
+
+      <!-- Group 2: Typography (Font Family) -->
+      <div id="inspector-font-group" class="flex items-center gap-1.5 pr-2.5 border-r border-[var(--border-subtle)]">
+        <span class="text-[10px] text-[var(--text-subtle)] font-mono">Font:</span>
+        <select id="insp-font-family" onchange="updateSelectedBlockProp('fontFamily', this.value)" class="bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-4 px-2 py-1 text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--border-accent)]">
+          <option value="Cormorant Garamond">Cormorant Garamond (Fine Art / Luxury)</option>
+          <option value="Noto Serif Thai">Noto Serif Thai (หอศิลป์ / ทางการ)</option>
+          <option value="Maitree">Maitree (มีหัว / หรูหรา)</option>
+          <option value="Sarabun">Sarabun (ทางการ)</option>
+          <option value="Cinzel">Cinzel (สากลคลาสสิก)</option>
+          <option value="Prompt">Prompt (โมเดิร์น)</option>
+        </select>
+      </div>
+
+      <!-- Group 3: Font Size & Weight -->
+      <div id="inspector-size-group" class="flex items-center gap-1 pr-2.5 border-r border-[var(--border-subtle)]">
+        <span class="text-[10px] text-[var(--text-subtle)] font-mono">Size:</span>
+        <input type="number" id="insp-font-size" min="6" max="48" step="1" onchange="updateSelectedBlockProp('fontSizePt', parseFloat(this.value))" class="w-12 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-4 px-1.5 py-1 text-xs text-center font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--border-accent)]" />
+        <span class="text-[10px] text-[var(--text-subtle)]">pt</span>
+        <button id="insp-btn-bold" onclick="toggleSelectedBlockProp('fontWeight', 'bold', 'normal')" class="w-6 h-6 corner-cut-4 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] font-bold flex items-center justify-center cursor-pointer">B</button>
+        <button id="insp-btn-italic" onclick="toggleSelectedBlockProp('fontStyle', 'italic', 'normal')" class="w-6 h-6 corner-cut-4 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] italic font-serif flex items-center justify-center cursor-pointer">I</button>
+      </div>
+
+      <!-- Group 4: Text Alignment -->
+      <div id="inspector-align-group" class="flex items-center gap-1 pr-2.5 border-r border-[var(--border-subtle)]">
+        <button onclick="updateSelectedBlockProp('textAlign', 'left')" class="p-1 corner-cut-4 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]" title="ชิดซ้าย">⇤</button>
+        <button onclick="updateSelectedBlockProp('textAlign', 'center')" class="p-1 corner-cut-4 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]" title="กึ่งกลาง">↔</button>
+        <button onclick="updateSelectedBlockProp('textAlign', 'right')" class="p-1 corner-cut-4 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]" title="ชิดขวา">⇥</button>
+      </div>
+
+      <!-- Group 5: Color Swatches -->
+      <div class="flex items-center gap-1.5 pr-2.5 border-r border-[var(--border-subtle)]">
+        <span class="text-[10px] text-[var(--text-subtle)] font-mono">Color:</span>
+        <div class="flex items-center gap-1">
+          <button onclick="updateSelectedBlockProp('color', '#8B1B1B')" class="w-4 h-4 corner-cut-2 bg-[#8B1B1B] border border-white/20 hover:scale-110 transition" title="แดงเพาะช่าง (Crimson)"></button>
+          <button onclick="updateSelectedBlockProp('color', '#D4AF37')" class="w-4 h-4 corner-cut-2 bg-[#D4AF37] border border-white/20 hover:scale-110 transition" title="ทองคำรัตนโกสินทร์ (Gold)"></button>
+          <button onclick="updateSelectedBlockProp('color', '#1F1C17')" class="w-4 h-4 corner-cut-2 bg-[#1F1C17] border border-white/20 hover:scale-110 transition" title="ดำชาร์โคล (Charcoal)"></button>
+          <button onclick="updateSelectedBlockProp('color', '#666666')" class="w-4 h-4 corner-cut-2 bg-[#666666] border border-white/20 hover:scale-110 transition" title="เทากลาง (Muted Gray)"></button>
+          <button onclick="updateSelectedBlockProp('color', '#FFFFFF')" class="w-4 h-4 corner-cut-2 bg-white border border-slate-400 hover:scale-110 transition" title="ขาวบริสุทธิ์ (Pure White)"></button>
+          <input type="color" id="insp-color-picker" onchange="updateSelectedBlockProp('color', this.value)" class="w-5 h-5 rounded-none corner-cut-2 bg-transparent border-0 cursor-pointer p-0" title="เลือกสีอิสระ" />
+        </div>
+      </div>
+
+      <!-- Group 6: Layer Order & Coordinates -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="changeBlockZIndex(1)" class="px-2 py-0.5 corner-cut-4 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)] hover:text-[var(--text-main)]" title="นำขึ้นหน้าสุด">Layer ▲</button>
+        <button onclick="changeBlockZIndex(-1)" class="px-2 py-0.5 corner-cut-4 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)] hover:text-[var(--text-main)]" title="ส่งลงหลังสุด">Layer ▼</button>
+        <span id="inspector-coords-badge" class="font-mono text-[10px] text-[var(--text-subtle)] pl-1.5">X: 0% Y: 0% W: 0% H: 0%</span>
+        
+        <!-- Deselect Button -->
+        <button onclick="deselectAllBlocks()" class="p-1 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] text-[var(--text-subtle)] hover:text-[var(--text-main)] transition ml-1" title="ปิดแผงคุณสมบัติ (Esc)">
+          ✕
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Gentle Helper Hint Bar when no block is selected -->
+    <div id="inspector-idle-hint" class="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none text-[11px] text-[var(--text-subtle)] bg-[var(--bg-surface-elevated)]/90 border border-[var(--border-subtle)] px-3 py-1 corner-cut-6 shadow-sm select-none">
+      💡 คลิกที่บล็อกบนหน้า A4 เพื่อย้ายตำแหน่ง ย่อ-ขยาย 8 ทิศทาง หรือปรับฟอนต์และสี
+    </div>
+
+    <!-- 📚 MULTI-PAGE PREVIEW DRAWER -->
+    <aside id="pages-drawer" class="fixed right-0 top-14 bottom-0 w-80 bg-[var(--bg-surface-solid)]/98 backdrop-blur-2xl border-l border-[var(--border-subtle)] p-4 flex flex-col gap-3 shadow-2xl z-40 transform translate-x-full transition-transform duration-200 select-none">
+      
+      <div class="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+        <div>
+          <h3 class="font-bold text-[var(--text-main)] text-sm font-serif-luxury" data-i18n="designer_preview_all">พรีวิวทุกหน้าผลงาน</h3>
+          <p class="text-[10px] text-[var(--text-muted)]">คลิกที่หน้าเพื่อตรวจสอบและจัดเฉพาะหน้า</p>
+        </div>
+        <button onclick="togglePagesDrawer()" class="p-1 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <div id="drawer-override-summary" class="text-[11px] font-mono text-[var(--color-accent-gold)] bg-[var(--color-accent-glow)] border border-[var(--border-accent)] px-3 py-1.5 corner-cut-6 flex items-center justify-between">
+        <span>จัดเฉพาะหน้า:</span>
+        <span id="drawer-override-count" class="font-bold">0 หน้า</span>
+      </div>
+
+      <div id="drawer-artworks-list" class="flex-1 overflow-y-auto space-y-2 pr-1 studio-scrollbar"></div>
+
+      <div class="pt-2 border-t border-[var(--border-subtle)]">
+        <a href="/catalog.html" target="_blank" class="w-full py-2.5 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-xs font-semibold text-[var(--color-accent-gold)] flex items-center justify-center gap-1.5 transition shadow-sm">
+          <span>📖</span> <span data-i18n="designer_back_to_catalog">เปิดดูสูจิบัตรจริง</span>
+        </a>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- 🍞 TOAST NOTIFICATION -->
+  <div id="studio-toast" class="fixed top-16 right-6 z-50 bg-[var(--bg-surface-elevated)] border border-[var(--border-accent)] text-[var(--text-main)] px-4 py-2.5 corner-cut-8 shadow-2xl text-xs font-semibold flex items-center gap-2 transform translate-y-[-20px] opacity-0 transition-all pointer-events-none">
+    <span class="text-[var(--color-accent-gold)]">✓</span>
+    <span id="toast-text" data-i18n="designer_save_success">บันทึกเลย์เอาต์สูจิบัตรลงระบบเรียบร้อยแล้ว</span>
+  </div>
+
+  <script>
+    let adminKey = '';
+    let catalogConfig = null;
+    let submissions = [];
+    let activeArtworkIndex = 0;
+    let selectedBlockId = null;
+    let zoomLevel = 100;
+    let isDragging = false;
+    let isResizing = false;
+    let resizeHandle = null;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let initialBlockCoords = { x: 0, y: 0, w: 0, h: 0 };
+    let canvasBgColor = '#FBF9F4';
+    let canvasTextColor = '#171C1A';
+
+    let activeTemplate = {
+      paperSize: 'a4_portrait',
+      pageWidthInches: 8.27,
+      pageHeightInches: 11.69,
+      bleedInches: 0.125,
+      gridSizeInches: 0.25,
+      snapToGrid: true,
+      backgroundColor: '#FBF9F4',
+      paddingInches: { top: 0.6, bottom: 0.6, left: 0.6, right: 0.6 },
+      blocks: []
+    };
+
+    const DEFAULT_MASTER_BLOCKS = [
+      {
+        id: 'blk-artwork-img',
+        type: 'artwork_image',
+        label: 'ภาพผลงาน',
+        xPct: 6,
+        yPct: 8,
+        wPct: 48,
+        hPct: 76,
+        zIndex: 1,
+        style: { objectFit: 'contain', borderRadius: 0, textAlign: 'center' }
+      },
+      {
+        id: 'blk-artwork-title',
+        type: 'artwork_title',
+        label: 'ชื่องานศิลปะ',
+        xPct: 58,
+        yPct: 10,
+        wPct: 36,
+        hPct: 12,
+        zIndex: 2,
+        style: { fontFamily: 'Maitree', fontSizePt: 16, fontWeight: 'bold', color: '#1F1C17', textAlign: 'left' }
+      },
+      {
+        id: 'blk-technique',
+        type: 'technique',
+        label: 'เทคนิค / วัสดุ',
+        xPct: 58,
+        yPct: 23,
+        wPct: 36,
+        hPct: 4,
+        zIndex: 2,
+        style: { fontFamily: 'Maitree', fontSizePt: 10, fontWeight: 'normal', color: '#555555', textAlign: 'left' }
+      },
+      {
+        id: 'blk-dimensions',
+        type: 'dimensions',
+        label: 'ขนาดผลงาน',
+        xPct: 58,
+        yPct: 28,
+        wPct: 36,
+        hPct: 4,
+        zIndex: 2,
+        style: { fontFamily: 'Maitree', fontSizePt: 10, fontWeight: 'normal', color: '#666666', textAlign: 'left' }
+      },
+      {
+        id: 'blk-year',
+        type: 'year_created',
+        label: 'ปีที่สร้างสรรค์',
+        xPct: 58,
+        yPct: 33,
+        wPct: 36,
+        hPct: 4,
+        zIndex: 2,
+        style: { fontFamily: 'Maitree', fontSizePt: 10, fontWeight: 'normal', color: '#777777', textAlign: 'left' }
+      },
+      {
+        id: 'blk-price',
+        type: 'price',
+        label: 'ราคาผลงาน',
+        xPct: 58,
+        yPct: 38,
+        wPct: 36,
+        hPct: 4,
+        zIndex: 2,
+        style: { fontFamily: 'Maitree', fontSizePt: 11, fontWeight: 'bold', color: '#C5A880', textAlign: 'left' }
+      },
+      {
+        id: 'blk-concept',
+        type: 'concept',
+        label: 'แนวคิด / คำบรรยาย',
+        xPct: 58,
+        yPct: 44,
+        wPct: 36,
+        hPct: 28,
+        zIndex: 2,
+        style: { fontFamily: 'Maitree', fontSizePt: 9.5, fontWeight: 'normal', fontStyle: 'italic', color: '#444444', textAlign: 'left' }
+      },
+      {
+        id: 'blk-artist-profile',
+        type: 'artist_profile',
+        label: 'ศิลปิน & ธงชาติ',
+        xPct: 58,
+        yPct: 74,
+        wPct: 36,
+        hPct: 12,
+        zIndex: 2,
+        style: { fontFamily: 'Maitree', fontSizePt: 11, fontWeight: 'bold', color: '#1F1C17', textAlign: 'left' }
+      },
+      {
+        id: 'blk-page-num',
+        type: 'page_number',
+        label: 'เลขหน้า',
+        xPct: 6,
+        yPct: 92,
+        wPct: 88,
+        hPct: 4,
+        zIndex: 2,
+        style: { fontFamily: 'Maitree', fontSizePt: 8.5, color: '#888888', textAlign: 'right' }
+      }
+    ];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramKey = urlParams.get('adminKey') || urlParams.get('admin');
+      const sessionKey = sessionStorage.getItem('curator_admin_key');
+      const candidateKey = (paramKey && paramKey !== 'true') ? paramKey : (sessionKey || '');
+
+      if (candidateKey === 'admin123') {
+        adminKey = candidateKey;
+        sessionStorage.setItem('curator_admin_key', candidateKey);
+        initStudio();
+      } else {
+        document.getElementById('admin-auth-shield').classList.remove('hidden');
+      }
+
+      setupGlobalKeyboardShortcuts();
+      setupCanvasInteraction();
+    });
+
+    function handleVerifyAdminKey() {
+      const input = document.getElementById('auth-admin-key-input').value.trim();
+      if (input === 'admin123') {
+        adminKey = input;
+        sessionStorage.setItem('curator_admin_key', input);
+        document.getElementById('admin-auth-shield').classList.add('hidden');
+        initStudio();
+      } else {
+        document.getElementById('auth-error-msg').classList.remove('hidden');
+      }
+    }
+
+    async function initStudio() {
+      try {
+        const cfgRes = await fetch('/api/catalog-config?_t=' + Date.now());
+        const cfgJson = await cfgRes.json();
+        catalogConfig = cfgJson.config || {};
+        
+        if (!catalogConfig.masterTemplate) {
+          catalogConfig.masterTemplate = {
+            paperSize: 'a4_portrait',
+            pageWidthInches: 8.27,
+            pageHeightInches: 11.69,
+            blocks: JSON.parse(JSON.stringify(DEFAULT_MASTER_BLOCKS))
+          };
+        }
+        if (!catalogConfig.pageOverrides) {
+          catalogConfig.pageOverrides = {};
+        }
+
+        const subRes = await fetch(`/api/submissions?status=approved&limit=500&_t=${Date.now()}`, {
+          headers: { 'x-admin-key': adminKey }
+        });
+        const subJson = await subRes.json();
+        submissions = subJson.submissions || [];
+        
+        if (submissions.length === 0) {
+          submissions = [{
+            id: 1,
+            title: 'ตัวอย่างผลงานศิลปะ (Sample Artwork)',
+            artist_name: 'อาจารย์ สุรชัย ใจอารีย์',
+            technique: 'Woodcut & Etching on Paper',
+            dimensions: '80 x 100 cm',
+            year_created: '2026',
+            price: '35,000',
+            description: 'แนวคิดแรงบันดาลใจจากความสงบนิ่งและแสงสว่างยามรุ่งอรุณ สะท้อนผ่านเส้นสายภาพพิมพ์แกะไม้',
+            image_url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1000&auto=format&fit=crop',
+            nationality: 'Thailand',
+            avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop'
+          }];
+        }
+
+        document.getElementById('total-artworks-badge').textContent = submissions.length;
+        selectArtworkSample(0);
+
+      } catch (err) {
+        console.error('Failed to init catalog designer', err);
+        showToast('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + err.message, true);
+      }
+    }
+
+    function changeArtworkSample(delta) {
+      if (submissions.length === 0) return;
+      let newIdx = activeArtworkIndex + delta;
+      if (newIdx < 0) newIdx = submissions.length - 1;
+      if (newIdx >= submissions.length) newIdx = 0;
+      selectArtworkSample(newIdx);
+    }
+
+    function selectArtworkSample(idx) {
+      activeArtworkIndex = idx;
+      const art = submissions[idx];
+      if (!art) return;
+
+      document.getElementById('artwork-sample-badge').textContent = '#' + (idx + 1);
+      document.getElementById('artwork-sample-title').textContent = window.getField ? window.getField(art, 'title') : (art.title || '');
+
+      const isCustom = Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
+      updateOverrideUI(isCustom);
+
+      if (isCustom) {
+        activeTemplate = JSON.parse(JSON.stringify(catalogConfig.pageOverrides[art.id]));
+      } else {
+        activeTemplate = JSON.parse(JSON.stringify(catalogConfig.masterTemplate));
+      }
+
+      renderCanvasBlocks();
+      renderPagesDrawerList();
+      deselectAllBlocks();
+    }
+
+    function updateOverrideUI(isCustom) {
+      const btnToggle = document.getElementById('btn-toggle-override');
+      const btnRevert = document.getElementById('btn-revert-master');
+      const indicator = document.getElementById('canvas-mode-indicator');
+
+      if (isCustom) {
+        btnToggle.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-bold transition border cursor-pointer bg-[var(--color-accent-glow)] border-[var(--border-accent)] text-[var(--color-accent-light)] shadow-sm';
+        document.getElementById('override-icon').textContent = '✨';
+        document.getElementById('override-text').textContent = 'จัดเฉพาะหน้านี้ (Custom Page)';
+        btnRevert.classList.remove('hidden');
+        indicator.textContent = '✨ CUSTOM PAGE #' + (activeArtworkIndex + 1);
+        indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)] animate-pulse';
+      } else {
+        btnToggle.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-semibold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)]';
+        document.getElementById('override-icon').textContent = '🔓';
+        document.getElementById('override-text').textContent = 'ปลดล็อคจัดเฉพาะหน้านี้';
+        btnRevert.classList.add('hidden');
+        indicator.textContent = '🌐 MASTER TEMPLATE';
+        indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)]';
+      }
+    }
+
+    function toggleCurrentPageOverride() {
+      const art = submissions[activeArtworkIndex];
+      if (!art) return;
+
+      const isCustom = Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
+      if (!isCustom) {
+        if (!catalogConfig.pageOverrides) catalogConfig.pageOverrides = {};
+        catalogConfig.pageOverrides[art.id] = JSON.parse(JSON.stringify(activeTemplate));
+        updateOverrideUI(true);
+        showToast('ปลดล็อคจัดเฉพาะหน้า #' + (activeArtworkIndex + 1) + ' เรียบร้อยแล้ว');
+      }
+      renderPagesDrawerList();
+    }
+
+    function revertCurrentPageToMaster() {
+      const art = submissions[activeArtworkIndex];
+      if (!art) return;
+      if (confirm('คุณต้องการยกเลิกการจัดเฉพาะหน้า และคืนค่าหน้า #' + (activeArtworkIndex + 1) + ' ให้ใช้แม่แบบหลักใช่หรือไม่?')) {
+        if (catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]) {
+          delete catalogConfig.pageOverrides[art.id];
+        }
+        activeTemplate = JSON.parse(JSON.stringify(catalogConfig.masterTemplate));
+        updateOverrideUI(false);
+        renderCanvasBlocks();
+        renderPagesDrawerList();
+        showToast('คืนค่าหน้า #' + (activeArtworkIndex + 1) + ' กลับเป็นแม่แบบหลักแล้ว');
+      }
+    }
+
+    function renderCanvasBlocks() {
+      const layer = document.getElementById('canvas-blocks-layer');
+      layer.innerHTML = '';
+
+      const art = submissions[activeArtworkIndex] || {};
+      const blocks = activeTemplate.blocks || [];
+
+      blocks.forEach(block => {
+        const el = document.createElement('div');
+        el.id = 'blk-' + block.id;
+        el.className = 'absolute select-none cursor-move transition-shadow ' + (
+          selectedBlockId === block.id 
+            ? 'ring-2 ring-[var(--color-accent-gold)] z-50 bg-[var(--color-accent-glow)]' 
+            : 'hover:ring-1 hover:ring-[var(--border-accent)]'
+        );
+        
+        el.style.left = block.xPct + '%';
+        el.style.top = block.yPct + '%';
+        el.style.width = block.wPct + '%';
+        el.style.height = block.hPct + '%';
+        el.style.zIndex = block.zIndex || 1;
+
+        el.innerHTML = getBlockInnerHTML(block, art);
+
+        el.addEventListener('mousedown', (e) => {
+          if (e.target.classList.contains('resize-handle')) return;
+          e.stopPropagation();
+          selectBlock(block.id);
+          startDraggingBlock(e, block);
+        });
+
+        if (selectedBlockId === block.id) {
+          const handles = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+          handles.forEach(h => {
+            const handleEl = document.createElement('div');
+            handleEl.className = 'resize-handle handle-' + h;
+            handleEl.addEventListener('mousedown', (e) => {
+              e.stopPropagation();
+              startResizingBlock(e, block, h);
+            });
+            el.appendChild(handleEl);
+          });
+        }
+
+        layer.appendChild(el);
+      });
+
+      updateInspector();
+    }
+
+    function getBlockInnerHTML(block, art) {
+      const s = block.style || {};
+      const title = window.getField ? window.getField(art, 'title') : (art.title || 'Untitled');
+      const artistName = window.getArtistFullName ? window.getArtistFullName(art) : (art.artist_name || 'Artist Name');
+      const technique = window.getField ? window.getField(art, 'technique') : (art.technique || 'Printmaking');
+      const dimensions = window.formatDimensions ? window.formatDimensions(art.dimensions) : (art.dimensions || '100 x 100 cm');
+      const year = art.year_created || '2026';
+      const price = window.formatPrice ? window.formatPrice(art.price) : (art.price ? art.price + ' THB' : '');
+      const concept = window.getField ? window.getField(art, 'description') : (art.description || '');
+      const imgUrl = art.thumbnail_url || art.image_url || '';
+      const avatarUrl = art.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop';
+      const country = art.nationality || 'Thailand';
+
+      const fontFam = s.fontFamily === 'Cinzel' ? 'font-cinzel' : s.fontFamily === 'Sarabun' ? 'font-sans' : 'font-serif-art';
+      const fontWt = s.fontWeight === 'bold' ? 'font-bold' : s.fontWeight === 'semibold' ? 'font-semibold' : 'font-normal';
+      const fontItalic = s.fontStyle === 'italic' ? 'italic' : '';
+      const textAlign = 'text-' + (s.textAlign || 'left');
+      const color = s.color || canvasTextColor;
+      const fontSize = s.fontSizePt ? 'font-size: ' + s.fontSizePt + 'pt;' : '';
+
+      switch (block.type) {
+        case 'artwork_image':
+          return `
+            <div class="w-full h-full flex items-center justify-center overflow-hidden">
+              <img src="${imgUrl}" alt="${title}" class="w-full h-full object-${s.objectFit || 'contain'} pointer-events-none" />
+            </div>
+          `;
+
+        case 'artwork_title':
+          return `
+            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
+              <h3 class="${fontFam} ${fontWt} ${fontItalic} leading-tight w-full">${title}</h3>
+            </div>
+          `;
+
+        case 'artist_name':
+          return `
+            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
+              <span class="${fontFam} ${fontWt} leading-snug w-full">${artistName}</span>
+            </div>
+          `;
+
+        case 'technique':
+          return `
+            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
+              <span class="${fontFam} ${fontWt}">เทคนิค: ${technique}</span>
+            </div>
+          `;
+
+        case 'dimensions':
+          return `
+            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
+              <span class="${fontFam} ${fontWt}">ขนาด: ${dimensions}</span>
+            </div>
+          `;
+
+        case 'year_created':
+          return `
+            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
+              <span class="${fontFam} ${fontWt}">ปี: ${year}</span>
+            </div>
+          `;
+
+        case 'price':
+          return `
+            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
+              <span class="font-mono font-bold text-[var(--color-accent-gold)]">${price}</span>
+            </div>
+          `;
+
+        case 'concept':
+          return `
+            <div class="w-full h-full overflow-hidden ${textAlign}" style="${fontSize} color: ${color};">
+              <p class="${fontFam} ${fontItalic} leading-relaxed border-l-2 border-[var(--border-accent)] pl-2">
+                "${concept}"
+              </p>
+            </div>
+          `;
+
+        case 'artist_photo':
+          return `
+            <div class="w-full h-full flex items-center justify-center overflow-hidden">
+              <img src="${avatarUrl}" alt="" class="w-full h-full object-cover corner-cut-4 ring-1 ring-[var(--border-accent)] pointer-events-none" />
+            </div>
+          `;
+
+        case 'country_flag':
+          return `
+            <div class="w-full h-full flex items-center justify-center">
+              ${window.getCountryFlagBadge ? window.getCountryFlagBadge(country, { size: 'sm', showName: false }) : ''}
+            </div>
+          `;
+
+        case 'artist_profile':
+          return `
+            <div class="w-full h-full flex items-center gap-2 overflow-hidden">
+              <img src="${avatarUrl}" alt="" class="w-8 h-8 corner-cut-4 object-cover ring-1 ring-[var(--border-accent)] shrink-0 pointer-events-none" />
+              <div class="min-w-0">
+                <span class="text-[9px] uppercase tracking-wider text-[var(--color-accent-gold)] block font-bold">ศิลปินผู้สร้างสรรค์</span>
+                <h4 class="font-bold text-xs truncate" style="color: ${color};">${artistName}</h4>
+                <div class="mt-0.5">${window.getCountryFlagBadge ? window.getCountryFlagBadge(country, { size: 'sm', showName: false }) : ''}</div>
+              </div>
+            </div>
+          `;
+
+        case 'qr_code':
+          return `
+            <div class="w-full h-full flex flex-col items-center justify-center border border-[var(--border-subtle)] p-1 bg-white corner-cut-4">
+              <div class="text-[8px] font-mono text-slate-400 mb-0.5">3D GALLERY</div>
+              <div class="w-8 h-8 bg-black flex items-center justify-center text-white text-[9px] font-bold">QR</div>
+            </div>
+          `;
+
+        case 'page_number':
+          return `
+            <div class="w-full h-full flex items-center justify-between text-[8px] font-mono text-slate-400 border-t border-slate-300 pt-1">
+              <span>นิทรรศการภาพพิมพ์ร่วมสมัย 2569</span>
+              <span>หน้า ${activeArtworkIndex + 1}</span>
+            </div>
+          `;
+
+        case 'divider_line':
+          return `
+            <div class="w-full h-full flex items-center">
+              <div class="w-full border-t border-[var(--border-accent)]"></div>
+            </div>
+          `;
+
+        case 'custom_text':
+          return `
+            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
+              <span class="${fontFam} ${fontWt}">${block.customContent || 'ข้อความกำหนดเอง'}</span>
+            </div>
+          `;
+
+        default:
+          return '<div class="w-full h-full border border-dashed border-[var(--border-accent)] p-1 text-[10px] text-[var(--color-accent-gold)]">' + block.label + '</div>';
+      }
+    }
+
+    function startDraggingBlock(e, block) {
+      isDragging = true;
+      isResizing = false;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      initialBlockCoords = { x: block.xPct, y: block.yPct, w: block.wPct, h: block.hPct };
+    }
+
+    function startResizingBlock(e, block, handle) {
+      isResizing = true;
+      isDragging = false;
+      resizeHandle = handle;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      initialBlockCoords = { x: block.xPct, y: block.yPct, w: block.wPct, h: block.hPct };
+    }
+
+    function setupCanvasInteraction() {
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging && !isResizing) return;
+
+        const canvas = document.getElementById('designer-canvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+
+        const deltaXPct = ((e.clientX - dragStartX) / rect.width) * 100;
+        const deltaYPct = ((e.clientY - dragStartY) / rect.height) * 100;
+        const doSnap = document.getElementById('toggle-snap-chk').checked;
+
+        const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
+        if (!block) return;
+
+        if (isDragging) {
+          let newX = initialBlockCoords.x + deltaXPct;
+          let newY = initialBlockCoords.y + deltaYPct;
+
+          if (doSnap) {
+            newX = Math.round(newX / 2.5) * 2.5;
+            newY = Math.round(newY / 2.5) * 2.5;
+          }
+
+          block.xPct = Math.max(0, Math.min(100 - block.wPct, newX));
+          block.yPct = Math.max(0, Math.min(100 - block.hPct, newY));
+        } 
+        else if (isResizing && resizeHandle) {
+          let newX = initialBlockCoords.x;
+          let newY = initialBlockCoords.y;
+          let newW = initialBlockCoords.w;
+          let newH = initialBlockCoords.h;
+
+          if (resizeHandle.includes('e')) newW = Math.max(5, initialBlockCoords.w + deltaXPct);
+          if (resizeHandle.includes('s')) newH = Math.max(3, initialBlockCoords.h + deltaYPct);
+          if (resizeHandle.includes('w')) {
+            const appliedDelta = Math.min(initialBlockCoords.w - 5, deltaXPct);
+            newX = Math.max(0, initialBlockCoords.x + appliedDelta);
+            newW = Math.max(5, initialBlockCoords.w - appliedDelta);
+          }
+          if (resizeHandle.includes('n')) {
+            const appliedDelta = Math.min(initialBlockCoords.h - 3, deltaYPct);
+            newY = Math.max(0, initialBlockCoords.y + appliedDelta);
+            newH = Math.max(3, initialBlockCoords.h - appliedDelta);
+          }
+
+          if (doSnap) {
+            newX = Math.round(newX / 2.5) * 2.5;
+            newY = Math.round(newY / 2.5) * 2.5;
+            newW = Math.round(newW / 2.5) * 2.5;
+            newH = Math.round(newH / 2.5) * 2.5;
+          }
+
+          block.xPct = Math.max(0, Math.min(100 - newW, newX));
+          block.yPct = Math.max(0, Math.min(100 - newH, newY));
+          block.wPct = Math.max(5, Math.min(100 - block.xPct, newW));
+          block.hPct = Math.max(3, Math.min(100 - block.yPct, newH));
+        }
+
+        const el = document.getElementById('blk-' + block.id);
+        if (el) {
+          el.style.left = block.xPct + '%';
+          el.style.top = block.yPct + '%';
+          el.style.width = block.wPct + '%';
+          el.style.height = block.hPct + '%';
+        }
+
+        updateInspectorCoordinates(block);
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDragging || isResizing) {
+          isDragging = false;
+          isResizing = false;
+          syncActiveTemplateToSource();
+        }
+      });
+    }
+
+    function syncActiveTemplateToSource() {
+      const art = submissions[activeArtworkIndex];
+      if (!art) return;
+      const isCustom = Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
+      if (isCustom) {
+        catalogConfig.pageOverrides[art.id] = JSON.parse(JSON.stringify(activeTemplate));
+      } else {
+        catalogConfig.masterTemplate = JSON.parse(JSON.stringify(activeTemplate));
+      }
+    }
+
+    function selectBlock(id) {
+      selectedBlockId = id;
+      renderCanvasBlocks();
+    }
+
+    function deselectAllBlocks() {
+      selectedBlockId = null;
+      renderCanvasBlocks();
+    }
+
+    function updateInspector() {
+      const bar = document.getElementById('block-inspector-bar');
+      const hint = document.getElementById('inspector-idle-hint');
+
+      if (!selectedBlockId) {
+        bar.classList.add('hidden');
+        if (hint) hint.classList.remove('hidden');
+        return;
+      }
+
+      const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
+      if (!block) {
+        bar.classList.add('hidden');
+        if (hint) hint.classList.remove('hidden');
+        return;
+      }
+
+      bar.classList.remove('hidden');
+      if (hint) hint.classList.add('hidden');
+
+      document.getElementById('inspector-block-label').textContent = block.label;
+      updateInspectorCoordinates(block);
+
+      const s = block.style || {};
+      document.getElementById('insp-font-family').value = s.fontFamily || 'Maitree';
+      document.getElementById('insp-font-size').value = s.fontSizePt || 12;
+      document.getElementById('insp-color-picker').value = s.color || '#1F1C17';
+
+      // Hide or show text-specific groups depending on block type
+      const isText = ['artwork_title', 'artist_name', 'technique', 'dimensions', 'year_created', 'price', 'concept', 'custom_text'].includes(block.type);
+      const fontGroup = document.getElementById('inspector-font-group');
+      const sizeGroup = document.getElementById('inspector-size-group');
+      const alignGroup = document.getElementById('inspector-align-group');
+
+      if (fontGroup) fontGroup.style.display = isText ? 'flex' : 'none';
+      if (sizeGroup) sizeGroup.style.display = isText ? 'flex' : 'none';
+      if (alignGroup) alignGroup.style.display = isText ? 'flex' : 'none';
+    }
+
+    function updateInspectorCoordinates(block) {
+      const badge = document.getElementById('inspector-coords-badge');
+      if (badge && block) {
+        badge.textContent = 'X: ' + block.xPct.toFixed(1) + '% Y: ' + block.yPct.toFixed(1) + '% W: ' + block.wPct.toFixed(1) + '% H: ' + block.hPct.toFixed(1) + '%';
+      }
+    }
+
+    function updateSelectedBlockProp(prop, val) {
+      const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
+      if (!block) return;
+      if (!block.style) block.style = {};
+      block.style[prop] = val;
+      renderCanvasBlocks();
+      syncActiveTemplateToSource();
+    }
+
+    function toggleSelectedBlockProp(prop, valA, valB) {
+      const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
+      if (!block) return;
+      if (!block.style) block.style = {};
+      block.style[prop] = block.style[prop] === valA ? valB : valA;
+      renderCanvasBlocks();
+      syncActiveTemplateToSource();
+    }
+
+    function changeBlockZIndex(delta) {
+      const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
+      if (!block) return;
+      block.zIndex = Math.max(1, (block.zIndex || 1) + delta);
+      renderCanvasBlocks();
+      syncActiveTemplateToSource();
+    }
+
+    function duplicateSelectedBlock() {
+      const src = activeTemplate.blocks.find(b => b.id === selectedBlockId);
+      if (!src) return;
+      const copy = JSON.parse(JSON.stringify(src));
+      copy.id = 'blk-' + Date.now();
+      copy.xPct = Math.min(100 - copy.wPct, copy.xPct + 4);
+      copy.yPct = Math.min(100 - copy.hPct, copy.yPct + 4);
+      activeTemplate.blocks.push(copy);
+      selectBlock(copy.id);
+      syncActiveTemplateToSource();
+      showToast('ทำสำเนาบล็อกเรียบร้อยแล้ว');
+    }
+
+    function deleteSelectedBlock() {
+      if (!selectedBlockId) return;
+      activeTemplate.blocks = activeTemplate.blocks.filter(b => b.id !== selectedBlockId);
+      deselectAllBlocks();
+      syncActiveTemplateToSource();
+      showToast('ลบบล็อกเรียบร้อยแล้ว');
+    }
+
+    function addBlockElement(type) {
+      const labels = {
+        artwork_image: 'ภาพผลงาน',
+        artwork_title: 'ชื่องานศิลปะ',
+        artist_name: 'ชื่อศิลปิน & ตำแหน่ง',
+        artist_photo: 'ภาพศิลปิน',
+        country_flag: 'ธงชาติ / ประเทศ',
+        technique: 'เทคนิค / วัสดุ',
+        dimensions: 'ขนาดผลงาน',
+        year_created: 'ปีที่สร้างสรรค์',
+        price: 'ราคาผลงาน',
+        concept: 'แนวคิด / คำบรรยาย',
+        qr_code: 'QR Code 3D',
+        page_number: 'เลขหน้า',
+        custom_text: 'ข้อความอิสระ',
+        divider_line: 'เส้นคั่น'
+      };
+
+      const newBlock = {
+        id: 'blk-' + Date.now(),
+        type,
+        label: labels[type] || 'องค์ประกอบใหม่',
+        xPct: 15,
+        yPct: 20,
+        wPct: type === 'artwork_image' ? 45 : type === 'concept' ? 40 : 35,
+        hPct: type === 'artwork_image' ? 60 : type === 'concept' ? 20 : 6,
+        zIndex: activeTemplate.blocks.length + 1,
+        style: {
+          fontFamily: 'Maitree',
+          fontSizePt: 12,
+          fontWeight: 'normal',
+          color: canvasTextColor,
+          textAlign: 'left'
+        }
+      };
+
+      activeTemplate.blocks.push(newBlock);
+      selectBlock(newBlock.id);
+      syncActiveTemplateToSource();
+      toggleDropdown('add-block-dropdown');
+      showToast('เพิ่มบล็อก "' + newBlock.label + '" เรียบร้อย');
+    }
+
+    function applyPresetStyle(preset) {
+      if (preset === 'split') {
+        activeTemplate.blocks = JSON.parse(JSON.stringify(DEFAULT_MASTER_BLOCKS));
+      } else if (preset === 'hero') {
+        activeTemplate.blocks = [
+          { id: 'blk-img', type: 'artwork_image', label: 'ภาพผลงาน', xPct: 6, yPct: 6, wPct: 88, hPct: 56, zIndex: 1, style: { objectFit: 'contain' } },
+          { id: 'blk-title', type: 'artwork_title', label: 'ชื่องานศิลปะ', xPct: 6, yPct: 65, wPct: 50, hPct: 10, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 16, fontWeight: 'bold', color: canvasTextColor } },
+          { id: 'blk-concept', type: 'concept', label: 'แนวคิด', xPct: 6, yPct: 76, wPct: 50, hPct: 16, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 9, fontStyle: 'italic', color: '#555555' } },
+          { id: 'blk-artist', type: 'artist_profile', label: 'ศิลปิน', xPct: 60, yPct: 65, wPct: 34, hPct: 12, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 11, fontWeight: 'bold', color: canvasTextColor } },
+          { id: 'blk-specs', type: 'technique', label: 'เทคนิค', xPct: 60, yPct: 78, wPct: 34, hPct: 4, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 9.5, color: '#666666' } },
+          { id: 'blk-pg', type: 'page_number', label: 'เลขหน้า', xPct: 6, yPct: 93, wPct: 88, hPct: 4, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 8, color: '#888' } }
+        ];
+      } else if (preset === 'minimal') {
+        activeTemplate.blocks = [
+          { id: 'blk-img', type: 'artwork_image', label: 'ภาพผลงาน', xPct: 12, yPct: 10, wPct: 76, hPct: 65, zIndex: 1, style: { objectFit: 'contain' } },
+          { id: 'blk-title', type: 'artwork_title', label: 'ชื่องานศิลปะ', xPct: 15, yPct: 78, wPct: 70, hPct: 6, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 14, fontWeight: 'bold', textAlign: 'center', color: canvasTextColor } },
+          { id: 'blk-artist', type: 'artist_name', label: 'ชื่อศิลปิน', xPct: 15, yPct: 84, wPct: 70, hPct: 4, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 10.5, textAlign: 'center', color: '#666666' } },
+          { id: 'blk-pg', type: 'page_number', label: 'เลขหน้า', xPct: 6, yPct: 93, wPct: 88, hPct: 4, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 8, color: '#888', textAlign: 'center' } }
+        ];
+      } else if (preset === 'editorial') {
+        activeTemplate.blocks = [
+          { id: 'blk-img', type: 'artwork_image', label: 'ภาพผลงาน', xPct: 45, yPct: 8, wPct: 49, hPct: 82, zIndex: 1, style: { objectFit: 'cover' } },
+          { id: 'blk-title', type: 'artwork_title', label: 'ชื่องานศิลปะ', xPct: 6, yPct: 10, wPct: 35, hPct: 16, zIndex: 2, style: { fontFamily: 'Cinzel', fontSizePt: 18, fontWeight: 'bold', color: canvasTextColor } },
+          { id: 'blk-concept', type: 'concept', label: 'แนวคิด', xPct: 6, yPct: 30, wPct: 35, hPct: 30, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 9.5, fontStyle: 'italic', color: '#555555' } },
+          { id: 'blk-artist', type: 'artist_profile', label: 'ศิลปิน', xPct: 6, yPct: 70, wPct: 35, hPct: 14, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 11, fontWeight: 'bold', color: canvasTextColor } },
+          { id: 'blk-pg', type: 'page_number', label: 'เลขหน้า', xPct: 6, yPct: 92, wPct: 88, hPct: 4, zIndex: 2, style: { fontFamily: 'Maitree', fontSizePt: 8, color: '#888' } }
+        ];
+      }
+
+      renderCanvasBlocks();
+      syncActiveTemplateToSource();
+      toggleDropdown('preset-dropdown');
+      showToast('ปรับใช้สไตล์สำเร็จรูป "' + preset + '" แล้ว');
+    }
+
+    function setCanvasBackground(bg, text) {
+      canvasBgColor = bg;
+      canvasTextColor = text;
+      document.getElementById('designer-canvas').style.backgroundColor = bg;
+      renderCanvasBlocks();
+    }
+
+    function toggleGridDisplay(show) {
+      const grid = document.getElementById('canvas-grid-overlay');
+      if (grid) grid.style.display = show ? 'block' : 'none';
+    }
+
+    function toggleMarginDisplay(show) {
+      const margin = document.getElementById('canvas-margin-guide');
+      if (margin) margin.style.display = show ? 'block' : 'none';
+    }
+
+    function setZoom(delta) {
+      zoomLevel = Math.max(40, Math.min(180, zoomLevel + delta));
+      applyZoom();
+    }
+
+    function resetZoom() {
+      zoomLevel = 100;
+      applyZoom();
+    }
+
+    function applyZoom() {
+      document.getElementById('zoom-level-display').textContent = zoomLevel + '%';
+      document.getElementById('canvas-zoom-wrapper').style.transform = 'scale(' + (zoomLevel / 100) + ')';
+    }
+
+    function toggleDropdown(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const isHidden = el.classList.contains('hidden');
+      document.querySelectorAll('[id$="-dropdown"]').forEach(d => d.classList.add('hidden'));
+      if (isHidden) el.classList.remove('hidden');
+    }
+
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('[id$="-dropdown"]') && !e.target.closest('button')) {
+        document.querySelectorAll('[id$="-dropdown"]').forEach(d => d.classList.add('hidden'));
+      }
+    });
+
+    function togglePagesDrawer() {
+      const drawer = document.getElementById('pages-drawer');
+      drawer.classList.toggle('translate-x-full');
+      renderPagesDrawerList();
+    }
+
+    function renderPagesDrawerList() {
+      const container = document.getElementById('drawer-artworks-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const overrides = catalogConfig.pageOverrides || {};
+      const overrideCount = Object.keys(overrides).length;
+      document.getElementById('drawer-override-count').textContent = overrideCount + ' หน้า';
+
+      submissions.forEach((art, idx) => {
+        const isActive = idx === activeArtworkIndex;
+        const isCustom = Boolean(overrides[art.id]);
+        const title = window.getField ? window.getField(art, 'title') : (art.title || 'Untitled');
+        const imgUrl = art.thumbnail_url || art.image_url || '';
+
+        const item = document.createElement('div');
+        item.className = 'p-2 corner-cut-6 border transition flex items-center gap-3 cursor-pointer ' + (
+          isActive 
+            ? 'bg-[var(--color-accent-glow)] border-[var(--border-accent)] ring-1 ring-[var(--border-accent)]' 
+            : isCustom
+            ? 'bg-[var(--bg-surface-elevated)] border-[var(--border-accent)]/50 hover:border-[var(--border-accent)]'
+            : 'bg-[var(--bg-surface-elevated)]/60 border-[var(--border-subtle)] hover:border-[var(--border-accent)]/50'
+        );
+
+        item.innerHTML = `
+          <div class="relative w-12 h-16 bg-black/40 corner-cut-4 overflow-hidden border border-[var(--border-subtle)] shrink-0 flex items-center justify-center">
+            ${imgUrl ? `<img src="${imgUrl}" alt="" class="w-full h-full object-cover">` : `<span class="text-[9px] text-[var(--text-subtle)]">No Img</span>`}
+            <span class="absolute top-0.5 left-0.5 bg-black/80 font-mono text-[8px] text-[var(--color-accent-gold)] font-bold px-1 corner-cut-2">#${idx + 1}</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-1">
+              <h4 class="text-xs font-bold text-[var(--text-main)] truncate">${title}</h4>
+              ${isCustom ? `<span class="text-[9px] font-bold text-[var(--color-accent-light)] bg-[var(--color-accent-glow)] border border-[var(--border-accent)] px-1.5 py-0.2 corner-cut-4 shrink-0">✨ เฉพาะ</span>` : ''}
+            </div>
+            <p class="text-[11px] text-[var(--text-muted)] truncate mt-0.5">${art.artist_name || ''}</p>
+            <span class="text-[9px] font-mono text-[var(--text-subtle)]">${isCustom ? 'Custom Layout' : 'Master Layout'}</span>
+          </div>
+        `;
+
+        item.addEventListener('click', () => {
+          selectArtworkSample(idx);
+          togglePagesDrawer();
+        });
+
+        container.appendChild(item);
+      });
+    }
+
+    async function saveDesignerLayout() {
+      syncActiveTemplateToSource();
+
+      try {
+        const imgB = activeTemplate.blocks.find(b => b.type === 'artwork_image');
+        const titleB = activeTemplate.blocks.find(b => b.type === 'artwork_title' || b.type === 'meta');
+        const conceptB = activeTemplate.blocks.find(b => b.type === 'concept');
+        const artistB = activeTemplate.blocks.find(b => b.type === 'artist_profile' || b.type === 'artist_name' || b.type === 'artist');
+
+        const freeBlocks = {
+          image: imgB ? { x: imgB.xPct, y: imgB.yPct, w: imgB.wPct, h: imgB.hPct } : { x: 6, y: 10, w: 50, h: 74 },
+          meta: titleB ? { x: titleB.xPct, y: titleB.yPct, w: titleB.wPct } : { x: 60, y: 12, w: 34 },
+          concept: conceptB ? { x: conceptB.xPct, y: conceptB.yPct, w: conceptB.wPct } : { x: 60, y: 46, w: 34 },
+          artist: artistB ? { x: artistB.xPct, y: artistB.yPct, w: artistB.wPct } : { x: 60, y: 74, w: 34 }
+        };
+
+        const payload = {
+          config: {
+            ...catalogConfig,
+            masterTemplate: activeTemplate,
+            pageOverrides: catalogConfig.pageOverrides || {},
+            freeLayout: {
+              theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage'),
+              gridSnap: true,
+              blocks: freeBlocks
+            },
+            layout: {
+              template: 'freeform',
+              theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage')
+            }
+          }
+        };
+
+        const res = await fetch('/api/catalog-config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-key': adminKey
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const resJson = await res.json();
+        if (resJson.success) {
+          try {
+            localStorage.setItem('catalog_layout_updated', Date.now().toString());
+          } catch (_) {}
+          showToast('บันทึกเลย์เอาต์สูจิบัตรลงฐานข้อมูลเรียบร้อยแล้ว');
+        } else {
+          showToast('บันทึกล้มเหลว: ' + (resJson.error || 'Unknown error'), true);
+        }
+      } catch (err) {
+        showToast('เกิดข้อผิดพลาดในการบันทึก: ' + err.message, true);
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('studio-toast');
+      const text = document.getElementById('toast-text');
+      text.textContent = msg;
+      toast.className = 'fixed top-16 right-6 z-50 px-4 py-2.5 corner-cut-8 shadow-2xl text-xs font-semibold flex items-center gap-2 transition-all duration-300 ' + (
+        isError 
+          ? 'bg-rose-950/95 border border-rose-500/60 text-rose-200' 
+          : 'bg-[var(--bg-surface-elevated)] border border-[var(--border-accent)] text-[var(--text-main)]'
+      );
+      toast.style.transform = 'translateY(0)';
+      toast.style.opacity = '1';
+      setTimeout(() => {
+        toast.style.transform = 'translateY(-20px)';
+        toast.style.opacity = '0';
+      }, 3500);
+    }
+
+    function setupGlobalKeyboardShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+
+        if (e.key === 'Escape') {
+          deselectAllBlocks();
+        } else if (e.key === 'Delete' || e.key === 'Backspace') {
+          if (selectedBlockId) {
+            e.preventDefault();
+            deleteSelectedBlock();
+          }
+        } else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          saveDesignerLayout();
+        } else if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+          if (selectedBlockId) {
+            e.preventDefault();
+            duplicateSelectedBlock();
+          }
+        }
+      });
+    }
+
+  </script>
+</body>
+</html>

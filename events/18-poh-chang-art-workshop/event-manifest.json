@@ -1,0 +1,28 @@
+{
+  "eventId": "18-poh-chang-art-workshop",
+  "eventTitle": "18 Poh Chang art workshop",
+  "eventTheme": "heritage",
+  "adminEmail": "surachai.ai.udo+artworkshop18@gmail.com",
+  "createdAt": "2026-09-07T13:18:56.736Z",
+  "accountIsolation": {
+    "cloudflare": {
+      "accountEmail": "surachai.ai.udo+artworkshop18@gmail.com",
+      "d1DatabaseName": "d1-18-poh-chang-art-workshop",
+      "d1DatabaseId": "placeholder-18-poh-chang-art-workshop",
+      "pagesProject": "18-poh-chang-art-workshop"
+    },
+    "cloudinary": {
+      "accountEmail": "surachai.ai.udo+artworkshop18@gmail.com",
+      "cloudName": "pohchang18",
+      "uploadPreset": "pohchang18_preset"
+    }
+  },
+  "security": {
+    "sharedSecretToken": "sec_18pohchangartworkshop_61045e6c340ecfdf25c2a3a3e2a2bce7",
+    "adminKey": "admin123"
+  },
+  "integration": {
+    "masterPortalUrl": "https://master-portal.pages.dev",
+    "eventPageBaseUrl": "https://18-poh-chang-art-workshop.pages.dev"
+  }
+}

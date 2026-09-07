@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ทำเนียบศิลปินและผลงานสร้างสรรค์ | Artists Directory</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Sarabun', sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--border-accent);
+      border-radius: 9999px;
+    }
+  </style>
+  <script src="/js/i18n.js"></script>
+  <link rel="stylesheet" href="/css/themes.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body class="min-h-full flex flex-col bg-[var(--bg-base)] text-[var(--text-main)]">
+
+      <!-- Master Navigation Bar -->
+  <header class="master-navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Brand Lockup -->
+      <a href="/" class="flex items-center space-x-3 group shrink-0">
+        <div class="master-brand-badge">พ.ช.</div>
+        <div class="min-w-0">
+          <span id="nav-event-title" class="text-sm font-serif-luxury tracking-wider text-[var(--text-main)] block font-semibold truncate leading-tight" data-i18n="nav_event_default">Printmaking Exhibition</span>
+          <span class="text-[10px] text-[var(--color-accent-gold)] font-mono tracking-widest uppercase block leading-none mt-0.5" data-i18n="nav_sub_brand">Fine Art Exhibition</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links & Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <nav class="flex items-center space-x-1 sm:space-x-1.5 text-xs sm:text-sm font-normal">
+          <a href="/" class="master-nav-link "  data-i18n="nav_home">หน้าแรก</a>
+          <a href="/gallery.html" class="master-nav-link "  data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="master-nav-link active" aria-current="page" data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="master-nav-link "  data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/submit.html" class="master-nav-cta  ml-1 sm:ml-2"  data-i18n="nav_submit">ส่งผลงาน</a>
+        </nav>
+
+        <div class="h-4 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Admin Curator Desk Entrance -->
+          <a href="/admin.html" class="master-admin-btn" title="Curator Desk (เข้าสู่ระบบผู้ดูแล)" data-i18n-title="nav_admin">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span class="text-[11px] font-semibold hidden md:inline">Desk</span>
+          </a>
+
+          <!-- Language Switcher -->
+          <div id="lang-switcher"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <section class="relative py-14 px-4 sm:px-6 lg:px-8 border-b border-[var(--border-subtle)] overflow-hidden bg-[var(--bg-surface-solid)]">
+    <div class="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(var(--border-accent)_1px,transparent_1px)] [background-size:24px_24px]"></div>
+    <div class="max-w-5xl mx-auto text-center relative z-10 space-y-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)] text-xs font-semibold uppercase tracking-widest">
+        <span data-i18n="artists_badge">ARTISTS & CREATORS DIRECTORY</span>
+        <span class="text-[var(--text-subtle)]">•</span>
+        <span id="total-artists-badge" class="font-mono text-[var(--color-accent-light)] font-bold">0 ท่าน</span>
+        <span class="text-[var(--text-subtle)]">•</span>
+        <span id="total-artworks-badge" class="font-mono text-[var(--color-accent-gold)] font-bold">0 ผลงาน</span>
+      </div>
+      <h1 class="font-serif-luxury text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--text-main)] leading-tight">
+        <span data-i18n="artists_title_1">ทำเนียบศิลปินและ</span><span class="gold-gradient-text" data-i18n="artists_title_2">ผลงานสร้างสรรค์</span>
+      </h1>
+      <p class="text-xs sm:text-sm text-[var(--text-muted)] max-w-2xl mx-auto leading-relaxed font-light" data-i18n="artists_desc">
+        รวบรวมประวัติและผลงานของศิลปินผู้ร่วมสร้างสรรค์ผลงานในนิทรรศการ สามารถค้นหา กรองสัญชาติ และเลือกชมได้ทั้งรูปแบบการ์ดสรุปหรือตารางข้อมูล
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
+
+    <!-- Filter & Toolbar -->
+    <div class="gallery-surface corner-cut-20 p-4 sm:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-xl border border-[var(--border-subtle)]">
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <svg class="w-4 h-4 text-[var(--color-accent-gold)] absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0118 0z" />
+        </svg>
+        <input type="text" id="artist-search" placeholder="ค้นหาชื่อศิลปิน, ผลงาน, สัญชาติ, หรืออีเมล..." data-i18n-placeholder="search_artists_ph"
+          class="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-8 text-xs sm:text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)] transition">
+      </div>
+
+      <!-- Filters & View Switcher -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- Nationality Filter -->
+        <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-2 corner-cut-8 text-xs">
+          <span class="text-sm">🌐</span>
+          <select id="country-filter" class="bg-transparent text-xs text-[var(--text-main)] focus:outline-none cursor-pointer font-medium">
+            <option value="all" data-i18n="filter_all_countries">ทุกประเทศ (All Countries)</option>
+          </select>
+        </div>
+
+        <!-- Sort Filter -->
+        <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-2 corner-cut-8 text-xs">
+          <span class="text-sm">↕️</span>
+          <select id="sort-filter" class="bg-transparent text-xs text-[var(--text-main)] focus:outline-none cursor-pointer font-medium">
+            <option value="default" data-i18n="sort_default">ค่าเริ่มต้น (Default)</option>
+            <option value="name_asc" data-i18n="sort_name_asc">ชื่อศิลปิน (A - Z / ก - ฮ)</option>
+            <option value="name_desc" data-i18n="sort_name_desc">ชื่อศิลปิน (Z - A / ฮ - ก)</option>
+            <option value="country_asc" data-i18n="sort_country_asc">ตามประเทศ / สัญชาติ (A - Z)</option>
+            <option value="price_desc" data-i18n="sort_price_desc">ราคาผลงาน (มากไปน้อย)</option>
+            <option value="price_asc" data-i18n="sort_price_asc">ราคาผลงาน (น้อยไปมาก)</option>
+            <option value="artworks_desc" data-i18n="sort_artworks_desc">จำนวนผลงาน (มากไปน้อย)</option>
+          </select>
+        </div>
+
+        <!-- Jump to Artist Dropdown -->
+        <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-2 corner-cut-8 text-xs max-w-[200px]">
+          <span>🎯</span>
+          <select id="jump-artist" class="bg-transparent text-xs text-[var(--color-accent-gold)] focus:outline-none cursor-pointer font-semibold truncate">
+            <option value="" disabled selected data-i18n="jump_artist_ph">ไปที่ศิลปิน...</option>
+          </select>
+        </div>
+
+        <!-- View Switcher (Cards / Table) -->
+        <div class="flex items-center bg-[var(--bg-surface-elevated)] p-1 corner-cut-8 border border-[var(--border-subtle)] text-xs font-semibold">
+          <button id="view-card-btn" class="flex items-center gap-1.5 px-3 py-1.5 corner-cut-6 transition-all bg-[var(--color-accent)] text-[var(--color-accent-contrast)] font-semibold shadow-sm" title="Cards View">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            <span data-i18n="view_card">การ์ด</span>
+          </button>
+          <button id="view-table-btn" class="flex items-center gap-1.5 px-3 py-1.5 corner-cut-6 transition-all text-[var(--text-subtle)] hover:text-[var(--text-main)] font-normal" title="Table View">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span data-i18n="view_table">ตาราง</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 1: Grid Cards Container -->
+    <div id="grid-view" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Artist cards will be injected here -->
+      <div class="col-span-full py-16 text-center text-[var(--text-subtle)]">
+        <div class="w-8 h-8 border-2 border-[var(--color-accent-gold)] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        กำลังโหลดทำเนียบศิลปิน...
+      </div>
+    </div>
+
+    <!-- View 2: Table Spreadsheet View -->
+    <div id="table-view" class="hidden gallery-surface corner-cut-20 overflow-hidden shadow-xl border border-[var(--border-subtle)]">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm text-[var(--text-muted)]">
+          <thead class="bg-[var(--bg-surface-elevated)] text-[var(--color-accent-gold)] uppercase font-mono text-[11px] border-b border-[var(--border-subtle)] tracking-wider">
+            <tr>
+              <th scope="col" class="py-3.5 px-4 sm:px-6" data-i18n="th_artist">ศิลปิน</th>
+              <th scope="col" class="py-3.5 px-4" data-i18n="th_nationality">สัญชาติ</th>
+              <th scope="col" class="py-3.5 px-4 text-center" data-i18n="th_works_count">จำนวนผลงาน</th>
+              <th scope="col" class="py-3.5 px-4" data-i18n="th_technique">เทคนิคหลัก</th>
+              <th scope="col" class="py-3.5 px-4 text-right font-mono" data-i18n="th_price">ราคา</th>
+              <th scope="col" class="py-3.5 px-4" data-i18n="th_contact">ติดต่อ</th>
+              <th scope="col" class="py-3.5 px-4 text-right" data-i18n="th_action">ดำเนินการ</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="divide-y divide-[var(--border-subtle)]">
+            <!-- Rows injected here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden gallery-surface corner-cut-20 p-12 text-center space-y-3 border border-[var(--border-subtle)]">
+      <span class="text-4xl block">🔍</span>
+      <h3 class="text-lg font-bold text-[var(--text-main)]" data-i18n="empty_artists">ไม่พบข้อมูลศิลปินที่ตรงกับเงื่อนไข</h3>
+      <p class="text-xs text-[var(--text-subtle)]" data-i18n="empty_artists_sub">ลองเปลี่ยนคำค้นหาหรือเลือกดูทุกประเทศ</p>
+      <button onclick="resetFilters()" class="px-4 py-2 corner-cut-8 bg-[var(--color-accent-glow)] text-[var(--color-accent-light)] border border-[var(--border-accent)] text-xs font-semibold hover:brightness-110 transition cursor-pointer" data-i18n="btn_reset_filter">ล้างการค้นหา</button>
+    </div>
+
+  </main>
+
+  <!-- Modal: Artist Profile & Artworks Detail -->
+  <div id="artist-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+    <div class="gallery-surface max-w-3xl w-full corner-cut-20 overflow-hidden shadow-2xl border border-[var(--border-accent)] flex flex-col max-h-[90vh] transform scale-95 transition-transform duration-300" id="modal-container">
+      
+      <!-- Modal Header -->
+      <div class="p-6 pb-4 border-b border-[var(--border-subtle)] flex items-start justify-between gap-4 bg-[var(--bg-surface-solid)]">
+        <div class="flex items-center gap-4">
+          <img id="modal-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="" class="w-16 h-16 sm:w-20 sm:h-20 corner-cut-16 object-cover border-2 border-[var(--border-accent)] shadow-lg shrink-0 bg-[var(--mat-bg)]">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span id="modal-nationality-badge" class="px-2 py-0.5 corner-cut-6 text-[10px] font-semibold bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)]"></span>
+              <span id="modal-count-badge" class="text-[11px] font-mono text-[var(--text-subtle)]"></span>
+            </div>
+            <h2 id="modal-artist-name" class="text-xl sm:text-2xl font-serif-luxury font-bold text-[var(--text-main)]"></h2>
+            <p id="modal-contact" class="text-xs text-[var(--text-subtle)] mt-0.5 flex flex-wrap gap-3"></p>
+          </div>
+        </div>
+        <button onclick="closeArtistModal()" class="p-2 corner-cut-6 text-[var(--text-subtle)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-elevated)] transition cursor-pointer" aria-label="Close">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1 bg-[var(--bg-surface)]">
+        <!-- Bio Section -->
+        <div>
+          <h4 class="text-xs font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold mb-2" data-i18n="modal_bio_title">ประวัติและแนวคิด (Artist Biography)</h4>
+          <p id="modal-bio" class="text-sm text-[var(--text-muted)] leading-relaxed font-light bg-[var(--bg-surface-elevated)] p-4 corner-cut-12 border border-[var(--border-subtle)]"></p>
+        </div>
+
+        <!-- Artworks by Artist -->
+        <div>
+          <h4 class="text-xs font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold mb-3 flex items-center justify-between">
+            <span data-i18n="modal_artworks_title">ผลงานที่ร่วมแสดงในนิทรรศการนี้</span>
+            <span id="modal-artworks-subcount" class="text-[11px] text-[var(--text-subtle)] font-normal"></span>
+          </h4>
+          <div id="modal-artworks-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Artwork cards in modal injected here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-3">
+          <a href="/catalog.html" class="inline-flex items-center gap-1.5 text-[var(--color-accent-gold)] hover:underline font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span data-i18n="modal_open_catalog_btn">เปิดดูผลงานในสูจิบัตรดิจิทัล</span>
+          </a>
+            <button id="btn-modal-edit-artist" class="hidden inline-flex items-center gap-1.5 text-[var(--color-accent-light)] hover:text-white font-medium px-2.5 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] transition cursor-pointer">
+              <span>✏️</span>
+              <span>แก้ไขข้อมูลศิลปิน</span>
+            </button>
+            <button id="btn-modal-delete-artist" class="hidden inline-flex items-center gap-1.5 text-rose-400 hover:text-rose-300 font-medium px-2.5 py-1.5 corner-cut-6 bg-rose-950/40 border border-rose-800/40 hover:bg-rose-900/60 transition cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              <span data-i18n="btn_delete_artist">ลบศิลปินและผลงานทั้งหมด</span>
+            </button>
+          </div>
+          <button onclick="closeArtistModal()" class="px-4 py-2 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-main)] corner-cut-8 font-medium border border-[var(--border-subtle)] transition cursor-pointer" data-i18n="btn_close">ปิดหน้าต่าง</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Edit Artist Profile Modal -->
+    <div id="edit-artist-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md hidden">
+      <div class="gallery-surface max-w-2xl w-full corner-cut-20 p-5 sm:p-7 space-y-5 border border-[var(--border-accent)] shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
+        <div class="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
+          <div>
+            <h3 class="font-serif-luxury text-lg sm:text-xl font-bold text-[var(--text-main)] flex items-center gap-2">
+              <span>✏️</span>
+              <span>แก้ไขข้อมูลศิลปิน (Edit Artist Profile)</span>
+            </h3>
+            <p id="edit-artist-modal-subtitle" class="text-xs text-[var(--text-subtle)] mt-0.5 font-mono"></p>
+          </div>
+          <button onclick="closeEditArtistModal()" class="text-[var(--text-subtle)] hover:text-[var(--text-main)] text-2xl leading-none cursor-pointer">&times;</button>
+        </div>
+
+        <input type="hidden" id="edit-artist-original-name">
+
+        <!-- Avatar Replacement Box -->
+        <div class="space-y-3 bg-[var(--bg-base)] p-4 corner-cut-12 border border-[var(--border-subtle)]">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold flex items-center gap-1.5">
+              <span>📸</span>
+              <span>รูปภาพโปรไฟล์ศิลปิน (Artist Portrait)</span>
+            </span>
+            <span id="artist-edit-avatar-status" class="text-[11px] font-mono text-[var(--text-subtle)]"></span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+            <div class="w-20 h-20 bg-[var(--mat-bg)] corner-cut-12 overflow-hidden border border-[var(--border-accent)] flex items-center justify-center relative shrink-0">
+              <img id="artist-edit-avatar-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="Avatar" class="w-full h-full object-cover">
+              <span id="artist-edit-avatar-badge-new" class="hidden absolute top-0 right-0 bg-emerald-500 text-black text-[9px] font-bold px-1 corner-cut-2">NEW</span>
+            </div>
+
+            <div class="flex-1 space-y-2 w-full">
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="px-3 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] hover:brightness-110 text-[var(--color-accent-light)] border border-[var(--border-accent)] text-xs font-semibold cursor-pointer transition inline-flex items-center gap-1.5">
+                  <span>📸 เลือกรูปถ่ายศิลปินใหม่</span>
+                  <input type="file" id="artist-edit-avatar-file" accept="image/*" class="hidden" onchange="handleArtistAvatarFileChange(event)">
+                </label>
+                <button type="button" onclick="clearArtistAvatarEdit()" class="px-2.5 py-1.5 corner-cut-6 text-xs text-rose-400 hover:text-rose-200 border border-rose-800/40 hover:bg-rose-900/40 transition cursor-pointer">
+                  ลบรูปถ่าย
+                </button>
+              </div>
+
+              <!-- Upload Progress Bar -->
+              <div id="artist-edit-progress-wrap" class="hidden space-y-1">
+                <div class="flex justify-between text-[10px] font-mono text-[var(--color-accent-gold)]">
+                  <span>กำลังอัปโหลดรูปศิลปิน...</span>
+                  <span id="artist-edit-progress-pct">0%</span>
+                </div>
+                <div class="w-full bg-[var(--mat-bg)] h-1 corner-cut-2 overflow-hidden">
+                  <div id="artist-edit-progress-bar" class="bg-[var(--color-accent)] h-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <input type="hidden" id="artist-edit-avatar-url">
+            </div>
+          </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-[var(--bg-base)] p-4 corner-cut-12 border border-[var(--border-subtle)]">
+          <!-- Academic Title TH & EN -->
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">ตำแหน่งทางวิชาการ/ราชการ (ไทย / TH)</label>
+            <input type="text" id="artist-edit-academic-th" placeholder="เช่น ศ.ดร., รศ., ผศ., อาจารย์" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Academic Title (EN)</label>
+            <input type="text" id="artist-edit-academic-en" placeholder="e.g. Prof. Dr., Assoc. Prof." class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] placeholder-[var(--text-subtle)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Artist Name TH & EN -->
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">ชื่อศิลปิน (ไทย / TH) *</label>
+            <input type="text" id="artist-edit-name-th" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Artist Name (EN)</label>
+            <input type="text" id="artist-edit-name-en" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-sm text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Nationality & Contact -->
+          <div>
+            <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">สัญชาติ / ประเทศ (Nationality)</label>
+            <input type="text" id="artist-edit-nationality" list="country-suggestions-artist-page" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+            <datalist id="country-suggestions-artist-page">
+              <option value="Thailand">🇹🇭 ไทย (Thailand)</option>
+              <option value="Japan">🇯🇵 ญี่ปุ่น (Japan)</option>
+              <option value="France">🇫🇷 ฝรั่งเศส (France)</option>
+              <option value="Sweden">🇸🇪 สวีเดน (Sweden)</option>
+              <option value="United States">🇺🇸 สหรัฐอเมริกา (USA)</option>
+              <option value="United Kingdom">🇬🇧 สหราชอาณาจักร (UK)</option>
+              <option value="Germany">🇩🇪 เยอรมนี (Germany)</option>
+              <option value="Italy">🇮🇹 อิตาลี (Italy)</option>
+              <option value="China">🇨🇳 จีน (China)</option>
+              <option value="South Korea">🇰🇷 เกาหลีใต้ (South Korea)</option>
+            </datalist>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">อีเมลติดต่อ (Email)</label>
+            <input type="email" id="artist-edit-email" placeholder="artist@example.com" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Phone -->
+          <div class="col-span-1 sm:col-span-2">
+            <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">เบอร์โทรศัพท์ (Phone)</label>
+            <input type="text" id="artist-edit-phone" placeholder="+66..." class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none">
+          </div>
+
+          <!-- Bio TH & EN -->
+          <div class="col-span-1 sm:col-span-2 space-y-2">
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-gold)] mb-1">ประวัติและแนวคิด (ไทย / TH)</label>
+              <textarea id="artist-edit-bio-th" rows="3" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[var(--color-accent-light)] mb-1">Artist Biography (EN)</label>
+              <textarea id="artist-edit-bio-en" rows="3" class="w-full px-3 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:border-[var(--color-accent)] focus:outline-none"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border-subtle)]">
+          <button type="button" onclick="closeEditArtistModal()" class="px-4 py-2 corner-cut-6 bg-[var(--bg-surface-elevated)] hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] text-xs font-semibold transition border border-[var(--border-subtle)] cursor-pointer">ยกเลิก</button>
+          <button type="button" id="btn-save-artist-profile" onclick="saveArtistProfileEdits()" class="px-5 py-2 corner-cut-8 bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:brightness-110 text-xs font-bold transition shadow-md cursor-pointer flex items-center gap-1.5">
+            <span>💾</span>
+            <span>บันทึกข้อมูลศิลปิน</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+      <!-- Institutional Colophon Footer -->
+  <footer class="border-t border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] py-10 text-[var(--text-subtle)] font-light mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div class="space-y-1 text-center sm:text-left">
+          <p class="text-[var(--text-main)] font-serif-luxury tracking-wide text-sm font-semibold" data-i18n="footer_title">วิทยาลัยเพาะช่าง มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์</p>
+          <p class="text-[var(--text-subtle)] text-[11px]" data-i18n="footer_sub">Poh-Chang Academy of Arts • RMUTR &bull; Bangkok, Thailand</p>
+        </div>
+        <div class="flex items-center gap-6 text-[11px] text-[var(--text-muted)]">
+          <a href="/gallery.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/admin.html" class="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition" title="Curator Entrance" data-i18n="nav_curator_desk">Curator Desk</a>
+        </div>
+      </div>
+      <div class="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <p class="text-[11px] text-[var(--text-subtle)]">© 2026 Poh-Chang International Art Exhibition Platform. All artworks copyright of their respective artists.</p>
+        <span class="text-[11px] text-[var(--text-subtle)] font-mono">Curatorial Fine Art Salon System</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/cloudinary-upload.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let allArtists = [];
+    let currentView = 'card';
+    let isCuratorAdmin = false;
+
+    function checkAdminAuth() {
+      const params = new URLSearchParams(window.location.search);
+      const urlAdmin = params.get('admin') === 'true' || Boolean(params.get('adminKey') || params.get('key'));
+      const storedKey = localStorage.getItem('curator_admin_key') || sessionStorage.getItem('curator_admin_key');
+      isCuratorAdmin = Boolean(urlAdmin || (storedKey && storedKey.trim().length > 0));
+      return isCuratorAdmin;
+    }
+
+    async function loadArtists() {
+      checkAdminAuth();
+      try {
+        const res = await fetch('/api/artists');
+        const data = await res.json();
+
+        if (!data.success || !data.artists) {
+          throw new Error(data.error || 'Failed to fetch artists');
+        }
+
+        allArtists = data.artists;
+        const totalArts = allArtists.reduce((sum, a) => sum + (a.artworks_count || (a.artworks ? a.artworks.length : 0)), 0);
+        document.getElementById('total-artists-badge').textContent = `${allArtists.length} ${window.t('artists_count_unit')}`;
+        const totalArtsBadge = document.getElementById('total-artworks-badge');
+        if (totalArtsBadge) {
+          totalArtsBadge.textContent = `${totalArts} ${window.i18n.getLang() === 'th' ? 'ผลงาน' : 'Artworks'}`;
+        }
+
+        setupFilters();
+        render();
+      } catch (err) {
+        console.error('Error loading artists:', err);
+        document.getElementById('grid-view').innerHTML = `
+          <div class="col-span-full py-16 text-center text-rose-400">
+            <p>ไม่สามารถโหลดข้อมูลศิลปินได้: ${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    function setupFilters() {
+      const countrySelect = document.getElementById('country-filter');
+      const jumpSelect = document.getElementById('jump-artist');
+      const currentCountryVal = countrySelect.value || 'all';
+
+      countrySelect.innerHTML = `<option value="all" data-i18n="filter_all_countries">${window.t('filter_all_countries')}</option>`;
+
+      const countries = new Set();
+      allArtists.forEach(a => {
+        if (a.nationality) countries.add(a.nationality);
+      });
+
+      // Populate countries
+      Array.from(countries).sort().forEach(country => {
+        const opt = document.createElement('option');
+        opt.value = country;
+        const displayName = window.getCountryDisplayName(country);
+        opt.textContent = displayName;
+        if (country === currentCountryVal) opt.selected = true;
+        countrySelect.appendChild(opt);
+      });
+
+      // Populate Jump Select
+      jumpSelect.innerHTML = `<option value="" disabled selected>${window.t('jump_artist_ph')}</option>`;
+      allArtists.forEach((a) => {
+        const name = window.getField(a, 'artist_name');
+        const opt = document.createElement('option');
+        opt.value = a.artist_name;
+        opt.textContent = `${name} (${a.artworks_count} ${window.t('works_suffix')})`;
+        jumpSelect.appendChild(opt);
+      });
+    }
+
+    function parsePrice(art) {
+      if (!art || !art.price) return null;
+      const str = String(art.price).replace(/,/g, '');
+      const match = str.match(/\d+(\.\d+)?/);
+      return match ? parseFloat(match[0]) : null;
+    }
+
+    function getArtistMaxPrice(artist) {
+      let max = null;
+      (artist.artworks || []).forEach(art => {
+        const p = parsePrice(art);
+        if (p !== null) {
+          if (max === null || p > max) max = p;
+        }
+      });
+      return max;
+    }
+
+    function formatPriceDisplay(priceVal) {
+      if (priceVal == null) return '-';
+      return '฿' + Number(priceVal).toLocaleString('th-TH');
+    }
+
+    function getFilteredArtists() {
+      const search = (document.getElementById('artist-search').value || '').toLowerCase().trim();
+      const country = document.getElementById('country-filter').value;
+      const sortVal = (document.getElementById('sort-filter') && document.getElementById('sort-filter').value) || 'default';
+
+      let list = allArtists.filter(artist => {
+        const artistCode = window.resolveCountryCode(artist.nationality);
+        const filterCode = window.resolveCountryCode(country);
+        const matchCountry = country === 'all' || 
+                             (artist.nationality || '').toLowerCase() === country.toLowerCase() ||
+                             (artistCode && filterCode && artistCode === filterCode);
+        if (!matchCountry) return false;
+
+        if (!search) return true;
+
+        const nameMatch = (window.getField(artist, 'artist_name') || '').toLowerCase().includes(search) ||
+                          (artist.artist_name || '').toLowerCase().includes(search);
+        const bioMatch = (window.getField(artist, 'artist_bio') || '').toLowerCase().includes(search);
+        const natDisplay = (window.getCountryDisplayName(artist.nationality, 'th') + ' ' + window.getCountryDisplayName(artist.nationality, 'en')).toLowerCase();
+        const natMatch = (artist.nationality || '').toLowerCase().includes(search) || natDisplay.includes(search);
+        const emailMatch = (artist.artist_email || '').toLowerCase().includes(search);
+        const artMatch = (artist.artworks || []).some(art => 
+          (window.getField(art, 'title') || '').toLowerCase().includes(search) || 
+          (window.getField(art, 'technique') || '').toLowerCase().includes(search)
+        );
+
+        return nameMatch || bioMatch || natMatch || emailMatch || artMatch;
+      });
+
+      // Sorting logic
+      if (sortVal === 'name_asc') {
+        list.sort((a, b) => {
+          const nameA = window.getArtistFullName(a) || a.artist_name || '';
+          const nameB = window.getArtistFullName(b) || b.artist_name || '';
+          return nameA.localeCompare(nameB, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'name_desc') {
+        list.sort((a, b) => {
+          const nameA = window.getArtistFullName(a) || a.artist_name || '';
+          const nameB = window.getArtistFullName(b) || b.artist_name || '';
+          return nameB.localeCompare(nameA, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'country_asc') {
+        list.sort((a, b) => {
+          const cA = window.getCountryDisplayName(a.nationality) || a.nationality || '';
+          const cB = window.getCountryDisplayName(b.nationality) || b.nationality || '';
+          return cA.localeCompare(cB, window.i18n.getLang() === 'th' ? 'th' : 'en');
+        });
+      } else if (sortVal === 'price_desc') {
+        list.sort((a, b) => {
+          const pA = getArtistMaxPrice(a);
+          const pB = getArtistMaxPrice(b);
+          if (pA === null && pB === null) return 0;
+          if (pA === null) return 1;
+          if (pB === null) return -1;
+          return pB - pA;
+        });
+      } else if (sortVal === 'price_asc') {
+        list.sort((a, b) => {
+          const pA = getArtistMaxPrice(a);
+          const pB = getArtistMaxPrice(b);
+          if (pA === null && pB === null) return 0;
+          if (pA === null) return 1;
+          if (pB === null) return -1;
+          return pA - pB;
+        });
+      } else if (sortVal === 'artworks_desc') {
+        list.sort((a, b) => (b.artworks_count || 0) - (a.artworks_count || 0));
+      }
+
+      return list;
+    }
+
+    function render() {
+      const filtered = getFilteredArtists();
+      const emptyState = document.getElementById('empty-state');
+      const gridView = document.getElementById('grid-view');
+      const tableView = document.getElementById('table-view');
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+        gridView.classList.add('hidden');
+        tableView.classList.add('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      if (currentView === 'card') {
+        gridView.classList.remove('hidden');
+        tableView.classList.add('hidden');
+        renderCards(filtered);
+      } else {
+        gridView.classList.add('hidden');
+        tableView.classList.remove('hidden');
+        renderTable(filtered);
+      }
+    }
+
+    function renderCards(artists) {
+      const gridView = document.getElementById('grid-view');
+      gridView.innerHTML = artists.map((artist) => {
+        const artistName = window.getArtistFullName(artist);
+        const bio = window.getField(artist, 'artist_bio');
+        const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes('unsplash.com'));
+        const cleanBio = bio && bio.trim() !== '-' ? bio.trim() : '';
+        const bioSnippet = cleanBio ? `"${cleanBio.slice(0, 110)}..."` : (window.i18n.getLang() === 'th' ? 'ศิลปินร่วมจัดแสดงในนิทรรศการ' : 'Exhibiting artist');
+        const maxPrice = getArtistMaxPrice(artist);
+        
+        // Render artwork thumbnails (up to 3) with signature cut - filter out empty image URLs
+        const validArtworks = (artist.artworks || []).filter(art => Boolean((art.thumbnail_url || art.image_url || '').trim()));
+        const artThumbs = validArtworks.slice(0, 3).map(art => {
+          const artTitle = window.getField(art, 'title');
+          const imgSrc = art.thumbnail_url || art.image_url;
+          return `
+            <a href="/artwork.html?id=${art.id}" class="relative aspect-square corner-cut-8 overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] group/art block" title="${artTitle}">
+              <img src="${imgSrc}" alt="${artTitle}" class="w-full h-full object-cover group-hover/art:scale-110 transition-transform duration-300" onerror="this.parentElement.style.display='none';">
+            </a>
+          `;
+        }).join('');
+
+        const extraCount = validArtworks.length > 3 ? `
+          <div class="relative aspect-square corner-cut-8 border border-dashed border-[var(--border-accent)] bg-[var(--color-accent-glow)] flex items-center justify-center text-[10px] font-bold text-[var(--color-accent-light)]">
+            +${validArtworks.length - 3}
+          </div>
+        ` : '';
+
+        return `
+          <div class="gallery-surface corner-cut-20 overflow-hidden border border-[var(--border-subtle)] hover:border-[var(--border-accent)] transition-all duration-300 shadow-xl flex flex-col justify-between group hover:-translate-y-1">
+            <div class="p-5 space-y-4">
+              <!-- Artist Header -->
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  ${hasAvatar ? `
+                    <div class="relative w-14 h-14 corner-cut-12 overflow-hidden border-2 border-[var(--border-accent)] shadow-md shrink-0 bg-[var(--mat-bg)]">
+                      <img src="${artist.artist_avatar_url}" alt="${artistName}" class="w-full h-full object-cover">
+                    </div>
+                  ` : ''}
+                  <div class="min-w-0">
+                    <h3 class="font-serif-luxury text-base sm:text-lg font-bold text-[var(--text-main)] group-hover:text-[var(--color-accent-light)] transition-colors truncate">
+                      ${artistName}
+                    </h3>
+                    <div class="mt-1">
+                      ${window.getCountryFlagBadge(artist.nationality, { size: 'sm', showName: true })}
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-1 shrink-0">
+                  <span class="px-2.5 py-1 corner-cut-6 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)]">
+                    ${artist.artworks_count} ${window.t('works_suffix')}
+                  </span>
+                  ${maxPrice !== null ? `
+                    <span class="text-[11px] font-mono font-bold text-[var(--color-accent-gold)]">
+                      ${formatPriceDisplay(maxPrice)}
+                    </span>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- Artwork Preview Strip (Only if artist has valid images) -->
+              ${artThumbs ? `
+                <div class="p-2.5 corner-cut-12 bg-[var(--mat-bg)] border border-[var(--border-subtle)]">
+                  <div class="grid grid-cols-4 gap-2">
+                    ${artThumbs}
+                    ${extraCount}
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Bio Snippet -->
+              <p class="text-xs text-[var(--text-subtle)] italic leading-relaxed line-clamp-2">
+                ${bioSnippet}
+              </p>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="px-5 py-3.5 bg-[var(--bg-surface-solid)] border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
+              <span class="text-[var(--text-subtle)] text-[11px]">${window.t('exhibition_label')}</span>
+              <button onclick="openArtistModal('${encodeURIComponent(artist.artist_name)}')" class="inline-flex items-center gap-1 text-[var(--color-accent-light)] hover:text-[var(--color-accent-gold)] font-semibold group/btn cursor-pointer">
+                <span>${window.t('btn_view_profile')}</span>
+                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTable(artists) {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = artists.map(artist => {
+        const artistName = window.getArtistFullName(artist);
+        const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes('unsplash.com'));
+        const firstTechnique = (artist.artworks && artist.artworks[0] && window.getField(artist.artworks[0], 'technique')) || (window.i18n.getLang() === 'th' ? 'ภาพพิมพ์ร่วมสมัย' : 'Contemporary Printmaking');
+        const maxPrice = getArtistMaxPrice(artist);
+
+        return `
+          <tr class="hover:bg-[var(--bg-surface-elevated)]/60 transition-colors border-b border-[var(--border-subtle)]">
+            <td class="py-3 px-4 sm:px-6">
+              <div class="flex items-center gap-3">
+                ${hasAvatar ? `
+                  <img src="${artist.artist_avatar_url}" alt="" class="w-9 h-9 corner-cut-8 object-cover border border-[var(--border-accent)] shrink-0 bg-[var(--mat-bg)]">
+                ` : ''}
+                <span class="font-semibold text-[var(--text-main)]">${artistName}</span>
+              </div>
+            </td>
+            <td class="py-3 px-4 text-xs font-mono">
+              ${window.getCountryFlagBadge(artist.nationality, { size: 'sm', showName: true })}
+            </td>
+            <td class="py-3 px-4 text-center font-mono font-bold text-[var(--color-accent-gold)]">
+              ${artist.artworks_count}
+            </td>
+            <td class="py-3 px-4 text-xs text-[var(--text-muted)] max-w-[180px] truncate">
+              ${firstTechnique}
+            </td>
+            <td class="py-3 px-4 text-right font-mono text-xs font-semibold ${maxPrice !== null ? 'text-[var(--color-accent-gold)]' : 'text-[var(--text-subtle)]'}">
+              ${formatPriceDisplay(maxPrice)}
+            </td>
+            <td class="py-3 px-4 text-xs text-[var(--text-subtle)] font-mono">
+              ${artist.artist_email || '-'}
+            </td>
+            <td class="py-3 px-4 text-right">
+              <div class="inline-flex items-center gap-1.5 justify-end">
+                <button onclick="openArtistModal('${encodeURIComponent(artist.artist_name)}')" class="px-3 py-1.5 corner-cut-6 bg-[var(--color-accent-glow)] hover:brightness-110 text-[var(--color-accent-light)] border border-[var(--border-accent)] text-xs font-semibold transition cursor-pointer">
+                  ${window.t('btn_open_profile')}
+                </button>
+                ${isCuratorAdmin ? `
+                  <button onclick="deleteArtistByName('${encodeURIComponent(artist.artist_name)}', ${artist.artworks_count || (artist.artworks ? artist.artworks.length : 0)})" class="p-1.5 corner-cut-6 text-rose-400/80 hover:text-rose-300 hover:bg-rose-950/50 border border-rose-800/30 transition cursor-pointer" title="ลบศิลปินและผลงานทั้งหมด">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openArtistModal(encodedName) {
+      const name = decodeURIComponent(encodedName);
+      const artist = allArtists.find(a => a.artist_name === name || a.artist_name_en === name || a.artist_name_th === name);
+      if (!artist) return;
+
+      const artistName = window.getArtistFullName(artist);
+      const bio = window.getField(artist, 'artist_bio');
+      const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes('unsplash.com'));
+      const modalAvatar = document.getElementById('modal-avatar');
+
+      if (hasAvatar) {
+        modalAvatar.src = artist.artist_avatar_url;
+        modalAvatar.classList.remove('hidden');
+      } else {
+        modalAvatar.src = '';
+        modalAvatar.classList.add('hidden');
+      }
+      document.getElementById('modal-artist-name').textContent = artistName;
+      document.getElementById('modal-nationality-badge').innerHTML = window.getCountryFlagBadge(artist.nationality, { size: 'md', showName: true });
+      document.getElementById('modal-count-badge').textContent = `• ${artist.artworks_count} ${window.t('works_suffix')}`;
+      
+      const contactHtml = [];
+      if (artist.artist_email) contactHtml.push(`<span>✉️ ${artist.artist_email}</span>`);
+      if (artist.artist_phone) contactHtml.push(`<span>📞 ${artist.artist_phone}</span>`);
+      document.getElementById('modal-contact').innerHTML = contactHtml.join('');
+
+      document.getElementById('modal-bio').textContent = bio || (window.i18n.getLang() === 'th' ? 'ไม่มีข้อมูลประวัติเพิ่มเติม' : 'No biography available');
+      document.getElementById('modal-artworks-subcount').textContent = `(${artist.artworks_count} ${window.t('works_suffix')})`;
+
+      const artworksGrid = document.getElementById('modal-artworks-grid');
+      artworksGrid.innerHTML = (artist.artworks || []).map(art => {
+        const artTitle = window.getField(art, 'title');
+        const artTech = window.getField(art, 'technique') || (window.i18n.getLang() === 'th' ? 'ภาพพิมพ์' : 'Printmaking');
+        const artPrice = parsePrice(art);
+        return `
+          <div class="p-3 corner-cut-12 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] flex gap-3 group/item">
+            <img src="${art.thumbnail_url || art.image_url}" alt="${artTitle}" class="w-20 h-20 corner-cut-8 object-cover border border-[var(--border-subtle)] shrink-0 bg-[var(--mat-bg)]">
+            <div class="min-w-0 flex flex-col justify-between">
+              <div>
+                <h5 class="font-serif-luxury font-bold text-sm text-[var(--text-main)] truncate group-hover/item:text-[var(--color-accent-gold)] transition-colors">${artTitle}</h5>
+                <p class="text-[11px] text-[var(--text-subtle)] mt-0.5 truncate">${artTech}</p>
+                <p class="text-[10px] text-[var(--text-subtle)] font-mono">${art.dimensions ? window.formatDimensions(art.dimensions) + ' • ' : ''}${art.year_created || ''}</p>
+                ${artPrice !== null ? `
+                  <p class="text-[11px] font-mono font-bold text-[var(--color-accent-gold)] mt-0.5">${formatPriceDisplay(artPrice)}</p>
+                ` : ''}
+              </div>
+              <a href="/artwork.html?id=${art.id}" class="text-[11px] text-[var(--color-accent-gold)] hover:underline font-semibold mt-1 inline-flex items-center gap-1">
+                <span>${window.t('modal_view_artwork')}</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const modal = document.getElementById('artist-modal');
+      const container = document.getElementById('modal-container');
+      
+      const editBtn = document.getElementById('btn-modal-edit-artist');
+      if (editBtn) {
+        if (isCuratorAdmin) {
+          editBtn.classList.remove('hidden');
+          editBtn.onclick = () => openEditArtistModal(artist);
+        } else {
+          editBtn.classList.add('hidden');
+        }
+      }
+
+      const deleteBtn = document.getElementById('btn-modal-delete-artist');
+      if (deleteBtn) {
+        if (isCuratorAdmin) {
+          deleteBtn.classList.remove('hidden');
+          deleteBtn.onclick = () => deleteArtistByName(artist.artist_name, artist.artworks_count || (artist.artworks ? artist.artworks.length : 0));
+        } else {
+          deleteBtn.classList.add('hidden');
+        }
+      }
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        container.classList.remove('scale-95');
+      }, 10);
+    }
+
+    // ==========================================
+    // Edit Artist Profile Modal Logic
+    // ==========================================
+    let currentEditingArtist = null;
+    let pendingArtistAvatarFile = null;
+
+    function openEditArtistModal(artist) {
+      if (!artist) return;
+      currentEditingArtist = artist;
+      pendingArtistAvatarFile = null;
+
+      document.getElementById('edit-artist-original-name').value = artist.artist_name || '';
+      document.getElementById('edit-artist-modal-subtitle').textContent = `แก้ไขข้อมูลโปรไฟล์ของ "${window.getArtistFullName(artist)}" (${artist.artworks_count || 0} ผลงาน)`;
+
+      const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes('unsplash.com'));
+      const previewEl = document.getElementById('artist-edit-avatar-preview');
+      if (hasAvatar) {
+        previewEl.src = artist.artist_avatar_url;
+        document.getElementById('artist-edit-avatar-status').textContent = 'มีรูปถ่ายแล้ว';
+      } else {
+        previewEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.artist_name || 'Artist')}&background=13141f&color=D4AF37&bold=true`;
+        document.getElementById('artist-edit-avatar-status').textContent = 'ไม่มีรูปภาพ (ใช้ตัวแทน)';
+      }
+
+      document.getElementById('artist-edit-avatar-url').value = artist.artist_avatar_url || '';
+      document.getElementById('artist-edit-avatar-badge-new').classList.add('hidden');
+      document.getElementById('artist-edit-avatar-file').value = '';
+      document.getElementById('artist-edit-progress-wrap').classList.add('hidden');
+
+      document.getElementById('artist-edit-academic-th').value = artist.academic_title_th || artist.academic_title || '';
+      document.getElementById('artist-edit-academic-en').value = artist.academic_title_en || artist.academic_title || '';
+      document.getElementById('artist-edit-name-th').value = artist.artist_name_th || artist.artist_name || '';
+      document.getElementById('artist-edit-name-en').value = artist.artist_name_en || artist.artist_name || '';
+      document.getElementById('artist-edit-nationality').value = artist.nationality || 'Thailand';
+      document.getElementById('artist-edit-email').value = artist.artist_email || '';
+      document.getElementById('artist-edit-phone').value = artist.artist_phone || '';
+      document.getElementById('artist-edit-bio-th').value = artist.artist_bio_th || artist.artist_bio || '';
+      document.getElementById('artist-edit-bio-en').value = artist.artist_bio_en || artist.artist_bio || '';
+
+      document.getElementById('edit-artist-modal').classList.remove('hidden');
+    }
+
+    function closeEditArtistModal() {
+      document.getElementById('edit-artist-modal').classList.add('hidden');
+      currentEditingArtist = null;
+      pendingArtistAvatarFile = null;
+    }
+
+    function handleArtistAvatarFileChange(e) {
+      if (!e.target.files || !e.target.files[0]) return;
+      const file = e.target.files[0];
+      pendingArtistAvatarFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('artist-edit-avatar-preview').src = ev.target.result;
+        document.getElementById('artist-edit-avatar-badge-new').classList.remove('hidden');
+        document.getElementById('artist-edit-avatar-status').textContent = `✓ เลือกรูปใหม่แล้ว (${file.name})`;
+        document.getElementById('artist-edit-avatar-status').className = 'text-[11px] font-mono text-emerald-400 font-semibold';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearArtistAvatarEdit() {
+      pendingArtistAvatarFile = null;
+      document.getElementById('artist-edit-avatar-url').value = '';
+      document.getElementById('artist-edit-avatar-file').value = '';
+      const artistName = document.getElementById('artist-edit-name-th').value || 'Artist';
+      document.getElementById('artist-edit-avatar-preview').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName)}&background=13141f&color=D4AF37&bold=true`;
+      document.getElementById('artist-edit-avatar-badge-new').classList.remove('hidden');
+      document.getElementById('artist-edit-avatar-badge-new').textContent = 'ลบแล้ว';
+      document.getElementById('artist-edit-avatar-status').textContent = 'จะลบรูปถ่ายเมื่อบันทึก';
+      document.getElementById('artist-edit-avatar-status').className = 'text-[11px] font-mono text-amber-400';
+    }
+
+    async function saveArtistProfileEdits() {
+      if (!currentEditingArtist) return;
+      const originalName = document.getElementById('edit-artist-original-name').value.trim();
+      const btnSave = document.getElementById('btn-save-artist-profile');
+      btnSave.disabled = true;
+      btnSave.innerHTML = `<span>⏳</span><span>กำลังบันทึกข้อมูล...</span>`;
+
+      const adminKey = prompt('กรุณาระบุรหัสผู้ดูแล (Admin Key) เพื่อยืนยันการแก้ไขข้อมูลศิลปิน:', 'admin123');
+      if (!adminKey) {
+        btnSave.disabled = false;
+        btnSave.innerHTML = `<span>💾</span><span>บันทึกข้อมูลศิลปิน</span>`;
+        return;
+      }
+
+      try {
+        const config = await EventAPI.getConfig();
+        let newAvatarUrl = document.getElementById('artist-edit-avatar-url').value;
+
+        // Upload avatar file to Cloudinary if selected
+        if (pendingArtistAvatarFile) {
+          const wrapEl = document.getElementById('artist-edit-progress-wrap');
+          const barEl = document.getElementById('artist-edit-progress-bar');
+          const pctEl = document.getElementById('artist-edit-progress-pct');
+          wrapEl.classList.remove('hidden');
+
+          const uploadRes = await CloudinaryUploader.uploadDirect(pendingArtistAvatarFile, {
+            cloudName: config.cloudinaryCloudName,
+            uploadPreset: config.cloudinaryUploadPreset,
+            onProgress: (pct) => {
+              barEl.style.width = `${pct}%`;
+              pctEl.textContent = `${pct}%`;
+            }
+          });
+          newAvatarUrl = uploadRes.imageUrl;
+        }
+
+        const academicTh = document.getElementById('artist-edit-academic-th').value.trim();
+        const academicEn = document.getElementById('artist-edit-academic-en').value.trim();
+        const nameTh = document.getElementById('artist-edit-name-th').value.trim();
+        const nameEn = document.getElementById('artist-edit-name-en').value.trim();
+
+        const payload = {
+          old_artist_name: originalName,
+          artist_name: nameTh || nameEn || originalName,
+          artist_name_th: nameTh,
+          artist_name_en: nameEn,
+          academic_title: academicTh || academicEn,
+          academic_title_th: academicTh,
+          academic_title_en: academicEn,
+          artist_avatar_url: newAvatarUrl,
+          nationality: document.getElementById('artist-edit-nationality').value.trim() || 'Thailand',
+          artist_email: document.getElementById('artist-edit-email').value.trim(),
+          artist_phone: document.getElementById('artist-edit-phone').value.trim(),
+          artist_bio_th: document.getElementById('artist-edit-bio-th').value.trim(),
+          artist_bio_en: document.getElementById('artist-edit-bio-en').value.trim()
+        };
+
+        const res = await EventAPI.updateArtist(originalName, payload, adminKey.trim());
+        if (res && res.success) {
+          alert('บันทึกการแก้ไขข้อมูลและรูปภาพศิลปินเรียบร้อยแล้ว');
+          closeEditArtistModal();
+          closeArtistModal();
+          await loadArtists();
+        } else {
+          alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + (res?.error || 'Failed to update artist'));
+        }
+      } catch (err) {
+        alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + err.message);
+      } finally {
+        btnSave.disabled = false;
+        btnSave.innerHTML = `<span>💾</span><span>บันทึกข้อมูลศิลปิน</span>`;
+      }
+    }
+
+    async function deleteArtistByName(artistName, artworkCount) {
+      const confirmPrompt = `${window.t('confirm_delete_artist') || 'คุณแน่ใจหรือไม่ว่าต้องการลบศิลปินท่านนี้ พร้อมผลงานทั้งหมดที่เกี่ยวข้องอย่างถาวร?'}\n\nศิลปิน: "${artistName}"\nผลงานทั้งหมด: ${artworkCount} รายการ\n\nการลบนี้จะนำศิลปินและผลงานออกจากทุกหน้าแสดงผล และไม่สามารถย้อนกลับได้!`;
+      if (!confirm(confirmPrompt)) return;
+
+      const adminKey = prompt('กรุณาระบุรหัสผู้ดูแล (Admin Key) เพื่อยืนยันการลบ:', 'admin123');
+      if (!adminKey) return;
+
+      try {
+        const res = await EventAPI.deleteArtist(artistName, adminKey.trim());
+        if (res.success) {
+          alert(`${window.t('toast_deleted_artist') || 'ลบศิลปินและผลงานสำเร็จ'}: ${res.message || ''}`);
+          closeArtistModal();
+          loadArtists();
+        } else {
+          alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + (res.error || 'Failed to delete artist'));
+        }
+      } catch (err) {
+        alert((window.t('app_error') || 'เกิดข้อผิดพลาด: ') + ' ' + err.message);
+      }
+    }
+
+    function closeArtistModal() {
+      const modal = document.getElementById('artist-modal');
+      const container = document.getElementById('modal-container');
+      modal.classList.add('opacity-0');
+      container.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 250);
+    }
+
+    function resetFilters() {
+      document.getElementById('artist-search').value = '';
+      document.getElementById('country-filter').value = 'all';
+      if (document.getElementById('sort-filter')) {
+        document.getElementById('sort-filter').value = 'default';
+      }
+      render();
+    }
+
+    function updateViewButtonStyles() {
+      const cardBtn = document.getElementById('view-card-btn');
+      const tableBtn = document.getElementById('view-table-btn');
+      if (currentView === 'card') {
+        cardBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 corner-cut-6 transition-all bg-[var(--color-accent)] text-[var(--color-accent-contrast)] font-semibold shadow-sm';
+        tableBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 corner-cut-6 transition-all text-[var(--text-subtle)] hover:text-[var(--text-main)] font-normal';
+      } else {
+        tableBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 corner-cut-6 transition-all bg-[var(--color-accent)] text-[var(--color-accent-contrast)] font-semibold shadow-sm';
+        cardBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 corner-cut-6 transition-all text-[var(--text-subtle)] hover:text-[var(--text-main)] font-normal';
+      }
+    }
+
+    // Event Listeners
+    document.getElementById('artist-search').addEventListener('input', render);
+    document.getElementById('country-filter').addEventListener('change', render);
+    if (document.getElementById('sort-filter')) {
+      document.getElementById('sort-filter').addEventListener('change', render);
+    }
+
+    document.getElementById('jump-artist').addEventListener('change', (e) => {
+      if (e.target.value) {
+        openArtistModal(encodeURIComponent(e.target.value));
+        e.target.value = '';
+      }
+    });
+
+    document.getElementById('view-card-btn').addEventListener('click', () => {
+      currentView = 'card';
+      updateViewButtonStyles();
+      render();
+    });
+
+    document.getElementById('view-table-btn').addEventListener('click', () => {
+      currentView = 'table';
+      updateViewButtonStyles();
+      render();
+    });
+
+    // Close modal on escape
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeArtistModal();
+    });
+
+    // Close modal on backdrop click
+    document.getElementById('artist-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'artist-modal') closeArtistModal();
+    });
+
+    // Listen to Language Changes
+    window.addEventListener('languageChanged', () => {
+      window.i18n.apply();
+      if (allArtists.length) {
+        document.getElementById('total-artists-badge').textContent = `${allArtists.length} ${window.t('artists_count_unit')}`;
+      }
+      setupFilters();
+      render();
+    });
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", async () => {
+      window.i18n.renderSwitcher('lang-switcher');
+      try {
+        if (window.EventAPI && typeof EventAPI.getConfig === 'function') {
+          const config = await EventAPI.getConfig();
+          if (config.eventTitle) {
+            document.getElementById("nav-event-title").textContent = config.eventTitle;
+          }
+        }
+      } catch (e) {
+        // Fallback
+      }
+      loadArtists();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "18-poh-chang-art-workshop",
+  "version": "1.0.0",
+  "description": "Virtual Exhibition Instance for 18 Poh Chang art workshop",
+  "scripts": {
+    "dev": "wrangler pages dev public --d1 DB=d1-18-poh-chang-art-workshop --local",
+    "init-db:local": "wrangler d1 execute d1-18-poh-chang-art-workshop --file=schema.sql --local",
+    "init-db:remote": "wrangler d1 execute d1-18-poh-chang-art-workshop --file=schema.sql --remote",
+    "deploy": "wrangler pages deploy public"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^3.114.0"
+  }
+}

@@ -1,0 +1,26 @@
+# Cloudflare Pages Configuration for Event: 18 Poh Chang art workshop
+# Dedicated Account Email: surachai.ai.udo+artworkshop18@gmail.com
+
+name = "18-poh-chang-art-workshop"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "public"
+
+# Isolated D1 Database for this Event
+[[d1_databases]]
+binding = "DB"
+database_name = "d1-18-poh-chang-art-workshop"
+database_id = "placeholder-18-poh-chang-art-workshop"
+
+[vars]
+EVENT_ID = "18-poh-chang-art-workshop"
+EVENT_TITLE = "18 Poh Chang art workshop"
+ADMIN_EMAIL = "surachai.ai.udo+artworkshop18@gmail.com"
+MASTER_PORTAL_URL = "https://master-portal.pages.dev"
+SHARED_SECRET_TOKEN = "sec_18pohchangartworkshop_61045e6c340ecfdf25c2a3a3e2a2bce7"
+ADMIN_KEY = "admin123"
+EVENT_PAGE_BASE_URL = "https://18-poh-chang-art-workshop.pages.dev"
+EVENT_THEME = "heritage"
+
+# Dedicated Cloudinary Storage Account for this Event
+CLOUDINARY_CLOUD_NAME = "pohchang18"
+CLOUDINARY_UPLOAD_PRESET = "pohchang18_preset"

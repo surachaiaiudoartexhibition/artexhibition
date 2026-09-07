@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-[var(--bg-base)] text-[var(--text-main)]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Exhibition 2026 | นิทรรศการศิลปะเสมือนจริง</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
+  </style>
+  <script src="/js/i18n.js"></script>
+  <link rel="stylesheet" href="/css/themes.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body class="min-h-full flex flex-col selection:bg-[#C5A059] selection:text-[#141E19] bg-[var(--bg-base)] text-[var(--text-main)]">
+      <!-- Master Navigation Bar -->
+  <header class="master-navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Brand Lockup -->
+      <a href="/" class="flex items-center space-x-3 group shrink-0">
+        <div class="master-brand-badge">พ.ช.</div>
+        <div class="min-w-0">
+          <span id="nav-event-title" class="text-sm font-serif-luxury tracking-wider text-[var(--text-main)] block font-semibold truncate leading-tight" data-i18n="nav_event_default">Printmaking Exhibition</span>
+          <span class="text-[10px] text-[var(--color-accent-gold)] font-mono tracking-widest uppercase block leading-none mt-0.5" data-i18n="nav_sub_brand">Fine Art Exhibition</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links & Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <nav class="flex items-center space-x-1 sm:space-x-1.5 text-xs sm:text-sm font-normal">
+          <a href="/" class="master-nav-link active" aria-current="page" data-i18n="nav_home">หน้าแรก</a>
+          <a href="/gallery.html" class="master-nav-link "  data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="master-nav-link "  data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="master-nav-link "  data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/submit.html" class="master-nav-cta  ml-1 sm:ml-2"  data-i18n="nav_submit">ส่งผลงาน</a>
+        </nav>
+
+        <div class="h-4 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Admin Curator Desk Entrance -->
+          <a href="/admin.html" class="master-admin-btn" title="Curator Desk (เข้าสู่ระบบผู้ดูแล)" data-i18n-title="nav_admin">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span class="text-[11px] font-semibold hidden md:inline">Desk</span>
+          </a>
+
+          <!-- Language Switcher -->
+          <div id="lang-switcher"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="flex-1">
+    <section class="relative py-24 sm:py-32 overflow-hidden border-b border-white/[0.06]">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
+        <!-- Dignified Curatorial Kicker (No generic pill / no pulsing dot) -->
+        <div class="text-[11px] font-mono tracking-[0.25em] text-[#C5A059] uppercase mb-5 font-normal">
+          POH-CHANG ACADEMY OF ARTS &bull; VIRTUAL SALON &bull; 2026
+        </div>
+
+        <h1 id="hero-title" class="font-serif-luxury text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-[var(--text-main)] leading-[1.15] mb-6">
+          <span id="hero-title-main">International Contemporary</span><br class="hidden sm:inline">
+          <span id="hero-title-accent" class="text-[#9A7833] italic font-light">Printmaking 2026</span>
+        </h1>
+
+        <p id="hero-desc" class="text-sm sm:text-base text-[var(--text-muted)] max-w-2xl mx-auto mb-10 leading-relaxed font-light" data-i18n="hero_desc">
+          พื้นที่จัดแสดงผลงานศิลปะภาพพิมพ์ร่วมสมัยระดับนานาชาติ เชื่อมต่อผู้สร้างสรรค์ผลงานเข้ากับผู้ชมทั่วโลกแบบไร้พรมแดน
+        </p>
+
+        <!-- Focused Curatorial Call to Action -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="/gallery.html" class="w-full sm:w-auto px-10 py-4 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs sm:text-sm tracking-[0.14em] uppercase transition shadow-lg shadow-[#C5A059]/20 flex items-center justify-center gap-2 cursor-pointer">
+            <span data-i18n="btn_enter_gallery">เข้าชมนิทรรศการ (Virtual Gallery)</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+
+        <!-- Quiet Secondary Links (No competing buttons) -->
+        <div class="flex items-center justify-center gap-6 mt-7 text-xs tracking-wider uppercase text-[var(--text-muted)] font-light">
+          <a href="/artists.html" class="hover:text-[#9A7833] transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span data-i18n="btn_artists_dir">ทำเนียบศิลปิน</span>
+          </a>
+          <span class="text-[var(--border-subtle)]" aria-hidden="true">&bull;</span>
+          <a href="/catalog.html" class="hover:text-[#9A7833] transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[#C5A059]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+            <span data-i18n="btn_open_catalog">สูจิบัตรดิจิทัล</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Curatorial Highlights Section -->
+    <section id="highlights-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[var(--border-subtle)] gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-[11px] font-mono tracking-widest text-[#C5A059] uppercase block">Curatorial Selection</span>
+            <span id="highlights-indicator" class="hidden items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-[#C5A059]/10 text-[#C5A059] border border-[#C5A059]/25 transition-all">
+              <span id="highlights-pulse" class="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-pulse"></span>
+              <span id="highlights-counter">หมุนเวียนผลงาน</span>
+            </span>
+          </div>
+          <h2 class="font-serif-luxury text-3xl sm:text-4xl text-[var(--text-main)] font-normal" data-i18n="sec_highlights_title">ผลงานเด่นในนิทรรศการ</h2>
+          <p class="text-xs text-[var(--text-muted)] mt-1 font-light" data-i18n="sec_highlights_desc">คัดเลือกผลงานที่ผ่านการคัดสรรโดยภัณฑารักษ์</p>
+        </div>
+        <div class="flex items-center gap-3 self-end sm:self-auto">
+          <!-- Manual Prev / Pause / Next Controls -->
+          <div id="highlights-controls" class="hidden items-center gap-1.5 mr-1">
+            <button id="btn-prev-highlight" type="button" aria-label="ผลงานก่อนหน้า" title="ก่อนหน้า (Previous)" class="w-8 h-8 rounded-lg border border-[var(--border-subtle)] hover:border-[#C5A059] text-[var(--text-subtle)] hover:text-[#C5A059] bg-[var(--bg-surface-elevated)]/60 hover:bg-[#C5A059]/10 transition flex items-center justify-center cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button id="btn-pause-highlight" type="button" aria-label="หยุด/เล่นหมุนเวียน" title="หยุด/เล่นอัตโนมัติ (Pause/Play)" class="w-8 h-8 rounded-lg border border-[var(--border-subtle)] hover:border-[#C5A059] text-[var(--text-subtle)] hover:text-[#C5A059] bg-[var(--bg-surface-elevated)]/60 hover:bg-[#C5A059]/10 transition flex items-center justify-center cursor-pointer text-xs">
+              <span id="pause-icon">⏸</span>
+            </button>
+            <button id="btn-next-highlight" type="button" aria-label="ผลงานถัดไป" title="ถัดไป (Next)" class="w-8 h-8 rounded-lg border border-[var(--border-subtle)] hover:border-[#C5A059] text-[var(--text-subtle)] hover:text-[#C5A059] bg-[var(--bg-surface-elevated)]/60 hover:bg-[#C5A059]/10 transition flex items-center justify-center cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+          <a href="/gallery.html" class="text-xs tracking-wider uppercase text-[#9A7833] hover:text-[#C5A059] transition flex items-center gap-1.5 font-medium whitespace-nowrap ml-2" data-i18n="view_all_arrow">
+            <span>ดูทั้งหมด</span> <span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6-Second Auto-Rotation Progress Bar -->
+      <div id="highlights-progress-container" class="hidden w-full h-1 bg-[var(--border-subtle)]/70 rounded-full overflow-hidden mb-8 relative">
+        <div id="highlights-progress-bar" class="h-full bg-gradient-to-r from-[#9A7833] via-[#C5A059] to-[#E5C378] w-0 rounded-full shadow-[0_0_8px_rgba(197,160,89,0.5)]"></div>
+      </div>
+
+      <div id="preview-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Loading Skeleton -->
+        <div class="gallery-surface rounded-2xl p-4 animate-pulse">
+          <div class="aspect-[4/3] bg-[var(--mat-bg)] rounded-xl mb-4"></div>
+          <div class="h-5 bg-[var(--bg-surface-elevated)] rounded w-2/3 mb-2"></div>
+          <div class="h-4 bg-[var(--bg-surface-elevated)] rounded w-1/3"></div>
+        </div>
+        <div class="gallery-surface rounded-2xl p-4 animate-pulse hidden sm:block">
+          <div class="aspect-[4/3] bg-[var(--mat-bg)] rounded-xl mb-4"></div>
+          <div class="h-5 bg-[var(--bg-surface-elevated)] rounded w-2/3 mb-2"></div>
+          <div class="h-4 bg-[var(--bg-surface-elevated)] rounded w-1/3"></div>
+        </div>
+        <div class="gallery-surface rounded-2xl p-4 animate-pulse hidden lg:block">
+          <div class="aspect-[4/3] bg-[var(--mat-bg)] rounded-xl mb-4"></div>
+          <div class="h-5 bg-[var(--bg-surface-elevated)] rounded w-2/3 mb-2"></div>
+          <div class="h-4 bg-[var(--bg-surface-elevated)] rounded w-1/3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Curatorial Selection Committee / Jury Section (Shown ONLY when jury is enabled for this event) -->
+    <section id="jury-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-[var(--border-subtle)] hidden">
+      <div class="mb-10 text-center max-w-2xl mx-auto space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 corner-cut-6 bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)] text-xs font-mono tracking-widest uppercase">
+          <span>🏛️</span>
+          <span id="jury-badge-text">PEER-REVIEWED & CURATED EXHIBITION</span>
+        </div>
+        <h2 id="jury-section-title" class="font-serif-luxury text-3xl sm:text-4xl text-[var(--text-main)] font-normal">
+          คณะกรรมการผู้ทรงคุณวุฒิพิจารณาคัดเลือกผลงาน
+        </h2>
+        <p id="jury-section-sub" class="text-xs sm:text-sm text-[var(--text-muted)] font-light">
+          ผู้ทรงคุณวุฒิและคณาจารย์ผู้ทรงเกียรติแห่งวิทยาลัยเพาะช่าง มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์
+        </p>
+      </div>
+
+      <div id="jury-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Dynamic Jury Cards -->
+      </div>
+    </section>
+  </main>
+
+      <!-- Institutional Colophon Footer -->
+  <footer class="border-t border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] py-10 text-[var(--text-subtle)] font-light mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div class="space-y-1 text-center sm:text-left">
+          <p class="text-[var(--text-main)] font-serif-luxury tracking-wide text-sm font-semibold" data-i18n="footer_title">วิทยาลัยเพาะช่าง มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์</p>
+          <p class="text-[var(--text-subtle)] text-[11px]" data-i18n="footer_sub">Poh-Chang Academy of Arts • RMUTR &bull; Bangkok, Thailand</p>
+        </div>
+        <div class="flex items-center gap-6 text-[11px] text-[var(--text-muted)]">
+          <a href="/gallery.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_gallery">ชมนิทรรศการ</a>
+          <a href="/artists.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_artists">ทำเนียบศิลปิน</a>
+          <a href="/catalog.html" class="hover:text-[var(--text-main)] transition" data-i18n="nav_catalog">สูจิบัตร</a>
+          <a href="/admin.html" class="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition" title="Curator Entrance" data-i18n="nav_curator_desk">Curator Desk</a>
+        </div>
+      </div>
+      <div class="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <p class="text-[11px] text-[var(--text-subtle)]">© 2026 Poh-Chang International Art Exhibition Platform. All artworks copyright of their respective artists.</p>
+        <span class="text-[11px] text-[var(--text-subtle)] font-mono">Curatorial Fine Art Salon System</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script>
+    // Highlights endless shuffled rotator state
+    let allHighlights = [];
+    let highlightDeck = [];
+    let currentDeckIndex = 0;
+    let currentActiveBatch = [];
+    let batchHistory = [];
+    let seenInCycleSet = new Set();
+    let autoRotateInterval = null;
+    let isUserPaused = false;
+    let isHoverPaused = false;
+    let isTransitioning = false;
+    let interactionsBound = false;
+    const ROTATE_DELAY_MS = 6000;
+
+    function getHighlightBatchSize() {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 640) return 2;
+      return 1;
+    }
+
+    function shuffleArray(arr) {
+      const c = [...arr];
+      for (let i = c.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [c[i], c[j]] = [c[j], c[i]];
+      }
+      return c;
+    }
+
+    function makeNewDeck(items, excludeFromStart = []) {
+      const excludeSet = new Set(excludeFromStart.map(x => x.id || x));
+      let deck = shuffleArray(items);
+      for (let i = 0; i < excludeFromStart.length && i < deck.length; i++) {
+        if (excludeSet.has(deck[i].id || deck[i])) {
+          for (let j = excludeFromStart.length; j < deck.length; j++) {
+            if (!excludeSet.has(deck[j].id || deck[j])) {
+              [deck[i], deck[j]] = [deck[j], deck[i]];
+              break;
+            }
+          }
+        }
+      }
+      return deck;
+    }
+
+    function updateHighlightCounter() {
+      const indicator = document.getElementById("highlights-indicator");
+      const counterEl = document.getElementById("highlights-counter");
+      const pulseEl = document.getElementById("highlights-pulse");
+      if (!indicator || !counterEl) return;
+
+      const total = allHighlights.length;
+      const batchSize = getHighlightBatchSize();
+      indicator.classList.remove("hidden");
+      indicator.classList.add("inline-flex");
+
+      if (total <= batchSize) {
+        if (pulseEl) pulseEl.classList.remove("animate-pulse");
+        counterEl.textContent = window.i18n.getLang() === 'th' ? `ทั้งหมด ${total} ผลงาน` : `${total} Artworks`;
+        return;
+      }
+
+      const isPaused = isUserPaused || isHoverPaused;
+      if (pulseEl) {
+        if (isPaused) {
+          pulseEl.classList.remove("animate-pulse", "bg-[#C5A059]");
+          pulseEl.classList.add("bg-amber-400/60");
+        } else {
+          pulseEl.classList.add("animate-pulse", "bg-[#C5A059]");
+          pulseEl.classList.remove("bg-amber-400/60");
+        }
+      }
+
+      const shown = Math.min(seenInCycleSet.size, total);
+      if (isHoverPaused) {
+        counterEl.textContent = window.i18n.getLang() === 'th' 
+          ? `พักชั่วคราว (${shown}/${total} ผลงาน)` 
+          : `Paused (${shown}/${total})`;
+      } else if (isUserPaused) {
+        counterEl.textContent = window.i18n.getLang() === 'th' 
+          ? `หยุดหมุนเวียน (${shown}/${total} ผลงาน)` 
+          : `Paused (${shown}/${total})`;
+      } else {
+        counterEl.textContent = window.i18n.getLang() === 'th' 
+          ? `สุ่มหมุนเวียน (${shown}/${total} ผลงาน)` 
+          : `Rotating (${shown}/${total})`;
+      }
+    }
+
+    function resetAndStartProgressBar() {
+      const bar = document.getElementById("highlights-progress-bar");
+      const progContainer = document.getElementById("highlights-progress-container");
+      if (!bar) return;
+
+      if (allHighlights.length <= getHighlightBatchSize()) {
+        if (progContainer) progContainer.classList.add("hidden");
+        return;
+      }
+      if (progContainer) {
+        progContainer.classList.remove("hidden");
+      }
+
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      void bar.offsetWidth; // force reflow
+
+      if (!isUserPaused && !isHoverPaused && document.visibilityState === 'visible') {
+        bar.style.transition = `width ${ROTATE_DELAY_MS}ms linear`;
+        bar.style.width = '100%';
+      }
+    }
+
+    function pauseProgressBar() {
+      const bar = document.getElementById("highlights-progress-bar");
+      if (!bar) return;
+      const computedWidth = window.getComputedStyle(bar).width;
+      bar.style.transition = 'none';
+      bar.style.width = computedWidth;
+    }
+
+    function resumeProgressBar() {
+      const bar = document.getElementById("highlights-progress-bar");
+      if (!bar || isUserPaused || isHoverPaused || document.visibilityState !== 'visible') return;
+      const parentWidth = bar.parentElement ? bar.parentElement.clientWidth : 1;
+      const currentPx = parseFloat(window.getComputedStyle(bar).width) || 0;
+      const currentPercent = parentWidth > 0 ? currentPx / parentWidth : 0;
+      const remainingTimeMs = Math.max(500, Math.round((1 - currentPercent) * ROTATE_DELAY_MS));
+
+      bar.style.transition = `width ${remainingTimeMs}ms linear`;
+      bar.style.width = '100%';
+    }
+
+    function renderHighlights() {
+      const container = document.getElementById("preview-grid");
+      if (!container || !currentActiveBatch.length) return;
+
+      container.innerHTML = "";
+      currentActiveBatch.forEach(art => {
+        seenInCycleSet.add(art.id);
+        const title = window.getField(art, 'title');
+        const artistName = window.getArtistFullName(art);
+        const technique = window.getField(art, 'technique') || (window.i18n.getLang() === 'th' ? 'ภาพพิมพ์ร่วมสมัย' : 'Contemporary Printmaking');
+        const card = document.createElement("div");
+        card.className = "highlight-card gallery-surface rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[var(--border-subtle)] will-change-transform";
+        
+        card.innerHTML = `
+          <a href="/artwork.html?id=${art.id}" class="block">
+            <!-- Artwork Presentation Mat (Clean Light Ivory - No Dark Frame) -->
+            <div class="relative aspect-[4/3] bg-[var(--mat-bg)] p-4 flex items-center justify-center overflow-hidden border-b border-[var(--border-subtle)]">
+              <img src="${art.thumbnail_url || art.image_url}" alt="${title}" 
+                   class="max-h-full max-w-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.06)] group-hover:scale-[1.03] transition duration-500 ease-out" 
+                   loading="lazy"
+                   onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80';">
+            </div>
+            <div class="p-5 space-y-2 bg-[var(--bg-surface-solid)]">
+              <div class="text-[11px] font-mono tracking-widest text-[#9A7833] uppercase">${window.t('by_artist')} ${artistName}</div>
+              <h3 class="font-serif-luxury text-xl text-[var(--text-main)] group-hover:text-[#9A7833] transition truncate leading-snug">${title}</h3>
+              <div class="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs text-[var(--text-muted)]">
+                <span class="font-mono text-[var(--text-subtle)] text-[10px] tracking-wider uppercase">${art.year_created || '2026'} &bull; ${technique}</span>
+                <span class="text-[#9A7833] font-semibold tracking-wide group-hover:translate-x-0.5 transition-transform flex items-center gap-1 text-[11px] uppercase">${window.t('view_details_arrow')} <span aria-hidden="true">&rarr;</span></span>
+              </div>
+            </div>
+          </a>
+        `;
+        container.appendChild(card);
+      });
+
+      updateHighlightCounter();
+    }
+
+    function advanceHighlights(direction = 1) {
+      if (isTransitioning || allHighlights.length <= getHighlightBatchSize()) return;
+
+      const container = document.getElementById("preview-grid");
+      const batchSize = getHighlightBatchSize();
+      let nextBatch = [];
+
+      if (direction > 0) {
+        if (currentActiveBatch.length) {
+          batchHistory.push([...currentActiveBatch]);
+          if (batchHistory.length > 30) batchHistory.shift();
+        }
+
+        let remaining = highlightDeck.slice(currentDeckIndex);
+        if (remaining.length >= batchSize) {
+          nextBatch = remaining.slice(0, batchSize);
+          currentDeckIndex += batchSize;
+        } else {
+          nextBatch = [...remaining];
+          const needed = batchSize - nextBatch.length;
+          highlightDeck = makeNewDeck(allHighlights, nextBatch);
+          const extra = highlightDeck.slice(0, needed);
+          nextBatch = nextBatch.concat(extra);
+          currentDeckIndex = needed;
+          seenInCycleSet.clear();
+        }
+      } else {
+        if (batchHistory.length > 0) {
+          nextBatch = batchHistory.pop();
+        } else {
+          currentDeckIndex = Math.max(0, currentDeckIndex - batchSize);
+          nextBatch = highlightDeck.slice(currentDeckIndex, currentDeckIndex + batchSize);
+          if (nextBatch.length < batchSize) {
+            nextBatch = allHighlights.slice(0, batchSize);
+          }
+        }
+      }
+
+      if (!nextBatch || !nextBatch.length) return;
+
+      isTransitioning = true;
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Phase 1: Animate existing cards out with direction shift
+      if (container) {
+        const currentCards = container.querySelectorAll('.highlight-card');
+        currentCards.forEach((c, idx) => {
+          c.style.transition = prefersReduced ? 'opacity 250ms ease' : `all 280ms cubic-bezier(0.4, 0, 0.2, 1) ${idx * 40}ms`;
+          c.style.opacity = '0';
+          if (!prefersReduced) {
+            c.style.transform = direction > 0 ? 'translateX(-24px)' : 'translateX(24px)';
+          }
+        });
+      }
+
+      // Phase 2: Render new batch with primed offset and staggered glide-in
+      setTimeout(() => {
+        currentActiveBatch = nextBatch;
+        renderHighlights();
+
+        if (container) {
+          const newCards = container.querySelectorAll('.highlight-card');
+          newCards.forEach((c, idx) => {
+            c.style.opacity = '0';
+            if (!prefersReduced) {
+              c.style.transform = direction > 0 ? 'translateX(28px)' : 'translateX(-28px)';
+            }
+            c.style.transition = prefersReduced ? 'opacity 350ms ease' : `all 420ms cubic-bezier(0.16, 1, 0.3, 1) ${idx * 65}ms`;
+          });
+
+          // Force reflow
+          void container.offsetHeight;
+
+          // Animate cards into resting place
+          newCards.forEach((c) => {
+            c.style.opacity = '1';
+            if (!prefersReduced) {
+              c.style.transform = 'translateX(0)';
+            }
+          });
+        }
+
+        resetAndStartProgressBar();
+
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 450);
+      }, 280);
+    }
+
+    function startHighlightAutoRotate() {
+      if (autoRotateInterval) clearInterval(autoRotateInterval);
+      resetAndStartProgressBar();
+      autoRotateInterval = setInterval(() => {
+        if (!isUserPaused && !isHoverPaused && document.visibilityState === 'visible') {
+          advanceHighlights(1);
+        }
+      }, ROTATE_DELAY_MS);
+    }
+
+    function setupHighlightInteractions() {
+      const controls = document.getElementById("highlights-controls");
+      const btnPrev = document.getElementById("btn-prev-highlight");
+      const btnNext = document.getElementById("btn-next-highlight");
+      const btnPause = document.getElementById("btn-pause-highlight");
+      const pauseIcon = document.getElementById("pause-icon");
+      const section = document.getElementById("highlights-section");
+
+      if (allHighlights.length > getHighlightBatchSize() && controls) {
+        controls.classList.remove("hidden");
+        controls.classList.add("flex");
+      }
+
+      if (interactionsBound) return;
+      interactionsBound = true;
+
+      if (btnPrev) {
+        btnPrev.addEventListener("click", () => {
+          advanceHighlights(-1);
+          startHighlightAutoRotate();
+        });
+      }
+
+      if (btnNext) {
+        btnNext.addEventListener("click", () => {
+          advanceHighlights(1);
+          startHighlightAutoRotate();
+        });
+      }
+
+      if (btnPause) {
+        btnPause.addEventListener("click", () => {
+          isUserPaused = !isUserPaused;
+          if (pauseIcon) {
+            pauseIcon.textContent = isUserPaused ? "▶" : "⏸";
+          }
+          btnPause.title = isUserPaused 
+            ? (window.i18n.getLang() === 'th' ? "เล่นอัตโนมัติ (Resume)" : "Resume auto-play")
+            : (window.i18n.getLang() === 'th' ? "หยุดชั่วคราว (Pause)" : "Pause auto-play");
+          updateHighlightCounter();
+          if (isUserPaused) {
+            pauseProgressBar();
+          } else {
+            resumeProgressBar();
+          }
+        });
+      }
+
+      if (section) {
+        section.addEventListener("mouseenter", () => {
+          isHoverPaused = true;
+          updateHighlightCounter();
+          pauseProgressBar();
+        });
+        section.addEventListener("mouseleave", () => {
+          isHoverPaused = false;
+          updateHighlightCounter();
+          resumeProgressBar();
+        });
+
+        // Touch gestures for mobile
+        let touchStartX = 0;
+        section.addEventListener("touchstart", (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        section.addEventListener("touchend", (e) => {
+          const diffX = e.changedTouches[0].screenX - touchStartX;
+          if (Math.abs(diffX) > 45) {
+            if (diffX < 0) {
+              advanceHighlights(1);
+            } else {
+              advanceHighlights(-1);
+            }
+            startHighlightAutoRotate();
+          }
+        }, { passive: true });
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') {
+          pauseProgressBar();
+        } else {
+          resumeProgressBar();
+        }
+      });
+
+      // Responsive resize: re-render to match batch size without losing position
+      let resizeTimer = null;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (allHighlights.length > 0) {
+            const batchSize = getHighlightBatchSize();
+            if (controls) {
+              if (allHighlights.length > batchSize) {
+                controls.classList.remove("hidden");
+                controls.classList.add("flex");
+              } else {
+                controls.classList.add("hidden");
+                controls.classList.remove("flex");
+              }
+            }
+            if (currentActiveBatch.length !== batchSize) {
+              let startIdx = 0;
+              if (currentActiveBatch.length && highlightDeck.length) {
+                const foundIdx = highlightDeck.findIndex(a => a.id === currentActiveBatch[0].id);
+                if (foundIdx !== -1) startIdx = foundIdx;
+              }
+              currentActiveBatch = highlightDeck.slice(startIdx, startIdx + batchSize);
+              if (currentActiveBatch.length < batchSize) {
+                currentActiveBatch = allHighlights.slice(0, batchSize);
+              }
+              renderHighlights();
+              resetAndStartProgressBar();
+            }
+          }
+        }, 200);
+      });
+    }
+
+    async function loadJurySection() {
+      try {
+        const res = await EventAPI.getCatalogConfig();
+        if (!res || !res.success || !res.config || !res.config.jury) return;
+        const jury = res.config.jury;
+        if (!jury.enabled || !Array.isArray(jury.members) || jury.members.length === 0) return;
+
+        const section = document.getElementById('jury-section');
+        const titleEl = document.getElementById('jury-section-title');
+        const subEl = document.getElementById('jury-section-sub');
+        const grid = document.getElementById('jury-grid');
+        if (!section || !grid) return;
+
+        const isTh = window.i18n.getLang() === 'th';
+        titleEl.textContent = (isTh ? jury.title_th : jury.title_en) || jury.title_th || 'คณะกรรมการผู้ทรงคุณวุฒิพิจารณาคัดเลือกผลงาน';
+        subEl.textContent = (isTh ? jury.subtitle_th : jury.subtitle_en) || jury.subtitle_th || '';
+
+        grid.innerHTML = '';
+        jury.members.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'gallery-surface corner-cut-16 p-6 border border-[var(--border-subtle)] hover:border-[var(--border-accent)] flex flex-col items-center text-center space-y-3 shadow-lg transition-all';
+          const avatar = m.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name_th || 'Jury')}&background=14070a&color=D4AF37&bold=true`;
+
+          card.innerHTML = `
+            <div class="relative w-24 h-24 corner-cut-12 overflow-hidden border border-[var(--border-accent)] shadow-inner">
+              <img src="${avatar}" alt="${m.name_th}" class="w-full h-full object-cover">
+            </div>
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-[var(--color-accent-gold)] font-bold block mb-1">
+                ${isTh ? (m.role_th || 'กรรมการผู้ทรงคุณวุฒิ') : (m.role_en || 'Honored Juror')}
+              </span>
+              <h3 class="font-serif-luxury text-lg font-bold text-[var(--text-main)] leading-snug">
+                ${isTh ? m.name_th : (m.name_en || m.name_th)}
+              </h3>
+              ${m.academic_title ? `<p class="text-xs text-[var(--color-accent-light)] font-medium mt-1">${m.academic_title}</p>` : ''}
+              <p class="text-[11px] text-[var(--text-subtle)] mt-1">${m.institution || ''}</p>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        section.classList.remove('hidden');
+      } catch (err) {
+        console.error('Failed to load jury section:', err);
+      }
+    }
+
+    async function loadHighlights() {
+      const container = document.getElementById("preview-grid");
+      try {
+        const data = await EventAPI.getSubmissions("approved");
+        container.innerHTML = "";
+
+        if (!data.submissions || data.submissions.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full text-center py-16 gallery-surface rounded-sm">
+              <p class="text-stone-400 font-light">${window.t('empty_gallery')}</p>
+              <a href="/submit.html" class="inline-block mt-4 text-[#d4af37] hover:underline text-sm font-medium tracking-wide">${window.t('btn_submit_cta')}</a>
+            </div>
+          `;
+          return;
+        }
+
+        allHighlights = data.submissions;
+        const batchSize = getHighlightBatchSize();
+        highlightDeck = shuffleArray(allHighlights);
+        currentDeckIndex = 0;
+        batchHistory = [];
+        seenInCycleSet = new Set();
+
+        if (allHighlights.length <= batchSize) {
+          currentActiveBatch = [...allHighlights];
+        } else {
+          currentActiveBatch = highlightDeck.slice(0, batchSize);
+          currentDeckIndex = batchSize;
+        }
+
+        renderHighlights();
+        setupHighlightInteractions();
+        startHighlightAutoRotate();
+      } catch (err) {
+        console.error("Preview load error:", err);
+        container.innerHTML = `
+          <div class="col-span-full text-center py-16 gallery-surface rounded-sm space-y-3">
+            <p class="text-stone-400 font-light text-sm">${window.i18n.getLang() === 'th' ? 'ไม่สามารถโหลดผลงานเด่นได้ชั่วคราว' : 'Unable to load curatorial highlights at this moment.'}</p>
+            <button onclick="loadHighlights()" class="px-4 py-2 rounded-sm border border-[#c5a059]/40 text-[#e2c792] hover:bg-[#c5a059]/10 text-xs tracking-wider uppercase transition cursor-pointer">
+              ${window.i18n.getLang() === 'th' ? 'ลองใหม่อีกครั้ง (Retry)' : 'Retry'}
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      window.i18n.renderSwitcher('lang-switcher');
+      window.addEventListener('languageChanged', () => {
+        window.i18n.apply();
+        updateDynamicTitles();
+        renderHighlights();
+      });
+
+      try {
+        const config = await EventAPI.getConfig();
+        if (config.eventTitle) {
+          document.getElementById("nav-event-title").textContent = config.eventTitle;
+          window.currentEventTitle = config.eventTitle;
+        }
+        if (config.eventTitleEn) {
+          window.currentEventTitleEn = config.eventTitleEn;
+        }
+        if (config.eventDescriptionTh) {
+          window.currentEventDescTh = config.eventDescriptionTh;
+        }
+        if (config.eventDescriptionEn) {
+          window.currentEventDescEn = config.eventDescriptionEn;
+        }
+      } catch (e) {
+        console.warn("Config load error");
+      }
+
+      updateDynamicTitles();
+      await loadHighlights();
+    loadJurySection();
+    });
+
+    function updateDynamicTitles() {
+      const isTh = window.i18n.getLang() === 'th';
+      const mainEl = document.getElementById("hero-title-main");
+      const accentEl = document.getElementById("hero-title-accent");
+      const descEl = document.getElementById("hero-desc");
+
+      const rawTitle = isTh 
+        ? (window.currentEventTitle || "นิทรรศการภาพพิมพ์และศิลปกรรมร่วมสมัย | วิทยาลัยเพาะช่าง")
+        : (window.currentEventTitleEn || window.currentEventTitle || "International Contemporary Printmaking");
+
+      if (rawTitle.includes('|')) {
+        const parts = rawTitle.split('|').map(s => s.trim());
+        mainEl.textContent = parts[0];
+        accentEl.textContent = parts.slice(1).join(' | ');
+        accentEl.style.display = 'inline';
+      } else {
+        mainEl.textContent = rawTitle;
+        accentEl.textContent = '';
+        accentEl.style.display = 'none';
+      }
+
+      if (isTh) {
+        if (window.currentEventDescTh && descEl) descEl.textContent = window.currentEventDescTh;
+      } else {
+        if (window.currentEventDescEn && descEl) descEl.textContent = window.currentEventDescEn;
+      }
+    }
+  </script>
+</body>
+</html>
