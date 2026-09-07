@@ -32,6 +32,47 @@ const MasterPortalAPI = {
     return await res.json();
   },
 
+  async updateEvent(data, adminKey) {
+    try {
+      const res = await fetch("/api/events", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-key": adminKey
+        },
+        body: JSON.stringify(data)
+      });
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (parseErr) {
+        return { success: false, error: `Server returned non-JSON response (${res.status}): ${text.slice(0, 100) || res.statusText}` };
+      }
+    } catch (netErr) {
+      return { success: false, error: `Network connection error: ${netErr.message}` };
+    }
+  },
+
+  async deleteEvent(eventId, adminKey) {
+    try {
+      const res = await fetch(`/api/events?event_id=${encodeURIComponent(eventId)}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-key": adminKey
+        }
+      });
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (parseErr) {
+        return { success: false, error: `Server returned non-JSON response (${res.status}): ${text.slice(0, 100) || res.statusText}` };
+      }
+    } catch (netErr) {
+      return { success: false, error: `Network connection error: ${netErr.message}` };
+    }
+  },
+
   async provisionEvent(data, adminKey) {
     try {
       const res = await fetch("/api/events/provision", {

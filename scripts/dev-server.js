@@ -2017,6 +2017,82 @@ const masterServer = http.createServer(async (req, res) => {
     return;
   }
 
+  if (pathname === '/api/events' && (req.method === 'PUT' || req.method === 'PATCH')) {
+    const adminKey = req.headers['x-admin-key'];
+    if (adminKey !== 'master_admin_secret_999') {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Unauthorized: Invalid master admin key' }));
+      return;
+    }
+    const body = await parseBody(req);
+    const { event_id, event_title, portal_url, secret_token, status, catalog_url } = body;
+
+    if (!event_id) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Missing required field: event_id' }));
+      return;
+    }
+
+    const existing = masterDb.prepare('SELECT * FROM registered_events WHERE event_id = ?').get(event_id);
+    if (!existing) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: `Event '${event_id}' not found.` }));
+      return;
+    }
+
+    const updatedTitle = event_title !== undefined && event_title !== null ? String(event_title).trim() : existing.event_title;
+    const updatedUrl = portal_url !== undefined && portal_url !== null ? String(portal_url).trim() : existing.portal_url;
+    const updatedToken = secret_token && String(secret_token).trim() ? String(secret_token).trim() : existing.secret_token;
+    const updatedStatus = status !== undefined && status !== null ? String(status).trim() : existing.status;
+    const updatedCatalog = catalog_url !== undefined ? (catalog_url ? String(catalog_url).trim() : null) : existing.catalog_url;
+
+    masterDb.prepare(`
+      UPDATE registered_events
+      SET event_title = ?, portal_url = ?, secret_token = ?, status = ?, catalog_url = ?
+      WHERE event_id = ?
+    `).run(updatedTitle, updatedUrl, updatedToken, updatedStatus, updatedCatalog, event_id);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: true,
+      message: `Event '${event_id}' updated successfully.`,
+      event: { event_id, event_title: updatedTitle, portal_url: updatedUrl, status: updatedStatus, catalog_url: updatedCatalog }
+    }));
+    return;
+  }
+
+  if (pathname === '/api/events' && req.method === 'DELETE') {
+    const adminKey = req.headers['x-admin-key'];
+    if (adminKey !== 'master_admin_secret_999') {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Unauthorized: Invalid master admin key' }));
+      return;
+    }
+    const urlObj = new URL(req.url, `http://${req.headers.host}`);
+    let event_id = urlObj.searchParams.get('event_id');
+    if (!event_id) {
+      try {
+        const body = await parseBody(req);
+        event_id = body.event_id;
+      } catch (_) {}
+    }
+    if (!event_id) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Missing required parameter: event_id' }));
+      return;
+    }
+
+    masterDb.prepare('DELETE FROM master_artworks WHERE event_id = ?').run(event_id);
+    masterDb.prepare('DELETE FROM registered_events WHERE event_id = ?').run(event_id);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: true,
+      message: `Event '${event_id}' and related artworks deleted successfully.`
+    }));
+    return;
+  }
+
   // Automated Multi-Tenant Cloud Provisioning Endpoint
   if (pathname === '/api/events/provision' && req.method === 'POST') {
     const adminKey = req.headers['x-admin-key'];

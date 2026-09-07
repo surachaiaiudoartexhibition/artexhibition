@@ -489,6 +489,97 @@
 
   </main>
 
+  <!-- Edit Exhibition Modal -->
+  <div id="edit-event-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden" role="dialog" aria-modal="true" aria-labelledby="edit-event-modal-title">
+    <div class="gallery-surface max-w-lg w-full rounded-3xl p-6 sm:p-8 space-y-5 border border-[#C5A059]/40 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-[#E8E0D2] pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#FAF3E3] border border-[#C5A059]/40 text-[#8C6D2D] flex items-center justify-center text-lg font-serif-luxury font-bold">
+            <svg class="w-5 h-5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <div>
+            <h3 id="edit-event-modal-title" class="font-serif-luxury text-lg font-bold text-[#171C1A]">แก้ไขข้อมูลนิทรรศการ (Edit Exhibition)</h3>
+            <p id="edit-event-sub" class="text-xs text-[#64736C] font-mono"></p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEditEventModal()" class="text-[#64736C] hover:text-[#171C1A] text-2xl leading-none cursor-pointer" aria-label="ปิดหน้าต่าง">&times;</button>
+      </div>
+
+      <form id="edit-event-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-[#171C1A] mb-1">
+            รหัส Event (event_id)
+          </label>
+          <input type="text" id="edit_event_id" readonly class="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF3E3]/40 border border-[#E8E0D2] text-[#64736C] font-mono text-xs cursor-not-allowed">
+          <p class="text-[10px] text-[#8C6D2D] mt-1">รหัส Event เป็น Primary Key สำหรับอ้างอิงฐานข้อมูลและห้องจัดแสดง 3D</p>
+        </div>
+
+        <div>
+          <label for="edit_event_title" class="block text-xs font-semibold text-[#171C1A] mb-1">
+            ชื่อนิทรรศการ (Event Title) <span class="text-rose-500">*</span>
+          </label>
+          <input type="text" id="edit_event_title" required placeholder="เช่น 18 Poh Chang art workshop"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+        </div>
+
+        <div>
+          <label for="edit_portal_url" class="block text-xs font-semibold text-[#171C1A] mb-1">
+            URL เว็บไซต์ของ Event (portal_url) <span class="text-rose-500">*</span>
+          </label>
+          <input type="url" id="edit_portal_url" required placeholder="https://18pohchangartworkshop.pages.dev"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+          <p class="text-[10px] text-[#64736C] mt-1">ใช้สำหรับเปิดเข้าชมเว็บนิทรรศการ และดึงข้อมูลผลงาน (Pull Artworks)</p>
+        </div>
+
+        <div>
+          <label for="edit_catalog_url" class="block text-xs font-semibold text-[#171C1A] mb-1">
+            URL สูจิบัตรดิจิทัล (catalog_url)
+          </label>
+          <input type="url" id="edit_catalog_url" placeholder="https://18pohchangartworkshop.pages.dev/catalog.html"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+          <p class="text-[10px] text-[#64736C] mt-1">หากเว้นว่างไว้ ระบบจะใช้ค่าเริ่มต้น: portal_url + '/catalog.html'</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="edit_status" class="block text-xs font-semibold text-[#171C1A] mb-1">
+              สถานะนิทรรศการ (Status)
+            </label>
+            <select id="edit_status" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+              <option value="active">เปิดจัดแสดง (Active)</option>
+              <option value="archived">สิ้นสุดการจัดแสดง (Archived)</option>
+              <option value="draft">ฉบับร่าง (Draft)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="edit_secret_token" class="block text-xs font-semibold text-[#171C1A] mb-1">
+              Shared Secret Token
+            </label>
+            <input type="text" id="edit_secret_token" placeholder="เว้นว่างหากไม่ต้องการเปลี่ยน"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
+          </div>
+        </div>
+
+        <div id="edit-event-status-msg" class="hidden text-xs font-mono p-3 rounded-xl"></div>
+
+        <div class="pt-3 flex items-center justify-end gap-3 border-t border-[#E8E0D2]">
+          <button type="button" onclick="closeEditEventModal()" class="px-4 py-2.5 rounded-xl border border-[#E8E0D2] text-[#64736C] hover:text-[#171C1A] text-xs font-medium cursor-pointer transition">
+            ยกเลิก
+          </button>
+          <button type="submit" id="btn-save-event-edit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:brightness-110 text-[#141E19] text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md">
+            <svg class="w-4 h-4 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span id="btn-save-event-edit-text">บันทึกการแก้ไข</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Institutional Footer -->
   <footer class="border-t border-[#243830] bg-[#141E19] py-8 text-center text-xs text-[#8A9890] mt-12">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -674,7 +765,105 @@
           alert(`เกิดข้อผิดพลาด: ${err.message}`);
         }
       });
+
+      // Handle Edit Event Form
+      document.getElementById("edit-event-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const adminKey = document.getElementById("master-admin-key").value.trim();
+        const saveBtn = document.getElementById("btn-save-event-edit");
+        const saveBtnText = document.getElementById("btn-save-event-edit-text");
+        const statusMsg = document.getElementById("edit-event-status-msg");
+
+        const eventId = document.getElementById("edit_event_id").value.trim();
+        const eventTitle = document.getElementById("edit_event_title").value.trim();
+        const portalUrl = document.getElementById("edit_portal_url").value.trim();
+        const catalogUrl = document.getElementById("edit_catalog_url").value.trim();
+        const status = document.getElementById("edit_status").value;
+        const secretToken = document.getElementById("edit_secret_token").value.trim();
+
+        const payload = {
+          event_id: eventId,
+          event_title: eventTitle,
+          portal_url: portalUrl,
+          catalog_url: catalogUrl,
+          status: status
+        };
+        if (secretToken) {
+          payload.secret_token = secretToken;
+        }
+
+        saveBtn.disabled = true;
+        saveBtnText.textContent = "กำลังบันทึก...";
+        statusMsg.className = "text-xs font-mono p-3 rounded-xl bg-cyan-50 text-cyan-800 border border-cyan-200 block";
+        statusMsg.textContent = "กำลังส่งข้อมูลอัปเดต...";
+
+        try {
+          const res = await MasterPortalAPI.updateEvent(payload, adminKey);
+          if (res.success) {
+            statusMsg.className = "text-xs font-mono p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 block";
+            statusMsg.textContent = "✅ " + (res.message || "อัปเดตข้อมูลนิทรรศการสำเร็จ!");
+            setTimeout(() => {
+              closeEditEventModal();
+              loadEventsTable();
+            }, 600);
+          } else {
+            statusMsg.className = "text-xs font-mono p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 block";
+            statusMsg.textContent = "❌ " + (res.error || "เกิดข้อผิดพลาดในการบันทึก");
+          }
+        } catch (err) {
+          statusMsg.className = "text-xs font-mono p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 block";
+          statusMsg.textContent = "❌ " + err.message;
+        } finally {
+          saveBtn.disabled = false;
+          saveBtnText.textContent = "บันทึกการแก้ไข";
+        }
+      });
     });
+
+    let currentEventsCache = [];
+
+    function openEditEventModal(eventId) {
+      const ev = currentEventsCache.find(e => e.event_id === eventId);
+      if (!ev) {
+        alert("ไม่พบข้อมูล Event: " + eventId);
+        return;
+      }
+      document.getElementById('edit_event_id').value = ev.event_id;
+      document.getElementById('edit_event_title').value = ev.event_title || '';
+      document.getElementById('edit_portal_url').value = ev.portal_url || '';
+      document.getElementById('edit_catalog_url').value = ev.catalog_url || '';
+      document.getElementById('edit_status').value = ev.status || 'active';
+      document.getElementById('edit_secret_token').value = '';
+      document.getElementById('edit-event-sub').textContent = `Event ID: ${ev.event_id}`;
+
+      const msgEl = document.getElementById('edit-event-status-msg');
+      msgEl.classList.add('hidden');
+      msgEl.textContent = '';
+
+      document.getElementById('edit-event-modal').classList.remove('hidden');
+    }
+
+    function closeEditEventModal() {
+      document.getElementById('edit-event-modal').classList.add('hidden');
+    }
+
+    async function deleteEventConfirm(eventId) {
+      const adminKey = document.getElementById("master-admin-key").value.trim();
+      const confirmMsg = `⚠️ คุณต้องการลบการลงทะเบียนนิทรรศการ '${eventId}' ใช่หรือไม่?\n\nการดำเนินการนี้จะลบข้อมูล Event และผลงานของงานนี้ออกจาก Master Portal`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const res = await MasterPortalAPI.deleteEvent(eventId, adminKey);
+        if (res.success) {
+          alert(`✅ ${res.message || 'ลบ Event เรียบร้อยแล้ว'}`);
+          await loadEventsTable();
+        } else {
+          alert(`❌ ไม่สามารถลบได้: ${res.error}`);
+        }
+      } catch (err) {
+        alert(`❌ เกิดข้อผิดพลาด: ${err.message}`);
+      }
+    }
 
     function generateRandomToken() {
       const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -690,6 +879,7 @@
       try {
         const res = await MasterPortalAPI.getEvents();
         const list = res.events || [];
+        currentEventsCache = list;
 
         tbody.innerHTML = "";
         if (list.length === 0) {
@@ -704,9 +894,12 @@
           tr.className = "hover:bg-[#FAF3E3]/40 transition border-b border-[#E8E0D2]";
           tr.innerHTML = `
             <td class="py-3.5 px-4 font-mono font-semibold text-[#9A7833]">${ev.event_id}</td>
-            <td class="py-3.5 px-4 font-medium text-[#171C1A]">${title}</td>
+            <td class="py-3.5 px-4 font-medium text-[#171C1A]">
+              <div class="font-semibold text-sm">${title}</div>
+              ${ev.catalog_url ? `<div class="text-[10px] text-[#64736C] font-mono truncate max-w-xs mt-0.5" title="${ev.catalog_url}">📖 สูจิบัตร: ${ev.catalog_url}</div>` : ''}
+            </td>
             <td class="py-3.5 px-4 text-[#64736C] font-mono text-[11px] truncate max-w-xs">
-              <a href="${ev.portal_url}" target="_blank" class="hover:text-[#9A7833] underline">${ev.portal_url}</a>
+              <a href="${ev.portal_url}" target="_blank" class="hover:text-[#9A7833] underline font-semibold">${ev.portal_url}</a>
             </td>
             <td class="py-3.5 px-4 text-center font-mono text-[#171C1A] font-bold">${ev.artwork_count || 0} ${worksSuffix}</td>
             <td class="py-3.5 px-4">
@@ -715,7 +908,13 @@
               </span>
             </td>
             <td class="py-3.5 px-4 text-right">
-              <div class="flex items-center justify-end gap-2 flex-wrap">
+              <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                <button onclick="openEditEventModal('${ev.event_id}')" class="min-h-[38px] px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF3E3] text-[#8C6D2D] hover:text-[#171C1A] border border-[#C5A059]/50 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs" title="แก้ไขข้อมูลนิทรรศการนี้">
+                  <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>แก้ไข</span>
+                </button>
                 <a href="${ev.catalog_url || ev.portal_url + '/catalog.html'}" target="_blank" rel="noopener"
                   class="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#FAF3E3] hover:bg-[#F4EFE6] text-[#8C6D2D] hover:text-[#171C1A] border border-[#C5A059]/40 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                   title="เปิดดูสูจิบัตรดิจิทัลที่ออกแบบแล้วของ Event นี้">
@@ -724,17 +923,22 @@
                   </svg>
                   <span>${window.t('modal_btn_catalog')}</span>
                 </a>
-                <a href="/gallery-3d.html?event_id=${ev.event_id}" class="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#EBF2EE] hover:bg-[#DEEBE4] text-[#243830] hover:text-[#141E19] border border-[#355246]/30 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                <a href="/gallery-3d.html?event_id=${ev.event_id}" class="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#EBF2EE] hover:bg-[#DEEBE4] text-[#243830] hover:text-[#141E19] border border-[#355246]/30 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer" title="เปิดชมในห้องแสดงเสมือนจริง 3D">
                   <svg class="w-3.5 h-3.5 text-[#243830]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
                   </svg>
                   <span>${window.t('nav_3d_gallery')}</span>
                 </a>
-                <button onclick="pullSingleEvent('${ev.event_id}', this)" class="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#FAF3E3] hover:bg-[#F4EFE6] text-[#8C6D2D] hover:text-[#171C1A] border border-[#C5A059]/40 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                <button onclick="pullSingleEvent('${ev.event_id}', this)" class="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#FAF3E3] hover:bg-[#F4EFE6] text-[#8C6D2D] hover:text-[#171C1A] border border-[#C5A059]/40 transition text-xs font-semibold flex items-center gap-1.5 cursor-pointer" title="ดึงผลงานที่อนุมัติแล้วจาก Event เข้า Master D1">
                   <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                   <span>ดึงข้อมูล</span>
+                </button>
+                <button onclick="deleteEventConfirm('${ev.event_id}')" class="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 hover:border-rose-300 transition text-xs font-semibold flex items-center gap-1 cursor-pointer" title="ลบการลงทะเบียน Event นี้">
+                  <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
                 </button>
               </div>
             </td>
