@@ -239,6 +239,7 @@
   <script src="/js/api.js"></script>
   <link rel="stylesheet" href="/css/themes.css">
   <script src="/js/theme.js"></script>
+  <script src="/js/pdf-export.js" defer></script>
 </head>
 <body class="h-full flex flex-col overflow-hidden bg-[var(--bg-base)] text-[var(--text-main)] selection:bg-[var(--color-accent)] selection:text-white">
   <script>
@@ -246,6 +247,18 @@
       document.body.classList.add('mode-reader');
     }
   </script>
+
+  <!-- PDF Export Progress Overlay (Screen Only) -->
+  <div id="pdf-export-overlay" class="no-print fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div class="bg-[var(--bg-surface-solid)] border border-[var(--border-accent)] corner-cut-12 px-8 py-6 text-center shadow-2xl max-w-xs w-full mx-4">
+      <div class="w-10 h-10 mx-auto mb-3 border-2 border-[var(--color-accent-gold)] border-t-transparent rounded-full" style="animation: pdf-spin 0.8s linear infinite;"></div>
+      <p id="pdf-export-status" class="text-sm text-[var(--text-main)] font-medium mb-3">กำลังสร้าง PDF...</p>
+      <div class="w-full h-1.5 bg-[var(--bg-surface-elevated)] rounded-full overflow-hidden">
+        <div id="pdf-export-bar" class="h-full bg-[var(--color-accent-gold)] transition-all duration-200" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+  <style>@keyframes pdf-spin { to { transform: rotate(360deg); } }</style>
 
   <!-- Floating Sticky Navigation & Action Toolbar (Screen Only) -->
         <!-- Master Navigation Bar -->
@@ -360,10 +373,10 @@
           <span class="hidden md:inline" data-i18n="studio_btn_title">จัดหน้า</span>
         </button>
 
-        <!-- Print / PDF Button -->
-        <button onclick="printCatalog()" class="flex items-center gap-1 px-3 py-1.5 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-black font-bold text-xs shadow-md transition cursor-pointer" title="พิมพ์หรือบันทึกเป็น PDF">
-          <span>🖨️</span>
-          <span class="hidden sm:inline" data-i18n="btn_print_pdf">พิมพ์ PDF</span>
+        <!-- Export PDF Button (client-side vector PDF, one click) -->
+        <button onclick="exportCatalogPDF()" class="flex items-center gap-1 px-3 py-1.5 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-black font-bold text-xs shadow-md transition cursor-pointer" title="ดาวน์โหลดสูจิบัตรเป็น PDF ทันที (คมชัด พร้อมพิมพ์)">
+          <span>⬇️</span>
+          <span class="hidden sm:inline" data-i18n="btn_print_pdf">ดาวน์โหลด PDF</span>
         </button>
       </div>
 
@@ -1533,7 +1546,8 @@
         const jurySub = (isTh ? juryData.subtitle_th : juryData.subtitle_en) || 'Curatorial Selection Committee & Jury Board';
 
         const membersHtml = juryData.members.slice(0, 5).map(m => {
-          const avatar = m.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name_th || 'Jury')}&background=14070a&color=D4AF37&bold=true`;
+          const hasRealJuryAvatar = Boolean(m.avatar_url && m.avatar_url.trim() && !m.avatar_url.includes('unsplash.com'));
+          const avatar = hasRealJuryAvatar ? m.avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name_th || 'Jury')}&background=14070a&color=D4AF37&bold=true`;
           return `
             <div class="p-4 corner-cut-8 border ${borderSubClass} bg-[var(--bg-surface-elevated)]/60 flex items-center gap-4 shadow-sm">
               <img src="${avatar}" alt="" class="w-14 h-14 corner-cut-6 object-cover border border-[var(--border-accent)] shrink-0 shadow-inner">
@@ -2616,6 +2630,63 @@
       }, 100);
     }
     window.printCatalog = printCatalog;
+
+    // -------------------------------------------------------------
+    // ONE-CLICK VECTOR PDF EXPORT (no OS print dialog, no manual
+    // margin/scale setup - see /js/pdf-export.js for the renderer)
+    // -------------------------------------------------------------
+    async function exportCatalogPDF() {
+      const overlay = document.getElementById('pdf-export-overlay');
+      const statusEl = document.getElementById('pdf-export-status');
+      const barEl = document.getElementById('pdf-export-bar');
+      const isTh = window.i18n.getLang() === 'th';
+
+      if (overlay) { overlay.classList.remove('hidden'); overlay.classList.add('flex'); }
+      if (statusEl) statusEl.textContent = isTh ? 'กำลังเริ่มต้น...' : 'Starting...';
+      if (barEl) barEl.style.width = '0%';
+
+      try {
+        if (!window.PDFExport) {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = '/js/pdf-export.js';
+            s.onload = resolve;
+            s.onerror = () => reject(new Error(isTh ? 'โหลดตัวสร้าง PDF ไม่สำเร็จ' : 'Failed to load PDF exporter'));
+            document.head.appendChild(s);
+          });
+        }
+
+        const safeTitle = (catalogConfig.cover && (isTh ? catalogConfig.cover.title_highlight : catalogConfig.cover.title_highlight)) || document.title || 'catalog';
+        const filename = String(safeTitle).replace(/[^\w฀-๿-]+/g, '_').slice(0, 60) + '.pdf';
+
+        let orgName = '', orgSub = '';
+        try {
+          const coverEl = document.querySelector('.catalog-cover-page');
+          const spans = coverEl ? coverEl.querySelectorAll('div:first-child > div:first-child > div span') : [];
+          if (spans[0]) orgName = spans[0].textContent.trim();
+          if (spans[1]) orgSub = spans[1].textContent.trim();
+        } catch (e) { /* non-fatal, cover page will just omit the institution line */ }
+
+        await window.PDFExport.run({
+          catalogConfig,
+          submissions: getCuratedSubmissions(),
+          isTh,
+          filename,
+          orgName,
+          orgSub,
+          onProgress: (done, total, label) => {
+            if (statusEl) statusEl.textContent = label || '';
+            if (barEl) barEl.style.width = Math.round((done / total) * 100) + '%';
+          }
+        });
+      } catch (err) {
+        console.error('[exportCatalogPDF]', err);
+        alert((isTh ? 'สร้าง PDF ไม่สำเร็จ: ' : 'PDF export failed: ') + err.message);
+      } finally {
+        if (overlay) { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
+      }
+    }
+    window.exportCatalogPDF = exportCatalogPDF;
 
     // Initialize
     window.i18n.renderSwitcher('lang-switcher');

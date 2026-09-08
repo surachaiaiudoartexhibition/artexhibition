@@ -55,7 +55,7 @@ export async function onRequestGet(context) {
               role_th: "ประธานคณะกรรมการผู้ทรงคุณวุฒิ",
               role_en: "Chair of the Selection Committee",
               institution: "วิทยาลัยเพาะช่าง มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์",
-              avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=faces"
+              avatar_url: null
             },
             {
               id: "jury-2",
@@ -65,7 +65,7 @@ export async function onRequestGet(context) {
               role_th: "กรรมการผู้ทรงคุณวุฒิเชี่ยวชาญด้านภาพพิมพ์",
               role_en: "Honored Juror & Printmaking Specialist",
               institution: "ผู้ทรงคุณวุฒิภายนอก",
-              avatar_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=faces"
+              avatar_url: null
             },
             {
               id: "jury-3",
@@ -75,7 +75,7 @@ export async function onRequestGet(context) {
               role_th: "กรรมการและเลขานุการคณะกรรมการ",
               role_en: "Secretary of the Selection Committee",
               institution: "วิทยาลัยเพาะช่าง มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์",
-              avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=faces"
+              avatar_url: null
             }
           ]
         },

@@ -46,6 +46,16 @@
     .handle-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
     .handle-w  { top: calc(50% - 5px); left: -5px; cursor: ew-resize; }
 
+    .smart-guide-line {
+      position: absolute;
+      background: #ff2d78;
+      box-shadow: 0 0 4px rgba(255, 45, 120, 0.7);
+      pointer-events: none;
+      z-index: 35;
+    }
+    .smart-guide-v { top: 0; bottom: 0; width: 1px; }
+    .smart-guide-h { left: 0; right: 0; height: 1px; }
+
     .studio-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .studio-scrollbar::-webkit-scrollbar-track { background: var(--bg-surface); }
     .studio-scrollbar::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 4px; }
@@ -324,6 +334,9 @@
 
           <!-- Dynamic Blocks Container -->
           <div id="canvas-blocks-layer" class="absolute inset-0 z-20"></div>
+
+          <!-- Smart Alignment Guide Lines (Figma/Canva-style) -->
+          <div id="canvas-smart-guides" class="absolute inset-0 pointer-events-none z-30"></div>
 
         </div>
       </div>
@@ -634,9 +647,9 @@
             year_created: '2026',
             price: '35,000',
             description: 'แนวคิดแรงบันดาลใจจากความสงบนิ่งและแสงสว่างยามรุ่งอรุณ สะท้อนผ่านเส้นสายภาพพิมพ์แกะไม้',
-            image_url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1000&auto=format&fit=crop',
+            image_url: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27800%27 height=%271000%27%3E%3Crect width=%27800%27 height=%271000%27 fill=%27%23e5e0d8%27/%3E%3Ctext x=%27400%27 y=%27500%27 font-family=%27sans-serif%27 font-size=%2728%27 fill=%27%23999%27 text-anchor=%27middle%27%3E(No Artwork Image Yet)%3C/text%3E%3C/svg%3E',
             nationality: 'Thailand',
-            avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop'
+            avatar_url: 'https://ui-avatars.com/api/?name=Sample+Artist&background=1a1a1a&color=D4AF37&bold=true'
           }];
         }
 
@@ -790,7 +803,8 @@
       const price = window.formatPrice ? window.formatPrice(art.price) : (art.price ? art.price + ' THB' : '');
       const concept = window.getField ? window.getField(art, 'description') : (art.description || '');
       const imgUrl = art.thumbnail_url || art.image_url || '';
-      const avatarUrl = art.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop';
+      const hasRealAvatar = Boolean(art.avatar_url && art.avatar_url.trim() && !art.avatar_url.includes('unsplash.com'));
+      const avatarUrl = hasRealAvatar ? art.avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName || 'Artist')}&background=1a1a1a&color=D4AF37&bold=true`;
       const country = art.nationality || 'Thailand';
 
       const fontFam = s.fontFamily === 'Cinzel' ? 'font-cinzel' : s.fontFamily === 'Sarabun' ? 'font-sans' : 'font-serif-art';
@@ -937,7 +951,39 @@
       initialBlockCoords = { x: block.xPct, y: block.yPct, w: block.wPct, h: block.hPct };
     }
 
+    // Smart Alignment Guides: snap to page edges/center, margins, and other blocks' edges/centers
+    function getSnapTargets(excludeId) {
+      const xs = [0, 5, 50, 95, 100];
+      const ys = [0, 5, 50, 95, 100];
+      (activeTemplate.blocks || []).forEach(b => {
+        if (b.id === excludeId) return;
+        xs.push(b.xPct, b.xPct + b.wPct / 2, b.xPct + b.wPct);
+        ys.push(b.yPct, b.yPct + b.hPct / 2, b.yPct + b.hPct);
+      });
+      return { xs, ys };
+    }
+
+    function findNearestTarget(value, targets, threshold) {
+      let best = null, bestDist = threshold;
+      targets.forEach(t => {
+        const d = Math.abs(value - t);
+        if (d <= bestDist) { bestDist = d; best = t; }
+      });
+      return best;
+    }
+
+    function renderSmartGuides(xLine, yLine) {
+      const layer = document.getElementById('canvas-smart-guides');
+      if (!layer) return;
+      let html = '';
+      if (xLine !== null) html += `<div class="smart-guide-line smart-guide-v" style="left:${xLine}%;"></div>`;
+      if (yLine !== null) html += `<div class="smart-guide-line smart-guide-h" style="top:${yLine}%;"></div>`;
+      layer.innerHTML = html;
+    }
+
     function setupCanvasInteraction() {
+      const SNAP_THRESHOLD_PCT = 0.8;
+
       window.addEventListener('mousemove', (e) => {
         if (!isDragging && !isResizing) return;
 
@@ -952,18 +998,37 @@
         const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
         if (!block) return;
 
+        let guideX = null, guideY = null;
+
         if (isDragging) {
           let newX = initialBlockCoords.x + deltaXPct;
           let newY = initialBlockCoords.y + deltaYPct;
 
           if (doSnap) {
-            newX = Math.round(newX / 2.5) * 2.5;
-            newY = Math.round(newY / 2.5) * 2.5;
+            const targets = getSnapTargets(block.id);
+            const left = newX, centerX = newX + block.wPct / 2, right = newX + block.wPct;
+            const top = newY, centerY = newY + block.hPct / 2, bottom = newY + block.hPct;
+
+            const mCenterX = findNearestTarget(centerX, targets.xs, SNAP_THRESHOLD_PCT);
+            const mLeft = findNearestTarget(left, targets.xs, SNAP_THRESHOLD_PCT);
+            const mRight = findNearestTarget(right, targets.xs, SNAP_THRESHOLD_PCT);
+            if (mCenterX !== null) { newX = mCenterX - block.wPct / 2; guideX = mCenterX; }
+            else if (mLeft !== null) { newX = mLeft; guideX = mLeft; }
+            else if (mRight !== null) { newX = mRight - block.wPct; guideX = mRight; }
+            else { newX = Math.round(newX / 2.5) * 2.5; }
+
+            const mCenterY = findNearestTarget(centerY, targets.ys, SNAP_THRESHOLD_PCT);
+            const mTop = findNearestTarget(top, targets.ys, SNAP_THRESHOLD_PCT);
+            const mBottom = findNearestTarget(bottom, targets.ys, SNAP_THRESHOLD_PCT);
+            if (mCenterY !== null) { newY = mCenterY - block.hPct / 2; guideY = mCenterY; }
+            else if (mTop !== null) { newY = mTop; guideY = mTop; }
+            else if (mBottom !== null) { newY = mBottom - block.hPct; guideY = mBottom; }
+            else { newY = Math.round(newY / 2.5) * 2.5; }
           }
 
           block.xPct = Math.max(0, Math.min(100 - block.wPct, newX));
           block.yPct = Math.max(0, Math.min(100 - block.hPct, newY));
-        } 
+        }
         else if (isResizing && resizeHandle) {
           let newX = initialBlockCoords.x;
           let newY = initialBlockCoords.y;
@@ -984,10 +1049,25 @@
           }
 
           if (doSnap) {
-            newX = Math.round(newX / 2.5) * 2.5;
-            newY = Math.round(newY / 2.5) * 2.5;
-            newW = Math.round(newW / 2.5) * 2.5;
-            newH = Math.round(newH / 2.5) * 2.5;
+            const targets = getSnapTargets(block.id);
+            if (resizeHandle.includes('e')) {
+              const m = findNearestTarget(newX + newW, targets.xs, SNAP_THRESHOLD_PCT);
+              if (m !== null) { newW = Math.max(5, m - newX); guideX = m; }
+            }
+            if (resizeHandle.includes('w')) {
+              const m = findNearestTarget(newX, targets.xs, SNAP_THRESHOLD_PCT);
+              if (m !== null) { const diff = m - newX; newX = m; newW = Math.max(5, newW - diff); guideX = m; }
+            }
+            if (resizeHandle.includes('s')) {
+              const m = findNearestTarget(newY + newH, targets.ys, SNAP_THRESHOLD_PCT);
+              if (m !== null) { newH = Math.max(3, m - newY); guideY = m; }
+            }
+            if (resizeHandle.includes('n')) {
+              const m = findNearestTarget(newY, targets.ys, SNAP_THRESHOLD_PCT);
+              if (m !== null) { const diff = m - newY; newY = m; newH = Math.max(3, newH - diff); guideY = m; }
+            }
+            if (guideX === null) { newX = Math.round(newX / 2.5) * 2.5; newW = Math.round(newW / 2.5) * 2.5; }
+            if (guideY === null) { newY = Math.round(newY / 2.5) * 2.5; newH = Math.round(newH / 2.5) * 2.5; }
           }
 
           block.xPct = Math.max(0, Math.min(100 - newW, newX));
@@ -995,6 +1075,8 @@
           block.wPct = Math.max(5, Math.min(100 - block.xPct, newW));
           block.hPct = Math.max(3, Math.min(100 - block.yPct, newH));
         }
+
+        renderSmartGuides(guideX, guideY);
 
         const el = document.getElementById('blk-' + block.id);
         if (el) {
@@ -1011,6 +1093,7 @@
         if (isDragging || isResizing) {
           isDragging = false;
           isResizing = false;
+          renderSmartGuides(null, null);
           syncActiveTemplateToSource();
         }
       });
