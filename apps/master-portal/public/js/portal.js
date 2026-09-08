@@ -94,10 +94,13 @@ const MasterPortalAPI = {
     }
   },
 
-  async pullArtworks(eventId = null) {
+  async pullArtworks(eventId = null, adminKey = "") {
     const res = await fetch("/api/sync/pull", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": adminKey
+      },
       body: JSON.stringify(eventId ? { event_id: eventId } : {})
     });
     return await res.json();

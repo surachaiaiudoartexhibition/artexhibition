@@ -981,7 +981,8 @@
       banner.innerHTML = `⏳ กำลังเชื่อมต่อไปยัง Event APIs เพื่อดึงผลงานที่ได้รับการอนุมัติ...`;
 
       try {
-        const res = await MasterPortalAPI.pullArtworks(null);
+        const adminKey = document.getElementById("master-admin-key").value.trim();
+        const res = await MasterPortalAPI.pullArtworks(null, adminKey);
         if (res.success) {
           banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-emerald-950/40 border-emerald-500/30 text-emerald-300 block";
           let detailsHtml = (res.events || []).map(e => `
@@ -1020,7 +1021,8 @@
       banner.textContent = `กำลังดึงข้อมูลสำหรับ Event: ${eventId}...`;
 
       try {
-        const res = await MasterPortalAPI.pullArtworks(eventId);
+        const adminKey = document.getElementById("master-admin-key").value.trim();
+        const res = await MasterPortalAPI.pullArtworks(eventId, adminKey);
         if (res.success) {
           banner.className = "mt-6 p-5 rounded-2xl border text-xs font-mono bg-emerald-950/40 border-emerald-500/30 text-emerald-300 block";
           banner.textContent = `✅ ${res.message}`;
