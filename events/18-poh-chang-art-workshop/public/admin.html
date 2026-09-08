@@ -3559,7 +3559,7 @@
 
     // ====== RESET ALL SUBMISSIONS ======
     async function resetAllSubmissions() {
-      const count = allSubmissions ? allSubmissions.length : '?';
+      const count = allLoadedSubmissions ? allLoadedSubmissions.length : '?';
       const confirmed = confirm(
         `⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบผลงานทั้งหมด ${count} ชิ้น ออกจากระบบ?\n\n` +
         `การดำเนินการนี้ไม่สามารถย้อนกลับได้!\n` +
@@ -3586,7 +3586,7 @@
 
     // ====== SYNC ALL APPROVED → MASTER PORTAL ======
     async function syncAllToMasterPortal() {
-      const approvedCount = allSubmissions ? allSubmissions.filter(s => s.status === 'approved').length : '?';
+      const approvedCount = allLoadedSubmissions ? allLoadedSubmissions.filter(s => s.status === 'approved').length : '?';
       const confirmed = confirm(
         `🔄 Sync ผลงานที่อนุมัติแล้ว (${approvedCount} ชิ้น) ไปยัง Master Portal?\n\n` +
         `ระบบจะ:\n` +
