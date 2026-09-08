@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Maitree:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Sarabun', sans-serif; }
     .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
@@ -997,13 +997,26 @@
           const rotateStyle = s.rotationDeg ? `transform: rotate(${s.rotationDeg}deg);` : '';
           const posStyle = `left: ${x}%; top: ${y}%; width: ${w}%; ${hStyle} z-index: ${zIndex}; ${rotateStyle}`;
 
-          const fontFam = s.fontFamily === 'Cinzel' ? 'font-serif tracking-wide' : s.fontFamily === 'Sarabun' ? 'font-sans' : 'font-serif';
+          // Same real font-family stack per dropdown choice as the Designer Studio uses,
+          // so the published catalog page actually matches what was picked while laying
+          // out the page instead of collapsing everything but Cinzel/Sarabun to a generic
+          // browser serif.
+          const FONT_FAMILY_STACKS = {
+            'Cormorant Garamond': "'Cormorant Garamond','Noto Serif Thai',Georgia,serif",
+            'Noto Serif Thai': "'Noto Serif Thai','Cormorant Garamond',Georgia,serif",
+            'Maitree': "'Maitree','Noto Serif Thai',serif",
+            'Sarabun': "'Sarabun','Noto Serif Thai',sans-serif",
+            'Cinzel': "'Cinzel','Cormorant Garamond',serif",
+            'Prompt': "'Prompt','Noto Serif Thai',sans-serif"
+          };
+          const fontFamCss = FONT_FAMILY_STACKS[s.fontFamily] || FONT_FAMILY_STACKS['Maitree'];
+          const fontFam = '';
           const fontWt = s.fontWeight === 'bold' ? 'font-bold' : s.fontWeight === 'semibold' ? 'font-semibold' : 'font-normal';
           const fontItalic = s.fontStyle === 'italic' ? 'italic' : '';
           const textAlign = s.textAlign ? `text-${s.textAlign}` : 'text-left';
           const colorStyle = s.color ? `color: ${s.color};` : '';
           const fontSizeStyle = s.fontSizePt ? `font-size: ${s.fontSizePt}pt;` : '';
-          const customInlineStyle = `${colorStyle} ${fontSizeStyle}`;
+          const customInlineStyle = `font-family: ${fontFamCss}; ${colorStyle} ${fontSizeStyle}`;
 
           const rr = s.radius || {};
           const radiusStyle = `border-radius: ${rr.tl || 0}px ${rr.tr || 0}px ${rr.br || 0}px ${rr.bl || 0}px;`;

@@ -854,8 +854,8 @@
       const price = window.formatPrice ? window.formatPrice(art.price) : (art.price ? art.price + ' THB' : '');
       const concept = window.getField ? window.getField(art, 'description') : (art.description || '');
       const imgUrl = art.thumbnail_url || art.image_url || '';
-      const hasRealAvatar = Boolean(art.avatar_url && art.avatar_url.trim() && !art.avatar_url.includes('unsplash.com'));
-      const avatarUrl = hasRealAvatar ? art.avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName || 'Artist')}&background=1a1a1a&color=D4AF37&bold=true`;
+      const hasRealAvatar = Boolean(art.artist_avatar_url && art.artist_avatar_url.trim() && !art.artist_avatar_url.includes('unsplash.com'));
+      const avatarUrl = hasRealAvatar ? art.artist_avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(artistName || 'Artist')}&background=1a1a1a&color=D4AF37&bold=true`;
       const country = art.nationality || 'Thailand';
       const email = art.artist_email || '';
       const flagCode = window.resolveCountryCode ? window.resolveCountryCode(country) : null;
@@ -865,12 +865,25 @@
       const radiusCss = 'border-radius: ' + [r.tl || 0, r.tr || 0, r.br || 0, r.bl || 0].map(v => v + 'px').join(' ') + ';';
       const imgBorderCss = s.showBorder ? 'border: 1px solid var(--border-accent);' : '';
 
-      const fontFam = s.fontFamily === 'Cinzel' ? 'font-cinzel' : s.fontFamily === 'Sarabun' ? 'font-sans' : 'font-serif-art';
+      // Every font in the "Font:" dropdown gets its own real CSS font-family stack here,
+      // applied via inline style below - a Tailwind class per font used to cover only
+      // Cinzel/Sarabun, silently rendering every other choice (Cormorant Garamond, Noto
+      // Serif Thai, Prompt) as Maitree instead, so the studio preview lied about the pick.
+      const FONT_FAMILY_STACKS = {
+        'Cormorant Garamond': "'Cormorant Garamond','Noto Serif Thai',Georgia,serif",
+        'Noto Serif Thai': "'Noto Serif Thai','Cormorant Garamond',Georgia,serif",
+        'Maitree': "'Maitree','Noto Serif Thai',serif",
+        'Sarabun': "'Sarabun','Noto Serif Thai',sans-serif",
+        'Cinzel': "'Cinzel','Cormorant Garamond',serif",
+        'Prompt': "'Prompt','Noto Serif Thai',sans-serif"
+      };
+      const fontFamCss = FONT_FAMILY_STACKS[s.fontFamily] || FONT_FAMILY_STACKS['Maitree'];
+      const fontFam = '';
       const fontWt = s.fontWeight === 'bold' ? 'font-bold' : s.fontWeight === 'semibold' ? 'font-semibold' : 'font-normal';
       const fontItalic = s.fontStyle === 'italic' ? 'italic' : '';
       const textAlign = 'text-' + (s.textAlign || 'left');
       const color = s.color || canvasTextColor;
-      const fontSize = s.fontSizePt ? 'font-size: ' + s.fontSizePt + 'pt;' : '';
+      const fontSize = 'font-family: ' + fontFamCss + ';' + (s.fontSizePt ? ' font-size: ' + s.fontSizePt + 'pt;' : '');
 
       // Small uppercase caption labels ("ผลงานศิลปกรรม" / "ศิลปินผู้สร้างสรรค์"):
       // optional per block (showLabel), language independent of the site switcher (labelLang).

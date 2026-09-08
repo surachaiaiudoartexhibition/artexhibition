@@ -90,8 +90,18 @@
   // Map the catalog's 5 design fonts -> an embedded font that can render the given text.
   // (Cormorant Garamond has no Thai glyphs; the on-screen CSS silently falls back to Noto
   // Serif Thai for Thai characters via the font-stack, so we mirror that behavior here.)
+  // The Designer Studio's Font dropdown stores names with spaces ("Cormorant Garamond",
+  // "Noto Serif Thai") but the embedded PDF fonts are registered without spaces
+  // (see FONT_FILES above) - normalize first or those two picks silently fall back to
+  // jsPDF's default font instead of the one actually chosen. "Prompt" isn't embedded in
+  // the PDF at all, so it maps to Sarabun (closest embedded sans-serif) instead of failing.
+  const FONT_NAME_ALIASES = {
+    'Cormorant Garamond': 'CormorantGaramond',
+    'Noto Serif Thai': 'NotoSerifThai',
+    'Prompt': 'Sarabun'
+  };
   function pickFont(text, preferred) {
-    const family = preferred || 'Maitree';
+    const family = FONT_NAME_ALIASES[preferred] || preferred || 'Maitree';
     if (family === 'Cinzel') return 'Cinzel';
     const hasThai = THAI_RE.test(text || '');
     if (hasThai && family === 'CormorantGaramond') return 'NotoSerifThai';
