@@ -151,11 +151,19 @@
   }
 
   // Draw an image "contain" (fit within box, centered, preserve aspect) or "cover" (fill box, crop, clipped)
-  async function drawImageInBox(doc, url, x, y, w, h, fit) {
+  async function drawImageInBox(doc, url, x, y, w, h, fit, opts) {
+    opts = opts || {};
     const img = await loadImageResized(url, 1800);
     if (!img || w <= 0 || h <= 0) return;
     const boxRatio = w / h;
     const imgRatio = img.width / img.height;
+
+    // Per-corner radius isn't expressible with jsPDF's clip primitives, so we
+    // approximate with the largest corner value as a single uniform radius.
+    const r = opts.radius || {};
+    const radiusPx = Math.max(r.tl || 0, r.tr || 0, r.br || 0, r.bl || 0);
+    const radiusMm = Math.min(radiusPx * 0.3, Math.min(w, h) / 2);
+    const borderRgb = hexToRgb('#B4965A');
 
     if (fit === 'cover') {
       let drawW, drawH, drawX, drawY;
@@ -167,7 +175,8 @@
         drawX = x; drawY = y - (drawH - h) / 2;
       }
       doc.saveGraphicsState();
-      doc.rect(x, y, w, h, null);
+      if (radiusMm > 0) doc.roundedRect(x, y, w, h, radiusMm, radiusMm, null);
+      else doc.rect(x, y, w, h, null);
       doc.clip();
       doc.addImage(img.dataUri, img.format, drawX, drawY, drawW, drawH, undefined, 'FAST');
       doc.restoreGraphicsState();
@@ -177,7 +186,22 @@
       else { drawH = h; drawW = h * imgRatio; }
       const drawX = x + (w - drawW) / 2;
       const drawY = y + (h - drawH) / 2;
-      doc.addImage(img.dataUri, img.format, drawX, drawY, drawW, drawH, undefined, 'FAST');
+      if (radiusMm > 0) {
+        doc.saveGraphicsState();
+        doc.roundedRect(x, y, w, h, radiusMm, radiusMm, null);
+        doc.clip();
+        doc.addImage(img.dataUri, img.format, drawX, drawY, drawW, drawH, undefined, 'FAST');
+        doc.restoreGraphicsState();
+      } else {
+        doc.addImage(img.dataUri, img.format, drawX, drawY, drawW, drawH, undefined, 'FAST');
+      }
+    }
+
+    if (opts.showBorder) {
+      doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
+      doc.setLineWidth(0.25);
+      if (radiusMm > 0) doc.roundedRect(x, y, w, h, radiusMm, radiusMm);
+      else doc.rect(x, y, w, h);
     }
   }
 
@@ -231,8 +255,10 @@
     const maxLines = opts.maxLines || lines.length;
     const shownLines = lines.slice(0, maxLines);
     let cursorY = y + sizePt * PT_TO_MM * 0.9;
+    const textOpts = { align };
+    if (opts.rotationDeg) textOpts.angle = opts.rotationDeg;
     shownLines.forEach((line) => {
-      doc.text(line, anchorX, cursorY, { align });
+      doc.text(line, anchorX, cursorY, textOpts);
       cursorY += lineHeightMm;
     });
     return shownLines.length * lineHeightMm;
@@ -440,7 +466,7 @@
   const DEFAULT_ELEMENTS = {
     showTitle: true, showArtist: true, showFlag: true, showTechnique: true,
     showDimensions: true, showYear: true, showPrice: true, showConcept: true,
-    showAvatar: true, showViewLink: true, showPageNum: true
+    showAvatar: true, showViewLink: true, showPageNum: true, showEmail: true
   };
 
   async function drawArtworkSpreadPage(doc, ctx) {
@@ -462,11 +488,12 @@
         const h = pct2mm(b.hPct !== undefined ? b.hPct : (b.h || 10), PAGE_H_MM);
         const s = b.style || {};
         const align = s.textAlign || 'left';
-        const commonOpts = { fontFamily: s.fontFamily, fontSizePt: s.fontSizePt, color: s.color, bold: s.fontWeight === 'bold' || s.fontWeight === 'semibold', italic: s.fontStyle === 'italic', align };
+        const commonOpts = { fontFamily: s.fontFamily, fontSizePt: s.fontSizePt, color: s.color, bold: s.fontWeight === 'bold' || s.fontWeight === 'semibold', italic: s.fontStyle === 'italic', align, rotationDeg: s.rotationDeg };
+        const imgOpts = { radius: s.radius, showBorder: s.showBorder };
 
         switch (b.type) {
           case 'artwork_image':
-            await drawImageInBox(doc, item.image_url || item.thumbnail_url, x, y, w, h, s.objectFit === 'cover' ? 'cover' : 'contain');
+            await drawImageInBox(doc, item.image_url || item.thumbnail_url, x, y, w, h, s.objectFit === 'cover' ? 'cover' : 'contain', imgOpts);
             break;
           case 'artwork_title':
             if (elem.showTitle === false) break;
@@ -478,13 +505,17 @@
             break;
           case 'artist_photo':
             if (elem.showAvatar === false || !avatar) break;
-            await drawImageInBox(doc, avatar, x, y, w, h, 'cover');
+            await drawImageInBox(doc, avatar, x, y, w, h, s.objectFit === 'cover' ? 'cover' : 'contain', imgOpts);
             break;
           case 'country_flag': {
             if (elem.showFlag === false) break;
-            await drawCountryFlagChip(doc, item.nationality, x, y, { fontSizePt: 8, color: tokens.sub, isTh });
+            await drawImageInBox(doc, `https://flagcdn.com/w160/${window.resolveCountryCode ? (window.resolveCountryCode(item.nationality || 'Thailand') || 'th') : 'th'}.png`, x, y, w, h, 'contain', imgOpts);
             break;
           }
+          case 'artist_email':
+            if (elem.showEmail === false || !item.artist_email) break;
+            drawTextBlock(doc, item.artist_email, x, y, w, Object.assign({ fontSizePt: 9 }, commonOpts));
+            break;
           case 'artist_profile': {
             let ax = x;
             if (elem.showAvatar !== false && avatar) {
@@ -528,7 +559,7 @@
           case 'page_number':
             if (elem.showPageNum === false) break;
             hasPageNumBlock = true;
-            drawTextBlock(doc, (isTh ? 'หน้า' : 'Page') + ' ' + pageNum, x, y, w, { fontFamily: 'Sarabun', fontSizePt: 7.5, color: tokens.sub, align: 'right' });
+            drawTextBlock(doc, String(pageNum), x, y, w, Object.assign({ fontFamily: 'Sarabun', fontSizePt: 8 }, commonOpts));
             break;
           case 'divider_line': {
             doc.setDrawColor(goldRgb[0], goldRgb[1], goldRgb[2]);
@@ -538,6 +569,9 @@
           }
           case 'custom_text':
             drawTextBlock(doc, b.customContent || '', x, y, w, Object.assign({ fontSizePt: 10 }, commonOpts));
+            break;
+          case 'image_box':
+            if (b.imageUrl) await drawImageInBox(doc, b.imageUrl, x, y, w, h, s.objectFit === 'cover' ? 'cover' : 'contain', imgOpts);
             break;
           default:
             break;

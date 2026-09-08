@@ -994,7 +994,8 @@
           const s = b.style || {};
 
           const hStyle = h ? `height: ${h}%;` : '';
-          const posStyle = `left: ${x}%; top: ${y}%; width: ${w}%; ${hStyle} z-index: ${zIndex};`;
+          const rotateStyle = s.rotationDeg ? `transform: rotate(${s.rotationDeg}deg);` : '';
+          const posStyle = `left: ${x}%; top: ${y}%; width: ${w}%; ${hStyle} z-index: ${zIndex}; ${rotateStyle}`;
 
           const fontFam = s.fontFamily === 'Cinzel' ? 'font-serif tracking-wide' : s.fontFamily === 'Sarabun' ? 'font-sans' : 'font-serif';
           const fontWt = s.fontWeight === 'bold' ? 'font-bold' : s.fontWeight === 'semibold' ? 'font-semibold' : 'font-normal';
@@ -1004,12 +1005,27 @@
           const fontSizeStyle = s.fontSizePt ? `font-size: ${s.fontSizePt}pt;` : '';
           const customInlineStyle = `${colorStyle} ${fontSizeStyle}`;
 
+          const rr = s.radius || {};
+          const radiusStyle = `border-radius: ${rr.tl || 0}px ${rr.tr || 0}px ${rr.br || 0}px ${rr.bl || 0}px;`;
+          const imgBorderStyle = s.showBorder ? 'border: 1px solid rgba(180,150,90,0.6);' : '';
+          const flagCode2 = window.resolveCountryCode ? window.resolveCountryCode(item.nationality || 'Thailand') : null;
+          const flagImgUrl2 = flagCode2 ? `https://flagcdn.com/w160/${flagCode2}.png` : '';
+
+          // Small uppercase caption labels: optional per block (showLabel), language
+          // independent of the site's TH/EN switcher when labelLang is set explicitly.
+          const showLabel = s.showLabel !== false;
+          const capIsTh = s.labelLang === 'en' ? false : (s.labelLang === 'th' ? true : isTh);
+          const LABELS = {
+            artwork: capIsTh ? 'ผลงานศิลปกรรม' : 'Artwork Details',
+            artist: capIsTh ? 'ศิลปินผู้สร้างสรรค์' : 'Created by Artist'
+          };
+
           switch (b.type) {
             case 'artwork_image': {
               return `
                 <div class="cat-free-block cat-block-img" style="${posStyle}">
-                  <div class="relative w-full h-full flex items-center justify-center overflow-hidden">
-                    <img src="${item.image_url || item.thumbnail_url}" alt="${title}" class="max-h-full max-w-full object-${s.objectFit || 'contain'}">
+                  <div class="relative w-full h-full flex items-center justify-center overflow-hidden" style="${radiusStyle}">
+                    <img src="${item.image_url || item.thumbnail_url}" alt="${title}" class="w-full h-full object-${s.objectFit || 'contain'}" style="${radiusStyle} ${imgBorderStyle}">
                   </div>
                 </div>
               `;
@@ -1019,7 +1035,7 @@
               if (elem.showTitle === false) return '';
               return `
                 <div class="cat-free-block ${textAlign}" style="${posStyle}">
-                  <span class="text-[10px] font-mono uppercase tracking-widest text-amber-500 font-bold block mb-1">${window.t('lbl_artwork_meta')}</span>
+                  ${showLabel ? `<span class="text-[10px] font-mono uppercase tracking-widest text-amber-500 font-bold block mb-1">${LABELS.artwork}</span>` : ''}
                   <h3 class="${fontFam} ${fontWt} ${fontItalic} text-xl sm:text-2xl ${textHeadingClass} leading-snug" style="${customInlineStyle}">
                     ${title}
                   </h3>
@@ -1031,7 +1047,7 @@
               if (elem.showArtist === false) return '';
               return `
                 <div class="cat-free-block ${textAlign}" style="${posStyle}">
-                  <span class="text-[9px] font-mono uppercase text-amber-500 block font-semibold">${window.t('created_by_artist')}</span>
+                  ${showLabel ? `<span class="text-[9px] font-mono uppercase text-amber-500 block font-semibold">${LABELS.artist}</span>` : ''}
                   <h4 class="${fontFam} ${fontWt} text-sm ${textHeadingClass} truncate" style="${customInlineStyle}">${artistName}</h4>
                 </div>
               `;
@@ -1040,8 +1056,8 @@
             case 'artist_photo': {
               if (elem.showAvatar === false || !avatar) return '';
               return `
-                <div class="cat-free-block flex items-center justify-center overflow-hidden" style="${posStyle}">
-                  <img src="${avatar}" alt="" class="w-full h-full object-cover rounded-sm ring-2 ring-amber-500/40">
+                <div class="cat-free-block flex items-center justify-center overflow-hidden" style="${posStyle} ${radiusStyle}">
+                  <img src="${avatar}" alt="" class="w-full h-full object-${s.objectFit || 'contain'}" style="${radiusStyle} ${imgBorderStyle}">
                 </div>
               `;
             }
@@ -1049,8 +1065,8 @@
             case 'country_flag': {
               if (elem.showFlag === false) return '';
               return `
-                <div class="cat-free-block flex items-center" style="${posStyle}">
-                  ${window.getCountryFlagBadge ? window.getCountryFlagBadge(item.nationality || 'Thailand', { size: 'sm', showName: false }) : ''}
+                <div class="cat-free-block flex items-center justify-center overflow-hidden" style="${posStyle} ${radiusStyle}">
+                  ${flagImgUrl2 ? `<img src="${flagImgUrl2}" alt="${item.nationality || 'Thailand'}" class="w-full h-full object-contain" style="${radiusStyle} ${imgBorderStyle}">` : ''}
                 </div>
               `;
             }
@@ -1059,17 +1075,26 @@
               return `
                 <div class="cat-free-block flex items-center gap-3 pt-1" style="${posStyle}">
                   ${(elem.showAvatar !== false && avatar) ? `
-                    <img src="${avatar}" alt="" class="w-12 h-12 rounded-sm object-cover ring-2 ring-amber-500/40 shrink-0">
+                    <img src="${avatar}" alt="" class="w-12 h-12 rounded-sm object-cover shrink-0">
                   ` : ''}
                   <div class="min-w-0">
                     ${elem.showArtist !== false ? `
-                      <span class="text-[9px] font-mono uppercase text-amber-500 block font-semibold">${window.t('created_by_artist')}</span>
+                      ${showLabel ? `<span class="text-[9px] font-mono uppercase text-amber-500 block font-semibold">${LABELS.artist}</span>` : ''}
                       <h4 class="${fontFam} ${fontWt} text-sm ${textHeadingClass} truncate" style="${customInlineStyle}">${artistName}</h4>
                     ` : ''}
                     ${elem.showFlag !== false ? `
                       <div class="mt-0.5">${window.getCountryFlagBadge ? window.getCountryFlagBadge(item.nationality || 'Thailand', { size: 'sm', showName: false }) : ''}</div>
                     ` : ''}
                   </div>
+                </div>
+              `;
+            }
+
+            case 'artist_email': {
+              if (elem.showEmail === false || !item.artist_email) return '';
+              return `
+                <div class="cat-free-block ${textAlign}" style="${posStyle}">
+                  <span class="${fontFam} ${fontWt} text-xs truncate block" style="${customInlineStyle}">✉️ ${item.artist_email}</span>
                 </div>
               `;
             }
@@ -1139,9 +1164,8 @@
               if (elem.showPageNum === false) return '';
               hasPageNumBlock = true;
               return `
-                <div class="cat-free-block border-t ${borderSubClass} pt-2 flex items-center justify-between text-xs ${textSubClass}" style="${posStyle}">
-                  <span>${window.t('catalog_footer_title')}</span>
-                  <span>${window.t('catalog_page_prefix')} ${pageNum}</span>
+                <div class="cat-free-block ${textAlign}" style="${posStyle}">
+                  <span class="${fontFam} ${fontWt} font-mono ${textHeadingClass}" style="${customInlineStyle}">${pageNum}</span>
                 </div>
               `;
             }
@@ -1150,6 +1174,15 @@
               return `
                 <div class="cat-free-block flex items-center" style="${posStyle}">
                   <div class="w-full border-t border-amber-500/50"></div>
+                </div>
+              `;
+            }
+
+            case 'image_box': {
+              if (!b.imageUrl) return '';
+              return `
+                <div class="cat-free-block flex items-center justify-center overflow-hidden" style="${posStyle} ${radiusStyle}">
+                  <img src="${b.imageUrl}" alt="" class="w-full h-full object-${s.objectFit || 'contain'}" style="${radiusStyle} ${imgBorderStyle}">
                 </div>
               `;
             }
@@ -1289,7 +1322,7 @@
         <!-- Block 4: Artist Profile & Flag -->
         <div class="cat-free-block cat-block-artist flex items-center gap-3 pt-1" style="left: ${bl.artist.x}%; top: ${bl.artist.y}%; width: ${bl.artist.w}%;">
           ${(elem.showAvatar !== false && avatar) ? `
-            <img src="${avatar}" alt="" class="w-12 h-12 rounded-sm object-cover ring-2 ring-amber-500/40 shrink-0">
+            <img src="${avatar}" alt="" class="w-12 h-12 rounded-sm object-cover shrink-0">
           ` : ''}
           <div class="min-w-0">
             ${elem.showArtist !== false ? `
