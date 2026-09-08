@@ -150,12 +150,44 @@ export async function onRequest(context) {
     ).bind(id);
     await deleteStmt.run();
 
+    // 5. Notify Master Portal to remove from master_artworks
+    const masterPortalUrl = env.MASTER_PORTAL_URL;
+    const secretToken = env.SHARED_SECRET_TOKEN;
+    const eventId = env.EVENT_ID || 'event';
+    const globalId = `${eventId}-${String(id).padStart(4, '0')}`;
+
+    let masterSyncResult = { attempted: false, success: false };
+    if (masterPortalUrl && secretToken) {
+      masterSyncResult.attempted = true;
+      try {
+        const syncEndpoint = `${masterPortalUrl.replace(/\/+$/, '')}/api/sync`;
+        const webhookRes = await fetch(syncEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${secretToken}`
+          },
+          body: JSON.stringify({
+            action: 'delete',
+            event_id: eventId,
+            global_id: globalId
+          })
+        });
+        masterSyncResult.status = webhookRes.status;
+        masterSyncResult.success = webhookRes.ok;
+        masterSyncResult.response = await webhookRes.json().catch(() => null);
+      } catch (webhookErr) {
+        masterSyncResult.error = webhookErr.message;
+      }
+    }
+
     return new Response(JSON.stringify({
       success: true,
       message: `Artwork #${id} (${submission.title}) deleted successfully.`,
       deletedId: Number(id),
       cloudinaryDeleted: Array.from(publicIdsToDelete),
-      cloudinaryResults
+      cloudinaryResults,
+      masterPortalSync: masterSyncResult
     }), {
       status: 200,
       headers: { "Content-Type": "application/json" }

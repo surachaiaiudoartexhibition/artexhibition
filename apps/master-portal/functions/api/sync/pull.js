@@ -48,6 +48,7 @@ export async function onRequestPost(context) {
 
     const results = [];
     let totalSynced = 0;
+    let totalPruned = 0;
 
     for (const ev of events) {
       const eventReport = {
@@ -119,6 +120,28 @@ export async function onRequestPost(context) {
           eventReport.synced_count++;
           totalSynced++;
         }
+
+        // Prune master records for this event that are no longer approved
+        // (deleted, rejected, or otherwise removed at the event) so stale
+        // artworks don't keep showing up on the master portal.
+        const freshGlobalIds = submissions.map(
+          (sub) => `${ev.event_id}-${String(sub.id).padStart(4, "0")}`
+        );
+
+        let pruneStmt;
+        if (freshGlobalIds.length > 0) {
+          const placeholders = freshGlobalIds.map(() => "?").join(", ");
+          pruneStmt = env.DB.prepare(
+            `DELETE FROM master_artworks WHERE event_id = ? AND global_id NOT IN (${placeholders})`
+          ).bind(ev.event_id, ...freshGlobalIds);
+        } else {
+          pruneStmt = env.DB.prepare(
+            "DELETE FROM master_artworks WHERE event_id = ?"
+          ).bind(ev.event_id);
+        }
+        const pruneResult = await pruneStmt.run();
+        eventReport.pruned_count = pruneResult.meta?.changes || 0;
+        totalPruned += eventReport.pruned_count;
       } catch (eventErr) {
         eventReport.status = "error";
         eventReport.error = eventErr.message;
@@ -129,8 +152,9 @@ export async function onRequestPost(context) {
 
     return new Response(JSON.stringify({
       success: true,
-      message: `Successfully pulled and synchronized ${totalSynced} artwork(s) across ${events.length} event(s).`,
+      message: `Successfully pulled and synchronized ${totalSynced} artwork(s) (pruned ${totalPruned} stale record(s)) across ${events.length} event(s).`,
       total_synced: totalSynced,
+      total_pruned: totalPruned,
       events: results
     }), {
       status: 200,
