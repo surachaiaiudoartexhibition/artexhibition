@@ -123,25 +123,29 @@ export async function onRequestPost(context) {
 
         // Prune master records for this event that are no longer approved
         // (deleted, rejected, or otherwise removed at the event) so stale
-        // artworks don't keep showing up on the master portal.
-        const freshGlobalIds = submissions.map(
-          (sub) => `${ev.event_id}-${String(sub.id).padStart(4, "0")}`
+        // artworks don't keep showing up on the master portal. Diffed in
+        // JS (rather than a single large "NOT IN (...)" query) because D1
+        // rejects statements with too many bound parameters once an event
+        // has more than ~100 approved artworks.
+        const freshGlobalIds = new Set(
+          submissions.map((sub) => `${ev.event_id}-${String(sub.id).padStart(4, "0")}`)
         );
 
-        let pruneStmt;
-        if (freshGlobalIds.length > 0) {
-          const placeholders = freshGlobalIds.map(() => "?").join(", ");
-          pruneStmt = env.DB.prepare(
-            `DELETE FROM master_artworks WHERE event_id = ? AND global_id NOT IN (${placeholders})`
-          ).bind(ev.event_id, ...freshGlobalIds);
-        } else {
-          pruneStmt = env.DB.prepare(
-            "DELETE FROM master_artworks WHERE event_id = ?"
-          ).bind(ev.event_id);
+        const existingRows = await env.DB.prepare(
+          "SELECT global_id FROM master_artworks WHERE event_id = ?"
+        ).bind(ev.event_id).all();
+        const staleIds = (existingRows.results || [])
+          .map((r) => r.global_id)
+          .filter((gid) => !freshGlobalIds.has(gid));
+
+        for (const staleId of staleIds) {
+          await env.DB.prepare(
+            "DELETE FROM master_artworks WHERE event_id = ? AND global_id = ?"
+          ).bind(ev.event_id, staleId).run();
         }
-        const pruneResult = await pruneStmt.run();
-        eventReport.pruned_count = pruneResult.meta?.changes || 0;
-        totalPruned += eventReport.pruned_count;
+        eventReport.pruned_count = staleIds.length;
+        eventReport.pruned_ids = staleIds;
+        totalPruned += staleIds.length;
       } catch (eventErr) {
         eventReport.status = "error";
         eventReport.error = eventErr.message;
