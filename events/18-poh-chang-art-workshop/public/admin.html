@@ -2250,6 +2250,9 @@
                 <span>📄 โหลด Template</span>
               </button>
             </div>
+
+            <!-- Header Mapping Debug Panel (auto-populated on CSV paste/upload) -->
+            <div id="header-mapping-debug" class="text-[10px]"></div>
           </div>
 
         </div>
@@ -2597,8 +2600,78 @@
       storeTableRecords = parseCsvOrTsv(text);
       const badge = document.getElementById('badge-table-count');
       badge.textContent = `${storeTableRecords.length} แถว`;
+
+      // Show header mapping debug panel
+      showHeaderMappingDebug(text);
+
       recalculatePairing();
     }
+
+    function showHeaderMappingDebug(rawText) {
+      const debugEl = document.getElementById('header-mapping-debug');
+      if (!debugEl) return;
+      if (!rawText) { debugEl.innerHTML = ''; return; }
+
+      let text = rawText.trim();
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      const firstLine = text.split('\n')[0];
+      const isTab = firstLine.includes('\t');
+      // Quick split just for header preview
+      const rawHeaders = isTab ? firstLine.split('\t') : firstLine.split(',');
+      const normHeaders = rawHeaders.map(h => String(h).toLowerCase().replace(/[\s\-_/()\[\]]/g, '').replace(/[^a-z0-9\u0E00-\u0E7F]/g, ''));
+
+      const fieldMap = {
+        'title': ['artworktitle','artworkname','artwork','title','ชื่องาน','ชื่อผลงาน','ผลงาน','ชื่อภาพ','ชื่อชิ้นงาน','ชิ้นงาน'],
+        'artist_name': ['artistname','artist','creator','ชื่อศิลปิน','ศิลปิน','ชื่อนามสกุล','นามสกุล','ชื่อสกุล','ผู้สร้างสรรค์','ผู้จัดทำ','name','ชื่อ'],
+        'nationality': ['country','nationality','nation','ประเทศ','สัญชาติ','ชาติ'],
+        'technique': ['medium','technique','material','materials','วัสดุ','วัสดุอุปกรณ์','อุปกรณ์','เทคนิค','เทคนิกการพิมพ์','เทคนิก','เทคนิคและวัสดุ','เทคนิควัสดุ','เทคนิคการสร้าง','เทคนิคการพิมพ์','ประเภทงาน','ประเภทเทคนิค','วิธีการ','วิธีสร้าง','สื่อ','techniq','technic'],
+        'dimensions': ['dimensions','dimension','size','ขนาด','ขนาดผลงาน','มิติ','กว้างยาว'],
+        'year_created': ['year','yearcreated','ปี','ปีที่สร้าง','ปีคศ','ปีพศ','พศ','คศ'],
+        'price': ['price','ราคา','ราคาจำหน่าย','ราคาขาย','มูลค่า'],
+        'artist_bio': ['bio','biography','artistbio','ประวัติ','ประวัติศิลปิน','ประวัติย่อ'],
+        'description': ['concept','description','statement','แนวคิด','แนวความคิด','คำอธิบาย','แรงบันดาลใจ','คำอธิบายผลงาน'],
+        'id': ['id','no','number','code','ลำดับ','รหัส','ลำดับที่','รหัสผลงาน'],
+        'email': ['email','e-mail','mail','อีเมล','อีเมล์']
+      };
+
+      function detectField(h) {
+        for (const [field, keywords] of Object.entries(fieldMap)) {
+          if (keywords.some(k => h === k || h.includes(k))) return field;
+        }
+        return null;
+      }
+
+      const rows = rawHeaders.map((orig, i) => {
+        const norm = normHeaders[i];
+        const field = detectField(norm);
+        return `<tr class="border-b border-[var(--border-subtle)]">
+          <td class="px-2 py-1 font-mono text-[10px] text-[var(--text-muted)] max-w-[120px] truncate" title="${orig.trim()}">${orig.trim()}</td>
+          <td class="px-2 py-1 font-mono text-[10px] text-[var(--text-subtle)] max-w-[120px] truncate">${norm}</td>
+          <td class="px-2 py-1 text-[10px] font-semibold ${field ? 'text-emerald-400' : 'text-rose-400'}">${field || '❌ ไม่รู้จัก'}</td>
+        </tr>`;
+      }).join('');
+
+      debugEl.innerHTML = `
+        <details class="mt-2" open>
+          <summary class="text-[10px] font-mono cursor-pointer text-[var(--color-accent-gold)] hover:brightness-110 select-none">
+            🔍 Header Mapping Debug — ${rawHeaders.length} คอลัมน์ที่ตรวจพบ
+          </summary>
+          <div class="mt-1.5 overflow-x-auto">
+            <table class="w-full text-left border border-[var(--border-subtle)] corner-cut-6 text-[10px]">
+              <thead class="bg-[var(--bg-surface-elevated)]">
+                <tr>
+                  <th class="px-2 py-1 text-[var(--text-muted)] font-semibold">Header ต้นฉบับ</th>
+                  <th class="px-2 py-1 text-[var(--text-muted)] font-semibold">Normalized</th>
+                  <th class="px-2 py-1 text-[var(--text-muted)] font-semibold">Map to Field</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </details>
+      `;
+    }
+
 
     function parseCsvOrTsv(rawText) {
       if (!rawText) return [];
@@ -2657,7 +2730,7 @@
           'id', 'no', 'number', 'code', 'ลำดับ', 'รหัส', 'ลำดับที่',
           'artistname', 'artist', 'creator', 'ศิลปิน', 'ชื่อศิลปิน', 'ชื่อนามสกุล', 'นามสกุล', 'ชื่อสกุล', 'ผู้สร้างสรรค์',
           'artworktitle', 'artworkname', 'artwork', 'title', 'ชื่องาน', 'ชื่อผลงาน', 'ผลงาน', 'ชื่อภาพ',
-          'medium', 'technique', 'เทคนิค', 'วัสดุ',
+          'medium', 'technique', 'material', 'techniq', 'technic', 'เทคนิค', 'เทคนิก', 'วัสดุ', 'ประเภทงาน', 'สื่อ', 'วิธีการ',
           'dimensions', 'dimension', 'size', 'ขนาด',
           'year', 'yearcreated', 'ปี', 'ปีที่สร้าง',
           'price', 'ราคา',
@@ -2714,7 +2787,10 @@
               obj.nationality = val;
             }
             // 6. Medium / Technique
-            else if (['medium', 'technique', 'เทคนิค', 'วัสดุ', 'เทคนิควัสดุ', 'เทคนิคและวัสดุ', 'วัสดุอุปกรณ์'].some(k => h === k || h.includes(k))) {
+            else if (['medium', 'technique', 'material', 'materials', 'วัสดุ', 'วัสดุอุปกรณ์', 'อุปกรณ์',
+                      'เทคนิค', 'เทคนิกการพิมพ์', 'เทคนิก', 'เทคนิคและวัสดุ', 'เทคนิควัสดุ', 'เทคนิคการสร้าง',
+                      'เทคนิคการพิมพ์', 'ประเภทงาน', 'ประเภทเทคนิค', 'วิธีการ', 'วิธีสร้าง', 'สื่อ',
+                      'techniq', 'technic'].some(k => h === k || h.includes(k))) {
               obj.technique = val;
             }
             // 7. Dimensions / Size
