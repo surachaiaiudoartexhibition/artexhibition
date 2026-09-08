@@ -75,6 +75,12 @@
           </svg>
           <span data-i18n="btn_refresh">รีเฟรช</span>
         </button>
+        <button onclick="syncAllToMasterPortal()" class="px-3 py-2 corner-cut-8 border border-sky-800/40 hover:bg-sky-950/40 text-xs font-semibold text-sky-400 hover:text-sky-200 transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="ส่งผลงานที่อนุมัติแล้วทั้งหมดไปยัง Master Portal (artexhibition.pages.dev)">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+          </svg>
+          <span>Sync → Master Portal</span>
+        </button>
         <button onclick="resetAllSubmissions()" class="px-3 py-2 corner-cut-8 border border-rose-800/40 hover:bg-rose-950/40 text-xs font-semibold text-rose-400 hover:text-rose-200 transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="ล้างผลงานทั้งหมดออกจากระบบ เพื่อเริ่มนำเข้าข้อมูลใหม่">
           <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -3575,6 +3581,39 @@
         }
       } catch (err) {
         alert('เกิดข้อผิดพลาด: ' + err.message);
+      }
+    }
+
+    // ====== SYNC ALL APPROVED → MASTER PORTAL ======
+    async function syncAllToMasterPortal() {
+      const approvedCount = allSubmissions ? allSubmissions.filter(s => s.status === 'approved').length : '?';
+      const confirmed = confirm(
+        `🔄 Sync ผลงานที่อนุมัติแล้ว (${approvedCount} ชิ้น) ไปยัง Master Portal?\n\n` +
+        `ระบบจะ:\n` +
+        `1. ลบผลงานของ event นี้ออกจาก Master Portal ทั้งหมด\n` +
+        `2. ส่งผลงานที่ Approved ทั้งหมดขึ้น Master Portal ใหม่\n\n` +
+        `(artexhibition.pages.dev จะ update ทันที)`
+      );
+      if (!confirmed) return;
+
+      showToast('กำลัง Sync ไปยัง Master Portal…', 'info');
+      try {
+        const res = await fetch('/api/submissions/sync-all', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin123' }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(
+            `✅ Sync สำเร็จ — ส่งขึ้น Master Portal ${data.step3_pushed} ผลงาน` +
+            (data.step3_failed > 0 ? ` (ข้าม ${data.step3_failed} ชิ้นที่ไม่มีรูป)` : ''),
+            'success'
+          );
+        } else {
+          alert('Sync ล้มเหลว: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Sync ล้มเหลว: ' + err.message);
       }
     }
 
