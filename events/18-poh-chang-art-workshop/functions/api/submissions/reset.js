@@ -20,7 +20,36 @@ export async function onRequestPost(context) {
       await env.DB.prepare("DELETE FROM sqlite_sequence WHERE name = 'submissions'").run();
     } catch (_) {}
 
-    return new Response(JSON.stringify({ success: true, deleted, message: 'All submissions deleted successfully.' }), {
+    // Also notify Master Portal to remove all artworks from this event
+    const masterPortalUrl = env.MASTER_PORTAL_URL;
+    const secretToken = env.SHARED_SECRET_TOKEN;
+    const eventId = env.EVENT_ID;
+    let masterSyncResult = { attempted: false };
+
+    if (masterPortalUrl && secretToken && eventId) {
+      masterSyncResult.attempted = true;
+      try {
+        const syncEndpoint = `${masterPortalUrl.replace(/\/+$/, '')}/api/sync`;
+        const webhookRes = await fetch(syncEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${secretToken}`
+          },
+          body: JSON.stringify({
+            action: 'delete_event',
+            event_id: eventId
+          })
+        });
+        masterSyncResult.status = webhookRes.status;
+        masterSyncResult.success = webhookRes.ok;
+        masterSyncResult.response = await webhookRes.json().catch(() => null);
+      } catch (err) {
+        masterSyncResult.error = err.message;
+      }
+    }
+
+    return new Response(JSON.stringify({ success: true, deleted, masterPortalSync: masterSyncResult, message: 'All submissions deleted successfully.' }), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (err) {

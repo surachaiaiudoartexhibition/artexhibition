@@ -21,9 +21,98 @@ export async function onRequestPost(context) {
 
   try {
     const payload = await request.json();
+    const { action = 'upsert', event_id, global_id } = payload;
+
+    // ============================================================
+    // ACTION: DELETE — remove artwork from master_artworks
+    // ============================================================
+    if (action === 'delete') {
+      if (!event_id || !global_id) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Bad Request: Missing event_id or global_id for delete action."
+        }), { status: 400, headers: { "Content-Type": "application/json" } });
+      }
+
+      // Validate token
+      const eventStmt = env.DB.prepare(
+        "SELECT secret_token FROM registered_events WHERE event_id = ?"
+      ).bind(event_id);
+      const registeredEvent = await eventStmt.first();
+
+      const isAuthorized =
+        (registeredEvent && registeredEvent.secret_token === bearerToken) ||
+        (env.GLOBAL_SYNC_SECRET && bearerToken === env.GLOBAL_SYNC_SECRET);
+
+      if (!isAuthorized) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Forbidden: Invalid secret token for the specified event_id."
+        }), { status: 403, headers: { "Content-Type": "application/json" } });
+      }
+
+      await env.DB.prepare(
+        "DELETE FROM master_artworks WHERE global_id = ? AND event_id = ?"
+      ).bind(global_id, event_id).run();
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: `Artwork ${global_id} removed from Master Portal.`,
+        action: 'delete',
+        global_id,
+        event_id
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+
+    // ============================================================
+    // ACTION: DELETE_EVENT — remove ALL artworks for an event
+    // ============================================================
+    if (action === 'delete_event') {
+      if (!event_id) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Bad Request: Missing event_id for delete_event action."
+        }), { status: 400, headers: { "Content-Type": "application/json" } });
+      }
+
+      const eventStmt2 = env.DB.prepare(
+        "SELECT secret_token FROM registered_events WHERE event_id = ?"
+      ).bind(event_id);
+      const regEvent2 = await eventStmt2.first();
+
+      const isAuth2 =
+        (regEvent2 && regEvent2.secret_token === bearerToken) ||
+        (env.GLOBAL_SYNC_SECRET && bearerToken === env.GLOBAL_SYNC_SECRET);
+
+      if (!isAuth2) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Forbidden: Invalid secret token."
+        }), { status: 403, headers: { "Content-Type": "application/json" } });
+      }
+
+      const countRes = await env.DB.prepare(
+        "SELECT COUNT(*) as cnt FROM master_artworks WHERE event_id = ?"
+      ).bind(event_id).first();
+      const deletedCount = countRes?.cnt ?? 0;
+
+      await env.DB.prepare(
+        "DELETE FROM master_artworks WHERE event_id = ?"
+      ).bind(event_id).run();
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: `All ${deletedCount} artworks for event '${event_id}' removed from Master Portal.`,
+        action: 'delete_event',
+        event_id,
+        deleted: deletedCount
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+
+    // ============================================================
+    // ACTION: UPSERT (default) — add/update artwork in master_artworks
+    // ============================================================
     const {
-      event_id,
-      global_id,
       title,
       artist,
       image_url,
