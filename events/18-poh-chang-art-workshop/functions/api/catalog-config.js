@@ -4,9 +4,14 @@ export async function onRequestGet(context) {
   try {
     let config = null;
     if (env.DB) {
-      const row = await env.DB.prepare("SELECT value FROM catalog_config WHERE key = 'main'").first();
-      if (row && row.value) {
-        try { config = JSON.parse(row.value); } catch (e) { config = null; }
+      try {
+        const row = await env.DB.prepare("SELECT value FROM catalog_config WHERE key = 'main'").first();
+        if (row && row.value) {
+          try { config = JSON.parse(row.value); } catch (e) { config = null; }
+        }
+      } catch (_tableErr) {
+        // catalog_config table not yet created — fall through to default config
+        config = null;
       }
     }
 

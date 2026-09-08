@@ -15,7 +15,7 @@ export async function onRequestGet(context) {
   return new Response(JSON.stringify(publicConfig), {
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=60"
+      "Cache-Control": "no-store, no-cache, must-revalidate"
     }
   });
 }

@@ -47,7 +47,10 @@ export async function onRequestGet(context) {
       submissions: result.results || [],
       isAdmin
     }), {
-      headers: { "Content-Type": "application/json" }
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate"
+      }
     });
   } catch (err) {
     return new Response(JSON.stringify({

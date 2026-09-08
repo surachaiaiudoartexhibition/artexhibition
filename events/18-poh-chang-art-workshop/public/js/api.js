@@ -28,7 +28,10 @@ const EventAPI = {
     if (limit) params.set("limit", limit);
     params.set("_t", Date.now());
     const query = params.toString() ? `?${params.toString()}` : "";
-    const res = await fetch(`/api/submissions${query}`, { headers });
+    const res = await fetch(`/api/submissions${query}`, {
+      headers,
+      cache: "no-store"
+    });
     return await res.json();
   },
 
