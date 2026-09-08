@@ -276,20 +276,37 @@
 
   // Draw a "label ... value" spec row (technique/dimensions/year/price), matching the
   // on-screen justify-between + bottom-border pattern in renderPageBlocks().
+  // Draws "label  value" as one compact unit that can sit left/center/right within
+  // the block's box (style.textAlign) - no underline, matching the on-screen version.
   function drawSpecRow(doc, label, value, x, y, w, tokens, style, isPriceRow) {
     if (value === undefined || value === null || value === '') return;
     const fontFamily = (style && style.fontFamily) || 'Sarabun';
     const fontSizePt = (style && style.fontSizePt) || 9;
-    drawTextBlock(doc, label, x, y, w * 0.42, { fontFamily: 'Sarabun', fontSizePt: fontSizePt * 0.85, color: tokens.sub });
-    drawTextBlock(doc, String(value), x + w * 0.42, y, w * 0.58, {
-      fontFamily, fontSizePt, align: 'right', bold: true,
+    const align = (style && style.textAlign) || 'left';
+    const gapMm = 2;
+    const valueStr = String(value);
+
+    const labelFont = pickFont(label, 'Sarabun');
+    doc.setFont(labelFont, (doc.getFontList()[labelFont] || []).includes('normal') ? 'normal' : 'bold');
+    doc.setFontSize(fontSizePt * 0.85);
+    const labelW = doc.getTextWidth(label);
+
+    const valueFont = pickFont(valueStr, fontFamily);
+    const valueStyles = doc.getFontList()[valueFont] || [];
+    doc.setFont(valueFont, valueStyles.includes('bold') ? 'bold' : (valueStyles[0] || 'normal'));
+    doc.setFontSize(fontSizePt);
+    const valueW = doc.getTextWidth(valueStr);
+
+    const totalW = labelW + gapMm + valueW;
+    let startX = x;
+    if (align === 'center') startX = x + Math.max(0, (w - totalW) / 2);
+    else if (align === 'right') startX = x + Math.max(0, w - totalW);
+
+    drawTextBlock(doc, label, startX, y, labelW + 2, { fontFamily: 'Sarabun', fontSizePt: fontSizePt * 0.85, color: tokens.sub, align: 'left' });
+    drawTextBlock(doc, valueStr, startX + labelW + gapMm, y, valueW + 2, {
+      fontFamily, fontSizePt, align: 'left', bold: true,
       color: isPriceRow ? tokens.gold : ((style && style.color) || tokens.heading)
     });
-    const borderRgb = hexToRgb(tokens.border);
-    doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
-    doc.setLineWidth(0.15);
-    const lineY = y + fontSizePt * PT_TO_MM * 1.25;
-    doc.line(x, lineY, x + w, lineY);
   }
 
   function pct2mm(pct, total) {
@@ -606,9 +623,9 @@
       }
       const specs = [
         elem.showTechnique !== false && ['เทคนิค / Technique', technique],
-        elem.showDimensions !== false && ['ขนาด / Dimensions', window.formatDimensions ? window.formatDimensions(item.dimensions) : item.dimensions],
+        elem.showDimensions !== false && ['ขนาด / Dimensions', window.formatDimensions ? window.formatDimensions(item.dimensions, isTh ? 'th' : 'en') : item.dimensions],
         elem.showYear !== false && ['ปีที่สร้าง / Year', item.year_created],
-        elem.showPrice !== false && item.price && ['ราคา / Price', window.formatPrice ? window.formatPrice(item.price) : item.price]
+        elem.showPrice !== false && item.price && ['ราคา / Price', window.formatPrice ? window.formatPrice(item.price, isTh ? 'th' : 'en') : item.price]
       ].filter(Boolean);
       specs.forEach(([label, val]) => {
         drawTextBlock(doc, label, metaX, my, metaW * 0.5, { fontFamily: 'Sarabun', fontSizePt: 8, color: tokens.sub });
@@ -690,10 +707,11 @@
       newPage();
       setProgress(onProgress, i + (hasJury ? 4 : 3), submissions.length + 3, (isTh ? 'กำลังวาดผลงาน ' : 'Drawing artwork ') + (i + 1) + '/' + submissions.length);
 
-      const title = window.getField ? window.getField(item, 'title') : (item.title || '');
-      const artistName = window.getArtistFullName ? window.getArtistFullName(item) : (item.artist_name || '');
-      const technique = window.getField ? window.getField(item, 'technique') : (item.technique || '');
-      const description = window.getField ? window.getField(item, 'description') : (item.description || '');
+      const langCode = isTh ? 'th' : 'en';
+      const title = window.getField ? window.getField(item, 'title', '', langCode) : (item.title || '');
+      const artistName = window.getArtistFullName ? window.getArtistFullName(item, '', langCode) : (item.artist_name || '');
+      const technique = window.getField ? window.getField(item, 'technique', '', langCode) : (item.technique || '');
+      const description = window.getField ? window.getField(item, 'description', '', langCode) : (item.description || '');
       const hasAvatar = Boolean(item.artist_avatar_url && String(item.artist_avatar_url).trim() && !String(item.artist_avatar_url).includes('unsplash.com'));
       const avatar = hasAvatar ? item.artist_avatar_url : '';
 

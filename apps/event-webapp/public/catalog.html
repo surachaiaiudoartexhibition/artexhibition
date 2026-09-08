@@ -1114,40 +1114,44 @@
 
             case 'technique': {
               if (elem.showTechnique === false) return '';
+              const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
               return `
-                <div class="cat-free-block flex items-center justify-between border-b border-current/10 pb-1" style="${posStyle}">
-                  <span class="${textSubClass} text-xs">${window.t('spec_technique_lbl')}</span>
-                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass} text-right" style="${customInlineStyle}">${technique}</span>
+                <div class="cat-free-block flex items-center gap-2 ${specJustify}" style="${posStyle}">
+                  <span class="${textSubClass} text-xs shrink-0">${window.tLang('spec_technique_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass}" style="${customInlineStyle}">${technique}</span>
                 </div>
               `;
             }
 
             case 'dimensions': {
               if (elem.showDimensions === false) return '';
+              const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
               return `
-                <div class="cat-free-block flex items-center justify-between border-b border-current/10 pb-1" style="${posStyle}">
-                  <span class="${textSubClass} text-xs">${window.t('spec_dimensions_lbl')}</span>
-                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass} text-right" style="${customInlineStyle}">${window.formatDimensions ? window.formatDimensions(item.dimensions) : item.dimensions}</span>
+                <div class="cat-free-block flex items-center gap-2 ${specJustify}" style="${posStyle}">
+                  <span class="${textSubClass} text-xs shrink-0">${window.tLang('spec_dimensions_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass}" style="${customInlineStyle}">${window.formatDimensions ? window.formatDimensions(item.dimensions, isTh ? 'th' : 'en') : item.dimensions}</span>
                 </div>
               `;
             }
 
             case 'year_created': {
               if (elem.showYear === false) return '';
+              const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
               return `
-                <div class="cat-free-block flex items-center justify-between border-b border-current/10 pb-1" style="${posStyle}">
-                  <span class="${textSubClass} text-xs">${window.t('spec_year_lbl')}</span>
-                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass} text-right" style="${customInlineStyle}">${item.year_created || '2026'}</span>
+                <div class="cat-free-block flex items-center gap-2 ${specJustify}" style="${posStyle}">
+                  <span class="${textSubClass} text-xs shrink-0">${window.tLang('spec_year_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass}" style="${customInlineStyle}">${item.year_created || '2026'}</span>
                 </div>
               `;
             }
 
             case 'price': {
               if (elem.showPrice === false || !item.price) return '';
+              const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
               return `
-                <div class="cat-free-block flex items-center justify-between pb-1" style="${posStyle}">
-                  <span class="${textSubClass} text-xs">${window.t('spec_price_lbl')}</span>
-                  <span class="font-mono text-amber-500 font-bold text-xs" style="${customInlineStyle}">${window.formatPrice ? window.formatPrice(item.price) : item.price}</span>
+                <div class="cat-free-block flex items-center gap-2 ${specJustify}" style="${posStyle}">
+                  <span class="${textSubClass} text-xs shrink-0">${window.tLang('spec_price_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="font-mono text-amber-500 font-bold text-xs" style="${customInlineStyle}">${window.formatPrice ? window.formatPrice(item.price, isTh ? 'th' : 'en') : item.price}</span>
                 </div>
               `;
             }
@@ -1156,7 +1160,7 @@
               if (elem.showConcept === false || !description) return '';
               return `
                 <div class="cat-free-block ${textAlign}" style="${posStyle}">
-                  <h5 class="text-[10px] font-mono ${textSubClass} uppercase tracking-widest mb-1.5">${window.t('concept_title')}</h5>
+                  <h5 class="text-[10px] font-mono ${textSubClass} uppercase tracking-widest mb-1.5">${window.tLang('concept_title', isTh ? 'th' : 'en')}</h5>
                   <p class="text-xs sm:text-sm ${textConceptClass} ${fontFam} italic leading-relaxed pl-3 border-l-2 border-amber-500/50" style="${customInlineStyle}">
                     "${description}"
                   </p>
@@ -1214,7 +1218,7 @@
                 <div class="cat-free-block space-y-3" style="${posStyle}">
                   ${elem.showTitle !== false ? `
                     <div>
-                      <span class="text-[10px] font-mono uppercase tracking-widest text-amber-500 font-bold block mb-1">${window.t('lbl_artwork_meta')}</span>
+                      <span class="text-[10px] font-mono uppercase tracking-widest text-amber-500 font-bold block mb-1">${window.tLang('lbl_artwork_meta', isTh ? 'th' : 'en')}</span>
                       <h3 class="font-serif text-xl sm:text-2xl font-bold ${textHeadingClass} leading-snug">
                         ${title}
                       </h3>
@@ -1224,26 +1228,26 @@
                     <div class="space-y-1.5 text-xs pt-1">
                       ${elem.showTechnique !== false ? `
                         <div class="flex justify-between border-b border-current/10 pb-1">
-                          <span class="${textSubClass}">${window.t('spec_technique_lbl')}</span>
+                          <span class="${textSubClass}">${window.tLang('spec_technique_lbl', isTh ? 'th' : 'en')}</span>
                           <span class="font-medium ${textHeadingClass} text-right">${technique}</span>
                         </div>
                       ` : ''}
                       ${elem.showDimensions !== false ? `
                         <div class="flex justify-between border-b border-current/10 pb-1">
-                          <span class="${textSubClass}">${window.t('spec_dimensions_lbl')}</span>
-                          <span class="font-medium ${textHeadingClass} text-right">${window.formatDimensions ? window.formatDimensions(item.dimensions) : item.dimensions}</span>
+                          <span class="${textSubClass}">${window.tLang('spec_dimensions_lbl', isTh ? 'th' : 'en')}</span>
+                          <span class="font-medium ${textHeadingClass} text-right">${window.formatDimensions ? window.formatDimensions(item.dimensions, isTh ? 'th' : 'en') : item.dimensions}</span>
                         </div>
                       ` : ''}
                       ${elem.showYear !== false ? `
                         <div class="flex justify-between border-b border-current/10 pb-1">
-                          <span class="${textSubClass}">${window.t('spec_year_lbl')}</span>
+                          <span class="${textSubClass}">${window.tLang('spec_year_lbl', isTh ? 'th' : 'en')}</span>
                           <span class="font-medium ${textHeadingClass} text-right">${item.year_created || '2026'}</span>
                         </div>
                       ` : ''}
                       ${elem.showPrice !== false && item.price ? `
                         <div class="flex justify-between pb-1">
-                          <span class="${textSubClass}">${window.t('spec_price_lbl')}</span>
-                          <span class="font-mono text-amber-500 font-bold">${window.formatPrice ? window.formatPrice(item.price) : item.price}</span>
+                          <span class="${textSubClass}">${window.tLang('spec_price_lbl', isTh ? 'th' : 'en')}</span>
+                          <span class="font-mono text-amber-500 font-bold">${window.formatPrice ? window.formatPrice(item.price, isTh ? 'th' : 'en') : item.price}</span>
                         </div>
                       ` : ''}
                     </div>
@@ -1262,8 +1266,8 @@
         if (!hasPageNumBlock && elem.showPageNum !== false) {
           footerHtml = `
             <div class="cat-free-footer absolute bottom-5 left-8 right-8 border-t ${borderSubClass} pt-2.5 flex items-center justify-between text-xs ${textSubClass} z-20">
-              <span>${window.t('catalog_footer_title')}</span>
-              <span>${window.t('catalog_page_prefix')} ${pageNum}</span>
+              <span>${window.tLang('catalog_footer_title', isTh ? 'th' : 'en')}</span>
+              <span>${window.tLang('catalog_page_prefix', isTh ? 'th' : 'en')} ${pageNum}</span>
             </div>
           `;
         }
@@ -1285,7 +1289,7 @@
         <div class="cat-free-block cat-block-meta space-y-3" style="left: ${bl.meta.x}%; top: ${bl.meta.y}%; width: ${bl.meta.w}%;">
           ${elem.showTitle !== false ? `
             <div>
-              <span class="text-[10px] font-mono uppercase tracking-widest text-amber-500 font-bold block mb-1">${window.t('lbl_artwork_meta')}</span>
+              <span class="text-[10px] font-mono uppercase tracking-widest text-amber-500 font-bold block mb-1">${window.tLang('lbl_artwork_meta', isTh ? 'th' : 'en')}</span>
               <h3 class="font-serif text-xl sm:text-2xl font-bold ${textHeadingClass} leading-snug">
                 ${title}
               </h3>
@@ -1296,26 +1300,26 @@
             <div class="space-y-1.5 text-xs pt-1">
               ${elem.showTechnique !== false ? `
                 <div class="flex justify-between border-b border-current/10 pb-1">
-                  <span class="${textSubClass}">${window.t('spec_technique_lbl')}</span>
+                  <span class="${textSubClass}">${window.tLang('spec_technique_lbl', isTh ? 'th' : 'en')}</span>
                   <span class="font-medium ${textHeadingClass} text-right">${technique}</span>
                 </div>
               ` : ''}
               ${elem.showDimensions !== false ? `
                 <div class="flex justify-between border-b border-current/10 pb-1">
-                  <span class="${textSubClass}">${window.t('spec_dimensions_lbl')}</span>
-                  <span class="font-medium ${textHeadingClass} text-right">${window.formatDimensions ? window.formatDimensions(item.dimensions) : item.dimensions}</span>
+                  <span class="${textSubClass}">${window.tLang('spec_dimensions_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="font-medium ${textHeadingClass} text-right">${window.formatDimensions ? window.formatDimensions(item.dimensions, isTh ? 'th' : 'en') : item.dimensions}</span>
                 </div>
               ` : ''}
               ${elem.showYear !== false ? `
                 <div class="flex justify-between border-b border-current/10 pb-1">
-                  <span class="${textSubClass}">${window.t('spec_year_lbl')}</span>
+                  <span class="${textSubClass}">${window.tLang('spec_year_lbl', isTh ? 'th' : 'en')}</span>
                   <span class="font-medium ${textHeadingClass} text-right">${item.year_created || '2026'}</span>
                 </div>
               ` : ''}
               ${elem.showPrice !== false && item.price ? `
                 <div class="flex justify-between pb-1">
-                  <span class="${textSubClass}">${window.t('spec_price_lbl')}</span>
-                  <span class="font-mono text-amber-500 font-bold">${window.formatPrice ? window.formatPrice(item.price) : item.price}</span>
+                  <span class="${textSubClass}">${window.tLang('spec_price_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="font-mono text-amber-500 font-bold">${window.formatPrice ? window.formatPrice(item.price, isTh ? 'th' : 'en') : item.price}</span>
                 </div>
               ` : ''}
             </div>
@@ -1325,7 +1329,7 @@
         <!-- Block 3: Concept Statement -->
         ${elem.showConcept !== false && description ? `
           <div class="cat-free-block cat-block-concept" style="left: ${bl.concept.x}%; top: ${bl.concept.y}%; width: ${bl.concept.w}%;">
-            <h5 class="text-[10px] font-mono ${textSubClass} uppercase tracking-widest mb-1.5">${window.t('concept_title')}</h5>
+            <h5 class="text-[10px] font-mono ${textSubClass} uppercase tracking-widest mb-1.5">${window.tLang('concept_title', isTh ? 'th' : 'en')}</h5>
             <p class="text-xs sm:text-sm ${textConceptClass} font-serif italic leading-relaxed pl-3 border-l-2 border-amber-500/50">
               "${description}"
             </p>
@@ -1339,7 +1343,7 @@
           ` : ''}
           <div class="min-w-0">
             ${elem.showArtist !== false ? `
-              <span class="text-[9px] font-mono uppercase text-amber-500 block font-semibold">${window.t('created_by_artist')}</span>
+              <span class="text-[9px] font-mono uppercase text-amber-500 block font-semibold">${window.tLang('created_by_artist', isTh ? 'th' : 'en')}</span>
               <h4 class="font-serif font-bold text-sm ${textHeadingClass} truncate">${artistName}</h4>
             ` : ''}
             ${elem.showFlag !== false ? `
@@ -1351,8 +1355,8 @@
         <!-- Pinned Page Footer -->
         ${elem.showPageNum !== false ? `
           <div class="cat-free-footer absolute bottom-5 left-8 right-8 border-t ${borderSubClass} pt-3 flex items-center justify-between text-xs ${textSubClass}">
-            <span>${window.t('catalog_footer_title')}</span>
-            <span>${window.t('catalog_page_prefix')} ${pageNum}</span>
+            <span>${window.tLang('catalog_footer_title', isTh ? 'th' : 'en')}</span>
+            <span>${window.tLang('catalog_page_prefix', isTh ? 'th' : 'en')} ${pageNum}</span>
           </div>
         ` : ''}
       `;
@@ -1362,7 +1366,10 @@
       const container = document.getElementById('catalog-content');
       container.innerHTML = '';
 
-      const isTh = window.i18n.getLang() === 'th';
+      // The catalog's content language is the admin's editorial choice (set in the
+      // Designer Studio), independent of the visitor's TH/EN site switcher - unless
+      // the admin left it on "follow site language" (catalogConfig.language unset).
+      const isTh = catalogConfig.language === 'en' ? false : catalogConfig.language === 'th' ? true : (window.i18n.getLang() === 'th');
       const pages = [];
 
       const currentTheme = (catalogConfig.layout && catalogConfig.layout.theme) || 'heritage';
@@ -1431,20 +1438,20 @@
 
       // --- Custom / Default Cover Texts ---
       const coverData = catalogConfig.cover || {};
-      const coverBadge = (isTh ? coverData.badge_th : coverData.badge_en) || window.t('catalog_cover_badge');
+      const coverBadge = (isTh ? coverData.badge_th : coverData.badge_en) || window.tLang('catalog_cover_badge', isTh ? 'th' : 'en');
       const coverTitle1 = (isTh ? coverData.title_th : coverData.title_en) || (isTh ? 'นิทรรศการภาพพิมพ์ร่วมสมัยนานาชาติ' : 'INTERNATIONAL CONTEMPORARY');
       const coverTitleHighlight = coverData.title_highlight || 'PRINTMAKING 2026';
-      const coverSub = (isTh ? coverData.subtitle_th : coverData.subtitle_en) || window.t('catalog_cover_sub');
-      const coverMeta = (isTh ? coverData.edition_th : coverData.edition_en) || window.t('catalog_cover_meta');
-      const coverCurator = (isTh ? coverData.curator_th : coverData.curator_en) || window.t('catalog_chief_curator');
-      const coverEdition = (isTh ? coverData.edition_th : coverData.edition_en) || window.t('catalog_edition_label');
+      const coverSub = (isTh ? coverData.subtitle_th : coverData.subtitle_en) || window.tLang('catalog_cover_sub', isTh ? 'th' : 'en');
+      const coverMeta = (isTh ? coverData.edition_th : coverData.edition_en) || window.tLang('catalog_cover_meta', isTh ? 'th' : 'en');
+      const coverCurator = (isTh ? coverData.curator_th : coverData.curator_en) || window.tLang('catalog_chief_curator', isTh ? 'th' : 'en');
+      const coverEdition = (isTh ? coverData.edition_th : coverData.edition_en) || window.tLang('catalog_edition_label', isTh ? 'th' : 'en');
 
       // --- Custom / Default Foreword Texts ---
       const fwData = catalogConfig.foreword || {};
-      const fwTitle = (isTh ? fwData.title_th : fwData.title_en) || window.t('catalog_foreword_title');
-      const fwP1 = (isTh ? fwData.p1_th : fwData.p1_en) || window.t('catalog_foreword_p1');
-      const fwP2 = (isTh ? fwData.p2_th : fwData.p2_en) || window.t('catalog_foreword_p2');
-      const fwCommittee = (isTh ? fwData.committee_th : fwData.committee_en) || window.t('catalog_committee');
+      const fwTitle = (isTh ? fwData.title_th : fwData.title_en) || window.tLang('catalog_foreword_title', isTh ? 'th' : 'en');
+      const fwP1 = (isTh ? fwData.p1_th : fwData.p1_en) || window.tLang('catalog_foreword_p1', isTh ? 'th' : 'en');
+      const fwP2 = (isTh ? fwData.p2_th : fwData.p2_en) || window.tLang('catalog_foreword_p2', isTh ? 'th' : 'en');
+      const fwCommittee = (isTh ? fwData.committee_th : fwData.committee_en) || window.tLang('catalog_committee', isTh ? 'th' : 'en');
 
       // Filter and Order Submissions
       const activeArtworks = getCuratedSubmissions();
@@ -1514,11 +1521,11 @@
           <!-- Bottom Metadata, Curator & Edition -->
           <div class="border-t ${borderSubClass} pt-4 flex items-center justify-between gap-3 text-xs text-[var(--text-subtle)]">
             <div class="space-y-0.5 text-left">
-              <span class="text-[9px] uppercase font-mono tracking-wider text-[var(--color-accent-gold)] font-semibold block">${window.t('catalog_chief_curator')}</span>
+              <span class="text-[9px] uppercase font-mono tracking-wider text-[var(--color-accent-gold)] font-semibold block">${window.tLang('catalog_chief_curator', isTh ? 'th' : 'en')}</span>
               <span class="text-xs font-medium text-[var(--text-main)]">${coverCurator}</span>
             </div>
             <div class="text-right space-y-0.5">
-              <span class="text-[9px] uppercase font-mono tracking-wider text-[var(--color-accent-gold)] font-semibold block">${window.t('catalog_edition_label')}</span>
+              <span class="text-[9px] uppercase font-mono tracking-wider text-[var(--color-accent-gold)] font-semibold block">${window.tLang('catalog_edition_label', isTh ? 'th' : 'en')}</span>
               <span class="text-xs font-mono text-[var(--text-muted)]">${coverEdition}</span>
             </div>
           </div>
@@ -1562,7 +1569,7 @@
 
           <!-- Foreword Footer -->
           <div class="border-t ${borderSubClass} pt-3 flex items-center justify-between text-xs text-[var(--text-subtle)]">
-            <span>${window.t('catalog_footer_title')}</span>
+            <span>${window.tLang('catalog_footer_title', isTh ? 'th' : 'en')}</span>
             <span>2026 POH-CHANG EXHIBITION</span>
           </div>
         </div>
@@ -1626,7 +1633,7 @@
 
             <!-- Jury Footer -->
             <div class="border-t ${borderSubClass} pt-3 flex items-center justify-between text-xs text-[var(--text-subtle)]">
-              <span>${window.t('catalog_footer_title')}</span>
+              <span>${window.tLang('catalog_footer_title', isTh ? 'th' : 'en')}</span>
               <span class="font-mono uppercase text-[10px] text-[var(--color-accent-gold)]">Official Selection Board</span>
             </div>
           </div>
@@ -1645,10 +1652,11 @@
       // -------------------------------------------------------------
       activeArtworks.forEach((item, index) => {
         const pageNum = index + (hasJuryPage ? 4 : 3);
-        const title = window.getField(item, 'title');
-        const artistName = window.getArtistFullName(item);
-        const technique = window.getField(item, 'technique') || (isTh ? 'ภาพพิมพ์' : 'Printmaking');
-        const description = window.getField(item, 'description') || (isTh ? 'ถ่ายทอดอารมณ์ความรู้สึกและสุนทรียะผ่านเทคนิคการสร้างสรรค์อันเป็นเอกลักษณ์' : 'Expressing emotion and aesthetics through unique creative techniques.');
+        const langCode = isTh ? 'th' : 'en';
+        const title = window.getField(item, 'title', '', langCode);
+        const artistName = window.getArtistFullName(item, '', langCode);
+        const technique = window.getField(item, 'technique', '', langCode) || (isTh ? 'ภาพพิมพ์' : 'Printmaking');
+        const description = window.getField(item, 'description', '', langCode) || (isTh ? 'ถ่ายทอดอารมณ์ความรู้สึกและสุนทรียะผ่านเทคนิคการสร้างสรรค์อันเป็นเอกลักษณ์' : 'Expressing emotion and aesthetics through unique creative techniques.');
         const hasAvatar = Boolean(item.artist_avatar_url && item.artist_avatar_url.trim() && !item.artist_avatar_url.includes('unsplash.com'));
         const avatar = hasAvatar ? item.artist_avatar_url : '';
 
@@ -1682,9 +1690,9 @@
             ${elem.showPageNum !== false ? `
               <div class="absolute top-5 left-8 right-8 flex items-center justify-between border-b ${borderSubClass} pb-2.5 text-xs z-20">
                 <span class="font-mono text-[11px] text-[var(--color-accent-gold)] uppercase tracking-wider font-bold">
-                  ${window.t('artwork_num_prefix')} ${String(index + 1).padStart(2, '0')}
+                  ${window.tLang('artwork_num_prefix', isTh ? 'th' : 'en')} ${String(index + 1).padStart(2, '0')}
                 </span>
-                <span class="font-mono ${textSubClass}">${window.t('catalog_spread_label')}</span>
+                <span class="font-mono ${textSubClass}">${window.tLang('catalog_spread_label', isTh ? 'th' : 'en')}</span>
               </div>
             ` : ''}
 
@@ -2685,7 +2693,9 @@
       const overlay = document.getElementById('pdf-export-overlay');
       const statusEl = document.getElementById('pdf-export-status');
       const barEl = document.getElementById('pdf-export-bar');
-      const isTh = window.i18n.getLang() === 'th';
+      // Match the locked catalog presentation language (if the admin set one) so the
+      // exported PDF's content isn't affected by the visitor's own site language.
+      const isTh = catalogConfig.language === 'en' ? false : catalogConfig.language === 'th' ? true : (window.i18n.getLang() === 'th');
 
       if (overlay) { overlay.classList.remove('hidden'); overlay.classList.add('flex'); }
       if (statusEl) statusEl.textContent = isTh ? 'กำลังเริ่มต้น...' : 'Starting...';

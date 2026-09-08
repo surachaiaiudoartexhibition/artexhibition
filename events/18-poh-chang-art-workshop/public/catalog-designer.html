@@ -156,6 +156,17 @@
         <span class="hidden lg:inline">ดูสูจิบัตร</span>
       </a>
 
+      <!-- Catalog Presentation Language (locks the PUBLISHED catalog's content
+           language to the admin's choice, independent of a visitor's TH/EN toggle) -->
+      <div class="hidden md:flex items-center gap-1.5" title="ภาษาที่ใช้แสดงเนื้อหาสูจิบัตรจริง ไม่ขึ้นกับปุ่มเปลี่ยนภาษาของผู้ชม">
+        <span class="text-[10px] text-[var(--text-subtle)] font-mono">ภาษาสูจิบัตร:</span>
+        <select id="catalog-language-select" onchange="updateCatalogLanguage(this.value)" class="bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-4 px-1.5 py-1 text-[10px] text-[var(--text-main)] focus:outline-none focus:border-[var(--border-accent)]">
+          <option value="">ตามเว็บไซต์ (Auto)</option>
+          <option value="th">ไทย (ล็อก)</option>
+          <option value="en">English (Locked)</option>
+        </select>
+      </div>
+
       <!-- Save Button (Primary Action) -->
       <button onclick="saveDesignerLayout()" class="flex items-center gap-1.5 px-3.5 py-1.5 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-black text-xs font-bold shadow-md transition cursor-pointer">
         <span>💾</span>
@@ -702,6 +713,8 @@
         }
 
         document.getElementById('total-artworks-badge').textContent = submissions.length;
+        const langSelect = document.getElementById('catalog-language-select');
+        if (langSelect) langSelect.value = catalogConfig.language || '';
         selectArtworkSample(0);
 
       } catch (err) {
@@ -1567,6 +1580,14 @@
 
         container.appendChild(item);
       });
+    }
+
+    // Locks (or unlocks) the PUBLISHED catalog's content language to the admin's
+    // choice here, independent of a visitor's own TH/EN toggle on the live site.
+    function updateCatalogLanguage(value) {
+      catalogConfig.language = value || null;
+      syncActiveTemplateToSource();
+      showToast(value ? ('ล็อกภาษาสูจิบัตรเป็น ' + (value === 'th' ? 'ไทย' : 'English') + ' แล้ว (บันทึกเพื่อยืนยัน)') : 'สูจิบัตรจะตามภาษาเว็บไซต์ (บันทึกเพื่อยืนยัน)');
     }
 
     async function saveDesignerLayout() {

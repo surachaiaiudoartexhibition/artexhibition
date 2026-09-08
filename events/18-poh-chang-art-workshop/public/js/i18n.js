@@ -895,9 +895,9 @@ class I18nManager {
   /**
    * Helper to retrieve bilingual content from an item based on active language
    */
-  getField(item, fieldName, defaultVal = '') {
+  getField(item, fieldName, defaultVal = '', langOverride = null) {
     if (!item) return defaultVal;
-    const lang = this.currentLang;
+    const lang = langOverride || this.currentLang;
     let val = '';
     if (lang === 'th') {
       val = item[fieldName + '_th'] || item[fieldName] || item[fieldName + '_en'] || defaultVal;
@@ -1009,10 +1009,10 @@ class I18nManager {
   /**
    * Helper to retrieve artist full display name including academic/official title
    */
-  getArtistFullName(item, defaultVal = '') {
+  getArtistFullName(item, defaultVal = '', langOverride = null) {
     if (!item) return defaultVal;
-    const title = this.getField(item, 'academic_title', '').trim();
-    const name = this.getField(item, 'artist_name', defaultVal).trim();
+    const title = this.getField(item, 'academic_title', '', langOverride).trim();
+    const name = this.getField(item, 'artist_name', defaultVal, langOverride).trim();
     if (!name) return defaultVal;
     return title ? `${title} ${name}` : name;
   }
@@ -1579,8 +1579,15 @@ function getCountryFlagBadge(country, options = {}) {
 
 window.i18n = new I18nManager();
 window.t = (key) => window.i18n.t(key);
-window.getField = (item, fieldName, defaultVal = '') => window.i18n.getField(item, fieldName, defaultVal);
-window.getArtistFullName = (item, defaultVal = '') => window.i18n.getArtistFullName(item, defaultVal);
+// Translate a key in a SPECIFIC language regardless of the visitor's current site
+// language - used by the catalog renderer when the admin has locked the catalog's
+// presentation language, so it must not react to the site-wide TH/EN switcher.
+window.tLang = (key, lang) => {
+  const dict = I18N_DICTIONARY[lang] || I18N_DICTIONARY.th;
+  return dict[key] || I18N_DICTIONARY.th[key] || key;
+};
+window.getField = (item, fieldName, defaultVal = '', lang = null) => window.i18n.getField(item, fieldName, defaultVal, lang);
+window.getArtistFullName = (item, defaultVal = '', lang = null) => window.i18n.getArtistFullName(item, defaultVal, lang);
 window.formatDimensions = (val, lang) => window.i18n.formatDimensions(val, lang);
 window.formatPrice = (val, lang) => window.i18n.formatPrice(val, lang);
 window.resolveCountryCode = resolveCountryCode;
