@@ -40,35 +40,55 @@ export async function onRequestPost(context) {
   }
 
   // Cloudinary configuration for storage
-  const cloudName = env.CLOUDINARY_CLOUD_NAME || 'gpea1udi';
-  const uploadPreset = env.CLOUDINARY_UPLOAD_PRESET || 'art_event_sirikit';
+  let cloudName = env.CLOUDINARY_CLOUD_NAME;
+  let uploadPreset = env.CLOUDINARY_UPLOAD_PRESET;
+  if (!cloudName || cloudName === 'pohchang18' || cloudName === 'event-demo-account') {
+    cloudName = 'gpea1udi';
+  }
+  if (!uploadPreset || uploadPreset === 'pohchang18_preset') {
+    uploadPreset = 'art_event_sirikit';
+  }
 
   async function uploadToCloudinary(base64DataUrl) {
     if (!base64DataUrl || typeof base64DataUrl !== 'string' || !base64DataUrl.startsWith('data:image/')) {
       return { url: '', public_id: '' };
     }
-    try {
-      const formData = new FormData();
-      formData.append('file', base64DataUrl);
-      formData.append('upload_preset', uploadPreset);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: 'POST',
-        body: formData
-      });
-      if (!res.ok) {
-        const errText = await res.text();
-        console.warn('Cloudinary upload error:', res.status, errText);
-        return { url: '', public_id: '' };
+
+    async function doUpload(cName, uPreset) {
+      try {
+        const formData = new FormData();
+        formData.append('file', base64DataUrl);
+        formData.append('upload_preset', uPreset);
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cName}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          console.warn(`Cloudinary upload failed (${cName}/${uPreset}):`, res.status, errText);
+          return null;
+        }
+        const data = await res.json();
+        return {
+          url: data.secure_url || data.url || '',
+          public_id: data.public_id || ''
+        };
+      } catch (e) {
+        console.warn(`Cloudinary upload exception (${cName}/${uPreset}):`, e.message);
+        return null;
       }
-      const data = await res.json();
-      return {
-        url: data.secure_url || data.url || '',
-        public_id: data.public_id || ''
-      };
-    } catch (e) {
-      console.warn('Cloudinary upload exception:', e.message);
-      return { url: '', public_id: '' };
     }
+
+    // 1. Try configured Cloudinary account
+    let result = await doUpload(cloudName, uploadPreset);
+
+    // 2. Fallback to master Cloudinary if configured failed
+    if (!result && (cloudName !== 'gpea1udi' || uploadPreset !== 'art_event_sirikit')) {
+      console.log('Attempting fallback to master Cloudinary storage (gpea1udi / art_event_sirikit)...');
+      result = await doUpload('gpea1udi', 'art_event_sirikit');
+    }
+
+    return result || { url: '', public_id: '' };
   }
 
   try {
