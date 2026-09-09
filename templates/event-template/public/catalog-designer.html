@@ -149,17 +149,15 @@
 
     <!-- Right Zone: Mode Override, View Catalog, Save & Language -->
     <div class="flex items-center gap-2 shrink-0">
-      <!-- Page Lock Controls: locked (🔒) pages always follow the master template and
-           can't be edited directly; unlocking (🔓) detaches this one page into its own
-           override so edits here never drift other pages that stayed locked. -->
+      <!-- Page Lock Control: a tick = this page follows the master template and can't
+           be edited directly; remove the tick to detach this one page into its own
+           arrangement, so edits here never drift other pages that stayed ticked. -->
       <div id="page-override-controls" class="flex items-center gap-1.5">
-        <button id="btn-toggle-override" onclick="toggleCurrentPageOverride()" class="flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-semibold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)]">
+        <label id="lock-checkbox-wrap" class="flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-semibold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)] select-none">
+          <input type="checkbox" id="chk-lock-template" checked onchange="onLockCheckboxChange(this.checked)" class="w-3.5 h-3.5 accent-[var(--color-accent-gold)] cursor-pointer" />
           <span id="override-icon">🔒</span>
-          <span id="override-text" class="hidden md:inline" data-i18n="designer_unlock_page">ล็อคตามแม่แบบหลัก (คลิกเพื่อปลดล็อค)</span>
-        </button>
-        <button id="btn-revert-master" onclick="revertCurrentPageToMaster()" class="text-[11px] text-[var(--text-muted)] hover:text-rose-400 hover:underline transition hidden cursor-pointer" data-i18n="designer_reset_master" title="ยกเลิกจัดเฉพาะหน้า คืนค่าแม่แบบหลัก">
-          คืนค่าแม่แบบหลัก
-        </button>
+          <span id="override-text" class="hidden md:inline" data-i18n="designer_unlock_page">ตามแม่แบบหลัก</span>
+        </label>
       </div>
 
       <!-- View Actual Catalog Link -->
@@ -264,7 +262,7 @@
           <span class="hidden sm:inline" data-i18n="designer_preset">ชุดจัดหน้า</span>
           <span class="text-[9px] opacity-70">▼</span>
         </button>
-        <div id="preset-dropdown" class="absolute left-0 mt-2 w-56 bg-[var(--bg-surface-solid)] border border-[var(--border-accent)] corner-cut-8 p-1.5 shadow-2xl hidden z-50 space-y-0.5 text-xs">
+        <div id="preset-dropdown" class="absolute left-0 mt-2 w-64 bg-[var(--bg-surface-solid)] border border-[var(--border-accent)] corner-cut-8 p-1.5 shadow-2xl hidden z-50 space-y-0.5 text-xs max-h-[70vh] overflow-y-auto studio-scrollbar">
           <div class="px-2.5 py-1 text-[10px] font-bold text-[var(--color-accent-gold)] uppercase tracking-wider">เลือกสไตล์สำเร็จรูป</div>
           <div class="px-2.5 pb-1.5 text-[9px] text-[var(--text-subtle)] leading-snug border-b border-[var(--border-subtle)] mb-1">🌐 ตั้งเป็นแม่แบบหลักทันที ทุกหน้าที่ล็อคอยู่จะใช้สไตล์นี้</div>
           <button onclick="applyPresetStyle('split')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center justify-between text-[var(--text-main)]">
@@ -278,6 +276,17 @@
           </button>
           <button onclick="applyPresetStyle('editorial')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center justify-between text-[var(--text-main)]">
             <span>📰 Editorial Asymmetric (นิตยสาร)</span>
+          </button>
+
+          <!-- Custom Template Library: admin-saved layouts, exportable as JSON so a
+               favorite design can be carried into another exhibition later. -->
+          <div class="px-2.5 pt-2 pb-1 text-[10px] font-bold text-[var(--color-accent-gold)] uppercase tracking-wider border-t border-[var(--border-subtle)] mt-1">แม่แบบของฉัน</div>
+          <div id="custom-template-list" class="space-y-0.5"></div>
+          <button onclick="saveCurrentAsTemplate()" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-1.5 text-[var(--color-accent-light)] font-semibold">
+            <span>➕ บันทึกเป็นแม่แบบใหม่...</span>
+          </button>
+          <button onclick="importTemplateFromJSON()" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center gap-1.5 text-[var(--text-muted)]">
+            <span>📥 นำเข้าแม่แบบจาก JSON...</span>
           </button>
         </div>
       </div>
@@ -705,6 +714,12 @@
         if (!catalogConfig.pageOverrides) {
           catalogConfig.pageOverrides = {};
         }
+        if (!catalogConfig.templateLibrary) {
+          // Named, reusable layouts the admin has saved - separate from the single
+          // masterTemplate. Exportable as JSON so a favorite layout can be carried
+          // over and imported into another exhibition's designer in the future.
+          catalogConfig.templateLibrary = [];
+        }
 
         const subRes = await fetch(`/api/submissions?status=approved&limit=500&_t=${Date.now()}`, {
           headers: { 'x-admin-key': adminKey }
@@ -731,6 +746,7 @@
         document.getElementById('total-artworks-badge').textContent = submissions.length;
         const langSelect = document.getElementById('catalog-language-select');
         if (langSelect) langSelect.value = catalogConfig.language || '';
+        renderPresetLibraryList();
         selectArtworkSample(0);
 
       } catch (err) {
@@ -803,16 +819,15 @@
     }
 
     function updateOverrideUI() {
-      const btnToggle = document.getElementById('btn-toggle-override');
-      const btnRevert = document.getElementById('btn-revert-master');
+      const lockWrap = document.getElementById('lock-checkbox-wrap');
+      const lockChk = document.getElementById('chk-lock-template');
       const indicator = document.getElementById('canvas-mode-indicator');
       const inspectorBar = document.getElementById('block-inspector-bar');
       const btnEditMaster = document.getElementById('btn-edit-master');
 
       if (isEditingMaster) {
         btnEditMaster.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-bold transition border cursor-pointer bg-[var(--color-accent-glow)] border-[var(--border-accent)] text-[var(--color-accent-light)] shadow-sm';
-        btnToggle.classList.add('hidden');
-        btnRevert.classList.add('hidden');
+        lockWrap.classList.add('hidden');
         indicator.textContent = '🌐 กำลังแก้ไขแม่แบบหลัก';
         indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)]';
         if (inspectorBar) inspectorBar.classList.remove('pointer-events-none', 'opacity-50', 'grayscale');
@@ -820,19 +835,19 @@
       }
 
       btnEditMaster.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-bold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)]';
+      lockWrap.classList.remove('hidden');
 
       const isCustom = isPageOverridden();
+      lockChk.checked = !isCustom;
       if (isCustom) {
-        btnToggle.classList.add('hidden');
-        btnRevert.classList.remove('hidden');
+        document.getElementById('override-icon').textContent = '🔓';
+        document.getElementById('override-text').textContent = 'จัดเฉพาะหน้านี้ (ติ๊กเพื่อล็อคกลับ)';
         indicator.textContent = '🔓 ปลดล็อค - หน้า #' + (activeArtworkIndex + 1);
         indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)]';
         if (inspectorBar) inspectorBar.classList.remove('pointer-events-none', 'opacity-50', 'grayscale');
       } else {
-        btnToggle.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-semibold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)]';
         document.getElementById('override-icon').textContent = '🔒';
-        document.getElementById('override-text').textContent = 'ล็อคตามแม่แบบหลัก (คลิกเพื่อปลดล็อค)';
-        btnRevert.classList.add('hidden');
+        document.getElementById('override-text').textContent = 'ตามแม่แบบหลัก';
         indicator.textContent = '🔒 ตามแม่แบบหลัก';
         indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)]';
         if (inspectorBar) inspectorBar.classList.add('pointer-events-none', 'opacity-50', 'grayscale');
@@ -845,36 +860,37 @@
       return Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
     }
 
-    // The only place that detaches a page from the master template - a deliberate,
-    // explicit admin action, never a side-effect of an edit or a save.
-    function toggleCurrentPageOverride() {
+    // The single control that attaches/detaches a page from the master template -
+    // a tick means "follow the master template" (locked), removing the tick means
+    // "arrange this page myself" (unlocked). Ticking a page that was already custom
+    // discards that page's own arrangement and reverts it to master, so it confirms;
+    // unticking a locked page simply creates its override, no confirmation needed.
+    function onLockCheckboxChange(checked) {
       if (isEditingMaster) return;
       const art = submissions[activeArtworkIndex];
       if (!art) return;
 
-      if (!isPageOverridden()) {
-        if (!catalogConfig.pageOverrides) catalogConfig.pageOverrides = {};
-        catalogConfig.pageOverrides[art.id] = JSON.parse(JSON.stringify(activeTemplate));
-        updateOverrideUI();
-        renderPagesDrawerList();
-        showToast('ปลดล็อคหน้า #' + (activeArtworkIndex + 1) + ' แล้ว ตอนนี้ปรับแต่งเฉพาะหน้านี้ได้');
-      }
-    }
-
-    function revertCurrentPageToMaster() {
-      const art = submissions[activeArtworkIndex];
-      if (!art) return;
-      if (confirm('คุณต้องการยกเลิกการจัดเฉพาะหน้า และคืนค่าหน้า #' + (activeArtworkIndex + 1) + ' ให้ใช้แม่แบบหลักใช่หรือไม่?')) {
-        if (catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]) {
+      if (checked) {
+        if (isPageOverridden()) {
+          if (!confirm('คุณต้องการล็อคหน้า #' + (activeArtworkIndex + 1) + ' กลับไปตามแม่แบบหลัก และยกเลิกการจัดเฉพาะหน้านี้ใช่หรือไม่?')) {
+            updateOverrideUI();
+            return;
+          }
           delete catalogConfig.pageOverrides[art.id];
+          activeTemplate = JSON.parse(JSON.stringify(catalogConfig.masterTemplate));
+          deselectAllBlocks();
+          renderCanvasBlocks();
+          showToast('ล็อคหน้า #' + (activeArtworkIndex + 1) + ' กลับเป็นแม่แบบหลักแล้ว');
         }
-        activeTemplate = JSON.parse(JSON.stringify(catalogConfig.masterTemplate));
-        deselectAllBlocks();
-        updateOverrideUI();
-        renderCanvasBlocks();
-        renderPagesDrawerList();
-        showToast('คืนค่าหน้า #' + (activeArtworkIndex + 1) + ' กลับเป็นแม่แบบหลักแล้ว');
+      } else {
+        if (!isPageOverridden()) {
+          if (!catalogConfig.pageOverrides) catalogConfig.pageOverrides = {};
+          catalogConfig.pageOverrides[art.id] = JSON.parse(JSON.stringify(activeTemplate));
+          showToast('ปลดล็อคหน้า #' + (activeArtworkIndex + 1) + ' แล้ว ตอนนี้ปรับแต่งเฉพาะหน้านี้ได้');
+        }
       }
+      updateOverrideUI();
+      renderPagesDrawerList();
     }
 
     function renderCanvasBlocks() {
@@ -1302,7 +1318,7 @@
     // Writes the in-memory edit buffer back to whichever real config object it belongs
     // to. In Master Template mode that's catalogConfig.masterTemplate directly. On a
     // specific artwork page it's that page's own pageOverrides entry - but ONLY if the
-    // page was already explicitly unlocked (see toggleCurrentPageOverride). A locked
+    // page was already explicitly unlocked (see onLockCheckboxChange). A locked
     // page never gets an override created here: unlocking is the one deliberate action
     // that detaches a page, never a side-effect of dragging a block or hitting save.
     function syncActiveTemplateToSource() {
@@ -1675,6 +1691,133 @@
       showToast('ใช้ชุดจัดหน้าสำเร็จรูป "' + preset + '" เป็นแม่แบบหลักแล้ว - ปรับแต่งต่อได้ทันที (กด 💾 เพื่อบันทึกทับแม่แบบ)');
     }
 
+    // ---------------------------------------------------------------------
+    // Custom Template Library: named layouts the admin saves for reuse, separate
+    // from the single masterTemplate. Applying one sets it as the master template
+    // the same way a built-in preset does. Export/Import moves a saved layout's
+    // JSON in or out, since each exhibition keeps its own database - this is how
+    // a favorite layout gets carried into another exhibition's designer later.
+    // ---------------------------------------------------------------------
+    function renderPresetLibraryList() {
+      const container = document.getElementById('custom-template-list');
+      if (!container) return;
+      const list = catalogConfig.templateLibrary || [];
+      if (list.length === 0) {
+        container.innerHTML = '<div class="px-2.5 py-1 text-[10px] text-[var(--text-subtle)] italic">ยังไม่มีแม่แบบที่บันทึกไว้</div>';
+        return;
+      }
+      container.innerHTML = list.map(tpl => `
+        <div class="w-full flex items-center gap-0.5">
+          <button onclick="applyCustomTemplate('${tpl.id}')" class="flex-1 min-w-0 text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition text-[var(--text-main)] truncate" title="${tpl.name}">
+            📄 ${tpl.name}
+          </button>
+          <button onclick="exportCustomTemplate('${tpl.id}', event)" class="p-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] text-[var(--text-subtle)] hover:text-[var(--text-main)] shrink-0" title="คัดลอกเป็น JSON เพื่อนำไปใช้ในนิทรรศการอื่น">📋</button>
+          <button onclick="deleteCustomTemplate('${tpl.id}', event)" class="p-1.5 corner-cut-4 hover:bg-rose-950/40 text-[var(--text-subtle)] hover:text-rose-400 shrink-0" title="ลบแม่แบบนี้">🗑️</button>
+        </div>
+      `).join('');
+    }
+
+    async function saveCurrentAsTemplate() {
+      const name = prompt('ตั้งชื่อแม่แบบที่จะบันทึกเข้าคลัง (เช่น "นิทรรศการภาพพิมพ์ 2569"):');
+      if (!name || !name.trim()) return;
+      if (!catalogConfig.templateLibrary) catalogConfig.templateLibrary = [];
+      const entry = {
+        id: 'tpl-' + Date.now(),
+        name: name.trim(),
+        blocks: JSON.parse(JSON.stringify(activeTemplate.blocks)),
+        createdAt: new Date().toISOString()
+      };
+      catalogConfig.templateLibrary.push(entry);
+      try {
+        const resJson = await persistCatalogConfig();
+        if (resJson.success) {
+          showToast('บันทึกแม่แบบ "' + entry.name + '" เข้าคลังแม่แบบแล้ว - นำไปใช้ในนิทรรศการอื่นได้ในอนาคต');
+          renderPresetLibraryList();
+        } else {
+          showToast('บันทึกแม่แบบล้มเหลว: ' + (resJson.error || 'Unknown error'), true);
+        }
+      } catch (err) {
+        showToast('เกิดข้อผิดพลาด: ' + err.message, true);
+      }
+    }
+
+    function applyCustomTemplate(id) {
+      const tpl = (catalogConfig.templateLibrary || []).find(t => t.id === id);
+      if (!tpl) return;
+      isEditingMaster = true;
+      selectedBlockId = null;
+      activeTemplate.blocks = JSON.parse(JSON.stringify(tpl.blocks));
+      updateOverrideUI();
+      renderCanvasBlocks();
+      renderPagesDrawerList();
+      syncActiveTemplateToSource();
+      toggleDropdown('preset-dropdown');
+      showToast('ใช้แม่แบบ "' + tpl.name + '" เป็นแม่แบบหลักแล้ว - ปรับแต่งต่อได้ทันที (กด 💾 เพื่อบันทึกทับแม่แบบ)');
+    }
+
+    async function deleteCustomTemplate(id, evt) {
+      if (evt) evt.stopPropagation();
+      const tpl = (catalogConfig.templateLibrary || []).find(t => t.id === id);
+      if (!tpl) return;
+      if (!confirm('ลบแม่แบบ "' + tpl.name + '" ออกจากคลังแม่แบบใช่หรือไม่?')) return;
+      catalogConfig.templateLibrary = catalogConfig.templateLibrary.filter(t => t.id !== id);
+      try {
+        const resJson = await persistCatalogConfig();
+        if (resJson.success) {
+          showToast('ลบแม่แบบ "' + tpl.name + '" แล้ว');
+          renderPresetLibraryList();
+        } else {
+          showToast('ลบแม่แบบล้มเหลว: ' + (resJson.error || 'Unknown error'), true);
+        }
+      } catch (err) {
+        showToast('เกิดข้อผิดพลาด: ' + err.message, true);
+      }
+    }
+
+    async function exportCustomTemplate(id, evt) {
+      if (evt) evt.stopPropagation();
+      const tpl = (catalogConfig.templateLibrary || []).find(t => t.id === id);
+      if (!tpl) return;
+      const json = JSON.stringify({ name: tpl.name, blocks: tpl.blocks }, null, 2);
+      try {
+        await navigator.clipboard.writeText(json);
+        showToast('คัดลอกแม่แบบ "' + tpl.name + '" เป็น JSON แล้ว - นำไปวางในตัวจัดหน้าของนิทรรศการอื่นได้');
+      } catch (err) {
+        prompt('คัดลอกข้อความนี้ (Ctrl+C) แล้วนำไปวางในตัวจัดหน้าของนิทรรศการอื่น:', json);
+      }
+    }
+
+    async function importTemplateFromJSON() {
+      const raw = prompt('วางโค้ด JSON ของแม่แบบที่คัดลอกมาจากนิทรรศการอื่น:');
+      if (!raw || !raw.trim()) return;
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (err) {
+        showToast('รูปแบบ JSON ไม่ถูกต้อง', true);
+        return;
+      }
+      if (!parsed || !Array.isArray(parsed.blocks)) {
+        showToast('ไฟล์นี้ไม่ใช่แม่แบบที่ถูกต้อง (ไม่พบ blocks)', true);
+        return;
+      }
+      const name = (parsed.name && String(parsed.name).trim()) || ('แม่แบบนำเข้า ' + new Date().toLocaleDateString('th-TH'));
+      if (!catalogConfig.templateLibrary) catalogConfig.templateLibrary = [];
+      const entry = { id: 'tpl-' + Date.now(), name, blocks: parsed.blocks, createdAt: new Date().toISOString() };
+      catalogConfig.templateLibrary.push(entry);
+      try {
+        const resJson = await persistCatalogConfig();
+        if (resJson.success) {
+          showToast('นำเข้าแม่แบบ "' + name + '" เรียบร้อยแล้ว');
+          renderPresetLibraryList();
+        } else {
+          showToast('บันทึกล้มเหลว: ' + (resJson.error || 'Unknown error'), true);
+        }
+      } catch (err) {
+        showToast('เกิดข้อผิดพลาด: ' + err.message, true);
+      }
+    }
+
     function setCanvasBackground(bg, text) {
       canvasBgColor = bg;
       canvasTextColor = text;
@@ -1802,6 +1945,59 @@
       showToast(value ? ('ล็อกภาษาสูจิบัตรเป็น ' + (value === 'th' ? 'ไทย' : 'English') + ' แล้ว (บันทึกเพื่อยืนยัน)') : 'สูจิบัตรจะตามภาษาเว็บไซต์ (บันทึกเพื่อยืนยัน)');
     }
 
+    // Sends the complete catalogConfig to the server (a full replace, not a merge -
+    // see functions/api/catalog-config.js) and returns the parsed response. Shared by
+    // the main Save button and every template-library action (save/delete/import),
+    // so those persist right away instead of waiting for an unrelated layout save.
+    async function persistCatalogConfig() {
+      const imgB = activeTemplate.blocks.find(b => b.type === 'artwork_image');
+      const titleB = activeTemplate.blocks.find(b => b.type === 'artwork_title' || b.type === 'meta');
+      const conceptB = activeTemplate.blocks.find(b => b.type === 'concept');
+      const artistB = activeTemplate.blocks.find(b => b.type === 'artist_profile' || b.type === 'artist_name' || b.type === 'artist');
+
+      const freeBlocks = {
+        image: imgB ? { x: imgB.xPct, y: imgB.yPct, w: imgB.wPct, h: imgB.hPct } : { x: 6, y: 10, w: 50, h: 74 },
+        meta: titleB ? { x: titleB.xPct, y: titleB.yPct, w: titleB.wPct } : { x: 60, y: 12, w: 34 },
+        concept: conceptB ? { x: conceptB.xPct, y: conceptB.yPct, w: conceptB.wPct } : { x: 60, y: 46, w: 34 },
+        artist: artistB ? { x: artistB.xPct, y: artistB.yPct, w: artistB.wPct } : { x: 60, y: 74, w: 34 }
+      };
+
+      const payload = {
+        config: {
+          ...catalogConfig,
+          masterTemplate: catalogConfig.masterTemplate,
+          pageOverrides: catalogConfig.pageOverrides || {},
+          templateLibrary: catalogConfig.templateLibrary || [],
+          freeLayout: {
+            theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage'),
+            gridSnap: true,
+            blocks: freeBlocks
+          },
+          layout: {
+            template: 'freeform',
+            theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage')
+          }
+        }
+      };
+
+      const res = await fetch('/api/catalog-config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': adminKey
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const resJson = await res.json();
+      if (resJson.success) {
+        try {
+          localStorage.setItem('catalog_layout_updated', Date.now().toString());
+        } catch (_) {}
+      }
+      return resJson;
+    }
+
     async function saveDesignerLayout() {
       // What gets persisted depends entirely on the current mode - never a guess:
       // Master Template mode writes catalogConfig.masterTemplate (affects every page
@@ -1814,49 +2010,8 @@
       syncActiveTemplateToSource();
 
       try {
-        const imgB = activeTemplate.blocks.find(b => b.type === 'artwork_image');
-        const titleB = activeTemplate.blocks.find(b => b.type === 'artwork_title' || b.type === 'meta');
-        const conceptB = activeTemplate.blocks.find(b => b.type === 'concept');
-        const artistB = activeTemplate.blocks.find(b => b.type === 'artist_profile' || b.type === 'artist_name' || b.type === 'artist');
-
-        const freeBlocks = {
-          image: imgB ? { x: imgB.xPct, y: imgB.yPct, w: imgB.wPct, h: imgB.hPct } : { x: 6, y: 10, w: 50, h: 74 },
-          meta: titleB ? { x: titleB.xPct, y: titleB.yPct, w: titleB.wPct } : { x: 60, y: 12, w: 34 },
-          concept: conceptB ? { x: conceptB.xPct, y: conceptB.yPct, w: conceptB.wPct } : { x: 60, y: 46, w: 34 },
-          artist: artistB ? { x: artistB.xPct, y: artistB.yPct, w: artistB.wPct } : { x: 60, y: 74, w: 34 }
-        };
-
-        const payload = {
-          config: {
-            ...catalogConfig,
-            masterTemplate: catalogConfig.masterTemplate,
-            pageOverrides: catalogConfig.pageOverrides || {},
-            freeLayout: {
-              theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage'),
-              gridSnap: true,
-              blocks: freeBlocks
-            },
-            layout: {
-              template: 'freeform',
-              theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage')
-            }
-          }
-        };
-
-        const res = await fetch('/api/catalog-config', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-admin-key': adminKey
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const resJson = await res.json();
+        const resJson = await persistCatalogConfig();
         if (resJson.success) {
-          try {
-            localStorage.setItem('catalog_layout_updated', Date.now().toString());
-          } catch (_) {}
           if (savingMaster) {
             showToast('บันทึกทับแม่แบบหลักเรียบร้อยแล้ว (มีผลกับทุกหน้าที่ยังล็อคตามแม่แบบอยู่)');
           } else if (savingCustomPage) {

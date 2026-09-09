@@ -1049,7 +1049,7 @@
               return `
                 <div class="cat-free-block ${textAlign}" style="${posStyle}">
                   ${showLabel ? `<span class="text-[10px] font-mono uppercase tracking-widest text-amber-500 font-bold block mb-1">${LABELS.artwork}</span>` : ''}
-                  <h3 class="${fontFam} ${fontWt} ${fontItalic} text-xl sm:text-2xl ${textHeadingClass} leading-snug" style="${customInlineStyle}">
+                  <h3 class="${fontFam} ${fontWt} ${fontItalic} ${textHeadingClass} leading-tight" style="${customInlineStyle}">
                     ${title}
                   </h3>
                 </div>
@@ -1061,7 +1061,7 @@
               return `
                 <div class="cat-free-block ${textAlign}" style="${posStyle}">
                   ${showLabel ? `<span class="text-[9px] font-mono uppercase text-amber-500 block font-semibold">${LABELS.artist}</span>` : ''}
-                  <h4 class="${fontFam} ${fontWt} text-sm ${textHeadingClass} truncate" style="${customInlineStyle}">${artistName}</h4>
+                  <h4 class="${fontFam} ${fontWt} leading-snug ${textHeadingClass} truncate" style="${customInlineStyle}">${artistName}</h4>
                 </div>
               `;
             }
@@ -1093,7 +1093,7 @@
                   <div class="min-w-0">
                     ${elem.showArtist !== false ? `
                       ${showLabel ? `<span class="text-[9px] font-mono uppercase text-amber-500 block font-semibold">${LABELS.artist}</span>` : ''}
-                      <h4 class="${fontFam} ${fontWt} text-sm ${textHeadingClass} truncate" style="${customInlineStyle}">${artistName}</h4>
+                      <h4 class="${fontFam} ${fontWt} leading-snug ${textHeadingClass} truncate" style="${customInlineStyle}">${artistName}</h4>
                     ` : ''}
                     ${elem.showFlag !== false ? `
                       <div class="mt-0.5">${window.getCountryFlagBadge ? window.getCountryFlagBadge(item.nationality || 'Thailand', { size: 'sm', showName: false }) : ''}</div>
@@ -1107,7 +1107,7 @@
               if (elem.showEmail === false || !item.artist_email) return '';
               return `
                 <div class="cat-free-block ${textAlign}" style="${posStyle}">
-                  <span class="${fontFam} ${fontWt} text-xs truncate block" style="${customInlineStyle}">${item.artist_email}</span>
+                  <span class="${fontFam} ${fontWt} truncate block" style="${customInlineStyle}">${item.artist_email}</span>
                 </div>
               `;
             }
@@ -1117,8 +1117,8 @@
               const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
               return `
                 <div class="cat-free-block flex items-center gap-2 ${specJustify}" style="${posStyle}">
-                  <span class="${textSubClass} text-xs shrink-0">${window.tLang('spec_technique_lbl', isTh ? 'th' : 'en')}</span>
-                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass}" style="${customInlineStyle}">${technique}</span>
+                  <span class="${textSubClass} text-[10px] shrink-0">${window.tLang('spec_technique_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="${fontFam} ${fontWt} ${textHeadingClass}" style="${customInlineStyle}">${technique}</span>
                 </div>
               `;
             }
@@ -1128,8 +1128,8 @@
               const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
               return `
                 <div class="cat-free-block flex items-center gap-2 ${specJustify}" style="${posStyle}">
-                  <span class="${textSubClass} text-xs shrink-0">${window.tLang('spec_dimensions_lbl', isTh ? 'th' : 'en')}</span>
-                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass}" style="${customInlineStyle}">${window.formatDimensions ? window.formatDimensions(item.dimensions, isTh ? 'th' : 'en') : item.dimensions}</span>
+                  <span class="${textSubClass} text-[10px] shrink-0">${window.tLang('spec_dimensions_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="${fontFam} ${fontWt} ${textHeadingClass}" style="${customInlineStyle}">${window.formatDimensions ? window.formatDimensions(item.dimensions, isTh ? 'th' : 'en') : item.dimensions}</span>
                 </div>
               `;
             }
@@ -1139,8 +1139,8 @@
               const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
               return `
                 <div class="cat-free-block flex items-center gap-2 ${specJustify}" style="${posStyle}">
-                  <span class="${textSubClass} text-xs shrink-0">${window.tLang('spec_year_lbl', isTh ? 'th' : 'en')}</span>
-                  <span class="${fontFam} ${fontWt} text-xs ${textHeadingClass}" style="${customInlineStyle}">${item.year_created || '2026'}</span>
+                  <span class="${textSubClass} text-[10px] shrink-0">${window.tLang('spec_year_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="${fontFam} ${fontWt} ${textHeadingClass}" style="${customInlineStyle}">${item.year_created || '2026'}</span>
                 </div>
               `;
             }
@@ -1150,8 +1150,8 @@
               const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
               return `
                 <div class="cat-free-block flex items-center gap-2 ${specJustify}" style="${posStyle}">
-                  <span class="${textSubClass} text-xs shrink-0">${window.tLang('spec_price_lbl', isTh ? 'th' : 'en')}</span>
-                  <span class="font-mono text-amber-500 font-bold text-xs" style="${customInlineStyle}">${window.formatPrice ? window.formatPrice(item.price, isTh ? 'th' : 'en') : item.price}</span>
+                  <span class="${textSubClass} text-[10px] shrink-0">${window.tLang('spec_price_lbl', isTh ? 'th' : 'en')}</span>
+                  <span class="font-mono text-amber-500 font-bold" style="${customInlineStyle}">${window.formatPrice ? window.formatPrice(item.price, isTh ? 'th' : 'en') : item.price}</span>
                 </div>
               `;
             }
@@ -1160,8 +1160,8 @@
               if (elem.showConcept === false || !description) return '';
               return `
                 <div class="cat-free-block ${textAlign}" style="${posStyle}">
-                  <h5 class="text-[10px] font-mono ${textSubClass} uppercase tracking-widest mb-1.5">${window.tLang('concept_title', isTh ? 'th' : 'en')}</h5>
-                  <p class="text-xs sm:text-sm ${textConceptClass} ${fontFam} italic leading-relaxed pl-3 border-l-2 border-amber-500/50" style="${customInlineStyle}">
+                  <h5 class="text-[9px] font-mono ${textSubClass} uppercase tracking-widest mb-1.5">${window.tLang('concept_title', isTh ? 'th' : 'en')}</h5>
+                  <p class="${textConceptClass} ${fontFam} italic leading-relaxed pl-2 border-l-2 border-amber-500/50" style="${customInlineStyle}">
                     "${description}"
                   </p>
                 </div>
