@@ -147,6 +147,7 @@
     <p>Multi-Tenant Virtual Exhibition System &bull; Poh-Chang Fine Art Virtual Pavilion</p>
   </footer>
 
+  <script src="/js/image-size.js"></script>
   <script src="/js/portal.js"></script>
   <script>
     let loadedEvents = [];
@@ -278,8 +279,10 @@
 
         strip.innerHTML = "";
         arts.slice(0, 3).forEach(art => {
+          const raw = art.thumbnail_url || art.image_url;
           const img = document.createElement("img");
-          img.src = art.thumbnail_url || art.image_url;
+          img.src = window.cloudinaryThumb ? window.cloudinaryThumb(raw, 300) : raw;
+          img.onerror = () => window.cloudinaryFallback && window.cloudinaryFallback(img, raw);
           img.alt = art.title;
           img.className = "w-full h-full object-cover rounded-lg";
           img.loading = "lazy";

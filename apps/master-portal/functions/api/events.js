@@ -31,7 +31,10 @@ export async function onRequestGet(context) {
       success: true,
       events
     }), {
-      headers: { "Content-Type": "application/json" }
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, max-age=60"
+      }
     });
   } catch (err) {
     return new Response(JSON.stringify({

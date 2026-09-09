@@ -536,6 +536,7 @@
     </div>
   </footer>
 
+  <script src="/js/image-size.js"></script>
   <script src="/js/portal.js"></script>
   <script>
     let registeredEvents = [];
@@ -751,8 +752,10 @@
 
         strip.innerHTML = "";
         arts.slice(0, 3).forEach(art => {
+          const raw = art.thumbnail_url || art.image_url;
           const img = document.createElement("img");
-          img.src = art.thumbnail_url || art.image_url;
+          img.src = window.cloudinaryThumb ? window.cloudinaryThumb(raw, 300) : raw;
+          img.onerror = () => window.cloudinaryFallback && window.cloudinaryFallback(img, raw);
           img.alt = art.title;
           img.className = "w-full h-full object-cover rounded-lg";
           img.loading = "lazy";
@@ -959,7 +962,8 @@
         const zone = clean(art.zone) || "Main Gallery";
         const nationality = clean(art.nationality);
         const desc = clean(window.getField(art, 'description'));
-        const imageUrl = art.thumbnail_url || art.image_url;
+        const rawImageUrl = art.thumbnail_url || art.image_url;
+        const imageUrl = window.cloudinaryThumb ? window.cloudinaryThumb(rawImageUrl, 800) : rawImageUrl;
         // Check if artist has a genuine custom photo (not placeholder or ui-avatars)
         const hasRealAvatar = !!(
           art.artist_avatar_url &&
@@ -988,7 +992,7 @@
               ` : ''}
             </div>
 
-            <img src="${imageUrl}" alt="${title}" 
+            <img src="${imageUrl}" alt="${title}" data-raw-src="${rawImageUrl}" onerror="window.cloudinaryFallback && window.cloudinaryFallback(this, this.dataset.rawSrc)"
                  onclick="openArtworkDetailModal('${art.global_id}')"
                  class="max-h-full max-w-full object-contain rounded-xs drop-shadow-[0_4px_16px_rgba(0,0,0,0.08)] group-hover:scale-[1.03] transition-transform duration-500 ease-out cursor-pointer" loading="lazy">
           </div>
@@ -1021,7 +1025,7 @@
               <!-- Artist Profile Row: Shows photo only if real portrait exists, otherwise clean icon/text -->
               <div class="flex items-center gap-2.5">
                 ${hasRealAvatar ? `
-                  <img src="${art.artist_avatar_url}" alt="${artistName}" 
+                  <img src="${window.cloudinaryThumb ? window.cloudinaryThumb(art.artist_avatar_url, 100) : art.artist_avatar_url}" alt="${artistName}" data-raw-src="${art.artist_avatar_url}" onerror="window.cloudinaryFallback && window.cloudinaryFallback(this, this.dataset.rawSrc)"
                        class="w-8 h-8 rounded-full object-cover border border-[#C5A059]/50 shrink-0 shadow-2xs">
                 ` : `
                   <span class="text-[#9A7833] shrink-0 opacity-80">
@@ -1202,7 +1206,8 @@
       const zone = clean(art.zone) || "Main Gallery";
       const nationality = clean(art.nationality);
       const desc = clean(window.getField(art, 'description'));
-      const imageUrl = art.image_url || art.thumbnail_url;
+      const rawImageUrl = art.image_url || art.thumbnail_url;
+      const imageUrl = window.cloudinaryFull ? window.cloudinaryFull(rawImageUrl, 2000) : rawImageUrl;
       const hasRealAvatar = !!(
         art.artist_avatar_url &&
         typeof art.artist_avatar_url === 'string' &&
@@ -1211,8 +1216,11 @@
         !art.artist_avatar_url.includes('unsplash.com')
       );
 
-      document.getElementById("detail-art-image").src = imageUrl;
-      document.getElementById("detail-art-raw-link").href = imageUrl;
+      const detailImg = document.getElementById("detail-art-image");
+      detailImg.src = imageUrl;
+      detailImg.onerror = () => window.cloudinaryFallback && window.cloudinaryFallback(detailImg, rawImageUrl);
+      // "Raw" link intentionally links the untransformed original, not the display copy.
+      document.getElementById("detail-art-raw-link").href = rawImageUrl;
       
       const dimParts = [dimensions, year].filter(Boolean);
       document.getElementById("detail-art-stage-dim").textContent = dimParts.join(" • ");
