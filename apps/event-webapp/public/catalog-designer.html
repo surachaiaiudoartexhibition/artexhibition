@@ -424,16 +424,22 @@
         <button onclick="updateSelectedBlockProp('textAlign', 'right')" class="p-1 corner-cut-4 bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)]" title="ชิดขวา">⇥</button>
       </div>
 
-      <!-- Group 5: Color Swatches -->
+      <!-- Group 5: Color (CMYK print production - not an RGB picker; see cmykPctToHex) -->
       <div class="flex items-center gap-1.5 pr-2.5 border-r border-[var(--border-subtle)]">
         <span class="text-[10px] text-[var(--text-subtle)] font-mono">Color:</span>
         <div class="flex items-center gap-1">
-          <button onclick="updateSelectedBlockProp('color', '#8B1B1B')" class="w-4 h-4 corner-cut-2 bg-[#8B1B1B] border border-white/20 hover:scale-110 transition" title="แดงเพาะช่าง (Crimson)"></button>
-          <button onclick="updateSelectedBlockProp('color', '#D4AF37')" class="w-4 h-4 corner-cut-2 bg-[#D4AF37] border border-white/20 hover:scale-110 transition" title="ทองคำรัตนโกสินทร์ (Gold)"></button>
-          <button onclick="updateSelectedBlockProp('color', '#1F1C17')" class="w-4 h-4 corner-cut-2 bg-[#1F1C17] border border-white/20 hover:scale-110 transition" title="ดำชาร์โคล (Charcoal)"></button>
-          <button onclick="updateSelectedBlockProp('color', '#666666')" class="w-4 h-4 corner-cut-2 bg-[#666666] border border-white/20 hover:scale-110 transition" title="เทากลาง (Muted Gray)"></button>
-          <button onclick="updateSelectedBlockProp('color', '#FFFFFF')" class="w-4 h-4 corner-cut-2 bg-white border border-slate-400 hover:scale-110 transition" title="ขาวบริสุทธิ์ (Pure White)"></button>
-          <input type="color" id="insp-color-picker" onchange="updateSelectedBlockProp('color', this.value)" class="w-5 h-5 rounded-none corner-cut-2 bg-transparent border-0 cursor-pointer p-0" title="เลือกสีอิสระ" />
+          <button onclick="setSelectedBlockColorHex('#8B1B1B')" class="w-4 h-4 corner-cut-2 bg-[#8B1B1B] border border-white/20 hover:scale-110 transition" title="แดงเพาะช่าง (Crimson)"></button>
+          <button onclick="setSelectedBlockColorHex('#D4AF37')" class="w-4 h-4 corner-cut-2 bg-[#D4AF37] border border-white/20 hover:scale-110 transition" title="ทองคำรัตนโกสินทร์ (Gold)"></button>
+          <button onclick="setSelectedBlockColorHex('#1F1C17')" class="w-4 h-4 corner-cut-2 bg-[#1F1C17] border border-white/20 hover:scale-110 transition" title="ดำชาร์โคล (Charcoal)"></button>
+          <button onclick="setSelectedBlockColorHex('#666666')" class="w-4 h-4 corner-cut-2 bg-[#666666] border border-white/20 hover:scale-110 transition" title="เทากลาง (Muted Gray)"></button>
+          <button onclick="setSelectedBlockColorHex('#FFFFFF')" class="w-4 h-4 corner-cut-2 bg-white border border-slate-400 hover:scale-110 transition" title="ขาวบริสุทธิ์ (Pure White)"></button>
+        </div>
+        <div id="insp-cmyk-swatch" class="w-4 h-4 corner-cut-2 border border-white/30 shrink-0" title="สีที่ได้จากค่า CMYK ปัจจุบัน"></div>
+        <div class="flex items-center gap-0.5" title="ค่าหมึกพิมพ์ Cyan / Magenta / Yellow / Key(Black) เป็นเปอร์เซ็นต์ (0-100)">
+          <label class="flex items-center gap-0.5"><span class="text-[9px] text-cyan-400 font-mono font-bold">C</span><input type="number" id="insp-cmyk-c" min="0" max="100" step="1" value="0" onchange="updateSelectedBlockColorFromCmyk()" class="w-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-4 px-0.5 py-1 text-[10px] text-center font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--border-accent)]" /></label>
+          <label class="flex items-center gap-0.5"><span class="text-[9px] text-fuchsia-400 font-mono font-bold">M</span><input type="number" id="insp-cmyk-m" min="0" max="100" step="1" value="0" onchange="updateSelectedBlockColorFromCmyk()" class="w-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-4 px-0.5 py-1 text-[10px] text-center font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--border-accent)]" /></label>
+          <label class="flex items-center gap-0.5"><span class="text-[9px] text-yellow-400 font-mono font-bold">Y</span><input type="number" id="insp-cmyk-y" min="0" max="100" step="1" value="0" onchange="updateSelectedBlockColorFromCmyk()" class="w-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-4 px-0.5 py-1 text-[10px] text-center font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--border-accent)]" /></label>
+          <label class="flex items-center gap-0.5"><span class="text-[9px] text-[var(--text-muted)] font-mono font-bold">K</span><input type="number" id="insp-cmyk-k" min="0" max="100" step="1" value="0" onchange="updateSelectedBlockColorFromCmyk()" class="w-8 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-4 px-0.5 py-1 text-[10px] text-center font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--border-accent)]" /></label>
         </div>
         <button id="insp-contrast-badge" onclick="autoFixContrast()" class="hidden px-1.5 py-0.5 corner-cut-4 text-[9px] font-mono font-bold cursor-pointer transition" title="คลิกเพื่อปรับสีให้อ่านง่ายอัตโนมัติ"></button>
       </div>
@@ -1368,7 +1374,16 @@
       const s = block.style || {};
       document.getElementById('insp-font-family').value = s.fontFamily || 'Maitree';
       document.getElementById('insp-font-size').value = s.fontSizePt || 12;
-      document.getElementById('insp-color-picker').value = s.color || '#1F1C17';
+      {
+        const curHex = s.color || '#1F1C17';
+        const [c, m, y, k] = hexToCmykPct(curHex);
+        document.getElementById('insp-cmyk-c').value = c;
+        document.getElementById('insp-cmyk-m').value = m;
+        document.getElementById('insp-cmyk-y').value = y;
+        document.getElementById('insp-cmyk-k').value = k;
+        const swatch = document.getElementById('insp-cmyk-swatch');
+        if (swatch) swatch.style.backgroundColor = curHex;
+      }
 
       // Hide or show text-specific groups depending on block type
       const isText = ['artwork_title', 'artist_name', 'technique', 'dimensions', 'year_created', 'price', 'concept', 'custom_text', 'artist_email', 'page_number'].includes(block.type);
@@ -1451,6 +1466,65 @@
       return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
     }
 
+    // ---------------------------------------------------------------------
+    // The catalog's colors are CMYK print production, not RGB - so the color
+    // editing controls themselves take C/M/Y/K percentages directly (0-100),
+    // never a browser RGB picker. The stored block color is still a hex string
+    // (every renderer - this canvas, catalog.html, the CSS preview - is a
+    // screen, which can only display RGB), but that hex is always DERIVED FROM
+    // the CMYK values the admin actually set, never picked as RGB in the first
+    // place; the PDF export separately re-derives real CMYK ink values from it.
+    // ---------------------------------------------------------------------
+    function hexToCmykPct(hex) {
+      const [r, g, b] = hexToRgbArr(hex);
+      const rp = r / 255, gp = g / 255, bp = b / 255;
+      const k = 1 - Math.max(rp, gp, bp);
+      if (k >= 1) return [0, 0, 0, 100];
+      return [
+        Math.round(((1 - rp - k) / (1 - k)) * 100),
+        Math.round(((1 - gp - k) / (1 - k)) * 100),
+        Math.round(((1 - bp - k) / (1 - k)) * 100),
+        Math.round(k * 100)
+      ];
+    }
+
+    function cmykPctToHex(c, m, y, k) {
+      const cc = Math.max(0, Math.min(100, Number(c) || 0)) / 100;
+      const mm = Math.max(0, Math.min(100, Number(m) || 0)) / 100;
+      const yy = Math.max(0, Math.min(100, Number(y) || 0)) / 100;
+      const kk = Math.max(0, Math.min(100, Number(k) || 0)) / 100;
+      const r = Math.round(255 * (1 - cc) * (1 - kk));
+      const g = Math.round(255 * (1 - mm) * (1 - kk));
+      const b = Math.round(255 * (1 - yy) * (1 - kk));
+      return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Reads the 4 CMYK inputs, converts to hex for storage/on-screen rendering, applies
+    // it to the selected block, and keeps the little live swatch in sync.
+    function updateSelectedBlockColorFromCmyk() {
+      const c = document.getElementById('insp-cmyk-c').value;
+      const m = document.getElementById('insp-cmyk-m').value;
+      const y = document.getElementById('insp-cmyk-y').value;
+      const k = document.getElementById('insp-cmyk-k').value;
+      const hex = cmykPctToHex(c, m, y, k);
+      const swatch = document.getElementById('insp-cmyk-swatch');
+      if (swatch) swatch.style.backgroundColor = hex;
+      updateSelectedBlockProp('color', hex);
+    }
+
+    // Sets all 4 CMYK fields (and the block color) at once - used by the quick preset
+    // swatches and by autoFixContrast, which both still work in terms of a hex result.
+    function setSelectedBlockColorHex(hex) {
+      const [c, m, y, k] = hexToCmykPct(hex);
+      document.getElementById('insp-cmyk-c').value = c;
+      document.getElementById('insp-cmyk-m').value = m;
+      document.getElementById('insp-cmyk-y').value = y;
+      document.getElementById('insp-cmyk-k').value = k;
+      const swatch = document.getElementById('insp-cmyk-swatch');
+      if (swatch) swatch.style.backgroundColor = hex;
+      updateSelectedBlockProp('color', hex);
+    }
+
     function relativeLuminance([r, g, b]) {
       const chan = (c) => {
         const v = c / 255;
@@ -1493,8 +1567,7 @@
       // Whichever of pure black/white contrasts more against the current page
       // background wins - always crosses the readable (4.5:1) threshold.
       const bestColor = contrastRatio('#000000', canvasBgColor) >= contrastRatio('#FFFFFF', canvasBgColor) ? '#171C1A' : '#FFFFFF';
-      updateSelectedBlockProp('color', bestColor);
-      document.getElementById('insp-color-picker').value = bestColor;
+      setSelectedBlockColorHex(bestColor);
       showToast('ปรับสีตัวอักษรให้อ่านง่ายขึ้นแล้ว');
     }
 
