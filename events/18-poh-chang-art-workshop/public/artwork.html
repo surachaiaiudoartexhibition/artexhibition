@@ -316,6 +316,7 @@
       // Images
       const img = document.getElementById("artwork-image");
       img.src = window.cloudinaryFull ? window.cloudinaryFull(art.image_url, 2000) : art.image_url;
+      img.onerror = () => window.cloudinaryFallback && window.cloudinaryFallback(img, art.image_url);
       img.alt = title;
       // "Raw" link intentionally links the untransformed original, not the display copy.
       document.getElementById("artwork-raw-link").href = art.image_url;
@@ -328,6 +329,7 @@
       const avatarEl = document.getElementById("artist-avatar");
       if (art.artist_avatar_url && art.artist_avatar_url.trim() && !art.artist_avatar_url.includes('unsplash.com')) {
         avatarEl.src = window.cloudinaryThumb ? window.cloudinaryThumb(art.artist_avatar_url, 150) : art.artist_avatar_url;
+        avatarEl.onerror = () => window.cloudinaryFallback && window.cloudinaryFallback(avatarEl, art.artist_avatar_url);
         avatarEl.classList.remove("hidden");
       } else {
         avatarEl.classList.add("hidden");

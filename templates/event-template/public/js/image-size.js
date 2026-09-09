@@ -33,4 +33,15 @@
   window.cloudinaryFull = function (url, maxWidth) {
     return applyTransform(url, `f_auto,q_auto,w_${maxWidth || 2000},c_limit`);
   };
+
+  // Some Cloudinary accounts have "Strict Transformations" enabled (blocks any
+  // on-the-fly transform that wasn't pre-approved) - confirmed live on one of this
+  // project's own events, where a transformed URL 404s even though the original
+  // loads fine. Every <img> using the helpers above must wire this in as its
+  // onerror handler so a blocked/failed transform degrades to the original image
+  // instead of breaking, regardless of which account or reason caused the failure.
+  window.cloudinaryFallback = function (el, rawUrl) {
+    el.onerror = null;
+    el.src = rawUrl;
+  };
 })();
