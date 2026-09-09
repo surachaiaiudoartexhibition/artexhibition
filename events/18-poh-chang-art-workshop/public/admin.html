@@ -3596,22 +3596,47 @@
       );
       if (!confirmed) return;
 
-      showToast('กำลัง Sync ไปยัง Master Portal…', 'info');
+      // The server only syncs one bounded batch per call (Cloudflare caps how many
+      // subrequests a single Function invocation can make) - loop here, following
+      // next_offset, until has_more is false, so any event size works regardless
+      // of how many approved artworks it has.
+      let offset = 0;
+      let totalPushed = 0;
+      let totalFailed = 0;
+      let totalApproved = null;
+      let hasMore = true;
+      let round = 0;
+
       try {
-        const res = await fetch('/api/submissions/sync-all', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin123' }
-        });
-        const data = await res.json();
-        if (data.success) {
+        while (hasMore) {
+          round++;
           showToast(
-            `✅ Sync สำเร็จ — ส่งขึ้น Master Portal ${data.step3_pushed} ผลงาน` +
-            (data.step3_failed > 0 ? ` (ข้าม ${data.step3_failed} ชิ้นที่ไม่มีรูป)` : ''),
-            'success'
+            totalApproved
+              ? `กำลัง Sync ไปยัง Master Portal… (${Math.min(offset, totalApproved)}/${totalApproved})`
+              : `กำลัง Sync ไปยัง Master Portal… (ชุดที่ ${round})`,
+            'info'
           );
-        } else {
-          alert('Sync ล้มเหลว: ' + (data.error || 'Unknown error'));
+          const res = await fetch(`/api/submissions/sync-all?offset=${offset}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin123' }
+          });
+          const data = await res.json();
+          if (!data.success) {
+            alert('Sync ล้มเหลว: ' + (data.error || 'Unknown error'));
+            return;
+          }
+          totalPushed += data.batch_pushed || 0;
+          totalFailed += data.batch_failed || 0;
+          totalApproved = data.total_approved;
+          hasMore = Boolean(data.has_more);
+          offset = data.next_offset ?? (offset + (data.batch_size || 0));
         }
+
+        showToast(
+          `✅ Sync สำเร็จ — ส่งขึ้น Master Portal ${totalPushed} ผลงาน` +
+          (totalFailed > 0 ? ` (ข้าม ${totalFailed} ชิ้นที่ไม่มีรูป)` : ''),
+          'success'
+        );
       } catch (err) {
         alert('Sync ล้มเหลว: ' + err.message);
       }

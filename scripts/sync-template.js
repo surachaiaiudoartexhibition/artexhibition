@@ -11,6 +11,17 @@ const path = require('node:path');
 const ROOT_DIR = path.join(__dirname, '..');
 const TEMPLATE_DIR = path.join(ROOT_DIR, 'templates', 'event-template');
 const EVENTS_DIR = path.join(ROOT_DIR, 'events');
+const EVENT_WEBAPP_DIR = path.join(ROOT_DIR, 'apps', 'event-webapp');
+
+// Binary assets (fonts, images, etc.) must NEVER go through a text read/replace/write
+// round-trip - decoding them as utf8 and re-encoding corrupts the bytes (verified: a
+// 46KB .ttf came back as 58KB and unusable). None of these ever contain a {{PLACEHOLDER}}
+// token anyway, so they're always copied as raw bytes via fs.copyFileSync instead.
+const BINARY_EXTENSIONS = new Set([
+  '.ttf', '.otf', '.woff', '.woff2', '.eot',
+  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.ico', '.bmp',
+  '.pdf', '.zip', '.gz', '.db', '.sqlite', '.sqlite3'
+]);
 
 function copyAndReplace(src, dest, replacements, preserveFiles = []) {
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
@@ -31,6 +42,8 @@ function copyAndReplace(src, dest, replacements, preserveFiles = []) {
 
     if (entry.isDirectory()) {
       copyAndReplace(srcPath, destPath, replacements, preserveFiles);
+    } else if (BINARY_EXTENSIONS.has(path.extname(targetName).toLowerCase())) {
+      fs.copyFileSync(srcPath, destPath);
     } else {
       let content = fs.readFileSync(srcPath, 'utf8');
       for (const [key, val] of Object.entries(replacements)) {
@@ -111,7 +124,37 @@ async function syncAllEvents() {
   console.log("===============================================================\n");
 }
 
-syncAllEvents().catch(err => {
-  console.error("Sync error:", err);
-  process.exit(1);
-});
+// apps/event-webapp is the shared local-dev sandbox (per docs/multi-tenant-deployment-sop.md,
+// it's also the Cloudflare Pages "Root directory" every future event can point at directly,
+// with zero folder duplication). Its application code (public/, functions/, schema.sql) should
+// track the template exactly like every events/* copy - but its wrangler.toml and package.json
+// hold local-dev-only demo credentials (a demo D1, localhost master-portal URL) that must never
+// be overwritten by a real event's placeholder substitution, so they're preserved untouched here
+// (no manifest-driven replacements are needed for the rest, since apps/event-webapp's runtime
+// config always comes from env vars, never from values baked into the HTML/JS themselves).
+function syncEventWebapp() {
+  console.log("===============================================================");
+  console.log(" 🔄 Propagating Template Updates to apps/event-webapp");
+  console.log("===============================================================\n");
+
+  if (!fs.existsSync(EVENT_WEBAPP_DIR)) {
+    console.log("ไม่พบโฟลเดอร์ apps/event-webapp ข้ามขั้นตอนนี้");
+    return;
+  }
+
+  const preserveFiles = ['wrangler.toml', 'package.json'];
+
+  try {
+    copyAndReplace(TEMPLATE_DIR, EVENT_WEBAPP_DIR, {}, preserveFiles);
+    console.log("✅ อัปเดต apps/event-webapp เรียบร้อย (คง wrangler.toml และ package.json เดิมไว้)\n");
+  } catch (err) {
+    console.error("❌ เกิดข้อผิดพลาดในการอัปเดต apps/event-webapp:", err.message);
+  }
+}
+
+syncAllEvents()
+  .then(() => syncEventWebapp())
+  .catch(err => {
+    console.error("Sync error:", err);
+    process.exit(1);
+  });

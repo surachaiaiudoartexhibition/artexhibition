@@ -22,5 +22,5 @@ EVENT_PAGE_BASE_URL = "https://18pohchangartworkshop.pages.dev"
 EVENT_THEME = "heritage"
 
 # Dedicated Cloudinary Storage Account for this Event
-CLOUDINARY_CLOUD_NAME = "gpea1udi"
-CLOUDINARY_UPLOAD_PRESET = "art_event_sirikit"
+CLOUDINARY_CLOUD_NAME = "mtykamzk"
+CLOUDINARY_UPLOAD_PRESET = "18_Art_Workshop"

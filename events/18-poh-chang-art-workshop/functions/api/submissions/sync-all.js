@@ -1,7 +1,15 @@
 // Cloudflare Pages Function: POST /api/submissions/sync-all
-// Full re-sync of all approved submissions to Master Portal:
-//   1. delete_event  → wipe master_artworks for this event
-//   2. upsert each   → re-push every approved submission
+// Full re-sync of all approved submissions to Master Portal, ONE BATCH per call:
+//   - offset=0 (default): first wipes master_artworks for this event, then upserts
+//     up to `limit` submissions
+//   - offset>0: upserts the next `limit` submissions (no delete - already done)
+// A single Cloudflare Worker/Pages Function invocation has a hard cap on how many
+// subrequests (fetch calls) it can make - the old version looped every approved
+// submission inside one invocation and failed once an event passed ~150 artworks
+// (see AGENT_HANDOFF.md). Splitting into small batches, each its own invocation
+// driven by the caller looping over offsets, keeps every single call safely under
+// that limit no matter how large an event's approved list grows.
+const MAX_BATCH_SIZE = 30;
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -25,6 +33,11 @@ export async function onRequestPost(context) {
     });
   }
 
+  const url = new URL(request.url);
+  const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0', 10) || 0);
+  const requestedLimit = parseInt(url.searchParams.get('limit') || '', 10);
+  const limit = Math.min(MAX_BATCH_SIZE, (requestedLimit > 0 ? requestedLimit : MAX_BATCH_SIZE));
+
   const syncEndpoint = `${masterPortalUrl.replace(/\/+$/, '')}/api/sync`;
 
   async function callSync(payload) {
@@ -41,21 +54,26 @@ export async function onRequestPost(context) {
   }
 
   try {
-    // Step 1: delete_event — wipe all for this event in master portal
-    const deleteResult = await callSync({ action: 'delete_event', event_id: eventId });
+    let deleteResult = null;
+    if (offset === 0) {
+      // Only wipe once, on the very first batch of a fresh sync run.
+      deleteResult = await callSync({ action: 'delete_event', event_id: eventId });
+    }
 
-    // Step 2: fetch all approved submissions from this event's D1
+    // Fetch the full approved list once to know total count and slice this batch -
+    // the D1 read itself doesn't count against the subrequest cap, only fetch() does.
     const result = await env.DB.prepare(
       "SELECT * FROM submissions WHERE status = 'approved' ORDER BY display_order ASC, id ASC"
     ).all();
-    const submissions = result.results || [];
+    const allSubmissions = result.results || [];
+    const totalApproved = allSubmissions.length;
+    const batch = allSubmissions.slice(offset, offset + limit);
 
-    // Step 3: upsert each one to master portal
     let pushed = 0;
     let failed = 0;
     const errors = [];
 
-    for (const sub of submissions) {
+    for (const sub of batch) {
       // Skip if no image (can't show in master portal)
       if (!sub.image_url || sub.image_url.trim() === '') {
         failed++;
@@ -91,13 +109,20 @@ export async function onRequestPost(context) {
       }
     }
 
+    const nextOffset = offset + batch.length;
+    const hasMore = nextOffset < totalApproved;
+
     return new Response(JSON.stringify({
       success: true,
       event_id: eventId,
       step1_delete_event: deleteResult,
-      step2_total_approved: submissions.length,
-      step3_pushed: pushed,
-      step3_failed: failed,
+      total_approved: totalApproved,
+      batch_offset: offset,
+      batch_size: batch.length,
+      batch_pushed: pushed,
+      batch_failed: failed,
+      next_offset: hasMore ? nextOffset : null,
+      has_more: hasMore,
       errors: errors.length > 0 ? errors : undefined
     }), {
       status: 200, headers: { 'Content-Type': 'application/json' }
