@@ -266,6 +266,7 @@
         </button>
         <div id="preset-dropdown" class="absolute left-0 mt-2 w-56 bg-[var(--bg-surface-solid)] border border-[var(--border-accent)] corner-cut-8 p-1.5 shadow-2xl hidden z-50 space-y-0.5 text-xs">
           <div class="px-2.5 py-1 text-[10px] font-bold text-[var(--color-accent-gold)] uppercase tracking-wider">เลือกสไตล์สำเร็จรูป</div>
+          <div class="px-2.5 pb-1.5 text-[9px] text-[var(--text-subtle)] leading-snug border-b border-[var(--border-subtle)] mb-1">🌐 ตั้งเป็นแม่แบบหลักทันที ทุกหน้าที่ล็อคอยู่จะใช้สไตล์นี้</div>
           <button onclick="applyPresetStyle('split')" class="w-full text-left px-2.5 py-1.5 corner-cut-4 hover:bg-[var(--bg-surface-elevated)] transition flex items-center justify-between text-[var(--text-main)]">
             <span>🏛️ Classic Split (ภาพซ้าย/ข้อมูลขวา)</span>
           </button>
@@ -1630,8 +1631,14 @@
       showToast('เพิ่มบล็อก "' + newBlock.label + '" เรียบร้อย');
     }
 
+    // Picking a preset always sets the MASTER TEMPLATE, not just the page you happen
+    // to be viewing - it's meant to define the shared standard every locked page
+    // inherits. So it switches into Master Template mode first (bypassing the
+    // per-page lock entirely) and is editable immediately afterward; any page that
+    // wants to diverge from it still has to be unlocked explicitly, same as always.
     function applyPresetStyle(preset) {
-      if (!requireEditable()) return;
+      isEditingMaster = true;
+      selectedBlockId = null;
       if (preset === 'split') {
         activeTemplate.blocks = JSON.parse(JSON.stringify(DEFAULT_MASTER_BLOCKS));
       } else if (preset === 'hero') {
@@ -1660,10 +1667,12 @@
         ];
       }
 
+      updateOverrideUI();
       renderCanvasBlocks();
+      renderPagesDrawerList();
       syncActiveTemplateToSource();
       toggleDropdown('preset-dropdown');
-      showToast('ปรับใช้สไตล์สำเร็จรูป "' + preset + '" แล้ว');
+      showToast('ใช้ชุดจัดหน้าสำเร็จรูป "' + preset + '" เป็นแม่แบบหลักแล้ว - ปรับแต่งต่อได้ทันที (กด 💾 เพื่อบันทึกทับแม่แบบ)');
     }
 
     function setCanvasBackground(bg, text) {
