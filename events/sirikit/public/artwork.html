@@ -87,9 +87,9 @@
       <!-- Breadcrumb & Action Bar -->
       <div class="flex items-center justify-between text-xs text-stone-400 pb-3 border-b border-white/[0.08]">
         <div class="flex items-center gap-2">
-          <a href="/" class="hover:text-white transition" data-i18n="artwork_breadcrumb_home">หน้าแรก</a>
+          <a href="/" class="hover:text-[var(--text-main)] transition" data-i18n="artwork_breadcrumb_home">หน้าแรก</a>
           <span class="text-stone-600">/</span>
-          <a href="/gallery.html" class="hover:text-white transition" data-i18n="artwork_breadcrumb_gallery">ห้องนิทรรศการ</a>
+          <a href="/gallery.html" class="hover:text-[var(--text-main)] transition" data-i18n="artwork_breadcrumb_gallery">ห้องนิทรรศการ</a>
           <span class="text-stone-600">/</span>
           <span id="breadcrumb-title" class="text-[#e2c792] font-normal truncate max-w-xs"></span>
         </div>
@@ -197,11 +197,11 @@
             </p>
 
             <div class="pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs">
-              <a href="/artists.html" class="inline-flex items-center gap-1.5 text-[#d4af37] hover:text-white transition tracking-wider uppercase text-[11px]">
+              <a href="/artists.html" class="inline-flex items-center gap-1.5 text-[#d4af37] hover:text-[var(--text-main)] transition tracking-wider uppercase text-[11px]">
                 <span data-i18n="view_in_artists_dir">ดูข้อมูลในทำเนียบศิลปิน</span>
                 <span>&rarr;</span>
               </a>
-              <button onclick="navigator.clipboard.writeText(window.location.href); alert(window.t('link_copied'));" class="p-1.5 text-stone-400 hover:text-white transition cursor-pointer" title="แชร์ผลงาน" data-i18n-title="btn_share_artwork">
+              <button onclick="navigator.clipboard.writeText(window.location.href); alert(window.t('link_copied'));" class="p-1.5 text-stone-400 hover:text-[var(--text-main)] transition cursor-pointer" title="แชร์ผลงาน" data-i18n-title="btn_share_artwork">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>

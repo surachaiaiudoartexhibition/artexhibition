@@ -897,15 +897,26 @@
       const fontWt = s.fontWeight === 'bold' ? 'font-bold' : s.fontWeight === 'semibold' ? 'font-semibold' : 'font-normal';
       const fontItalic = s.fontStyle === 'italic' ? 'italic' : '';
       const textAlign = 'text-' + (s.textAlign || 'left');
+      const specJustify = s.textAlign === 'center' ? 'justify-center' : s.textAlign === 'right' ? 'justify-end' : 'justify-start';
       const color = s.color || canvasTextColor;
       const fontSize = 'font-family: ' + fontFamCss + ';' + (s.fontSizePt ? ' font-size: ' + s.fontSizePt + 'pt;' : '');
 
+      // The language the PUBLISHED catalog will actually render in - same rule
+      // catalog.html uses, so the studio preview matches what visitors will see
+      // instead of always previewing in Thai regardless of the locked language.
+      const pageIsTh = catalogConfig.language === 'en' ? false : catalogConfig.language === 'th' ? true : ((window.i18n && window.i18n.getLang() === 'th') || false);
+
       // Small uppercase caption labels ("ผลงานศิลปกรรม" / "ศิลปินผู้สร้างสรรค์"):
       // optional per block (showLabel), language independent of the site switcher (labelLang).
-      const capIsTh = s.labelLang === 'en' ? false : (s.labelLang === 'th' ? true : ((window.i18n && window.i18n.getLang() === 'th') || true));
+      const capIsTh = s.labelLang === 'en' ? false : (s.labelLang === 'th' ? true : pageIsTh);
       const LABELS = {
         artwork: capIsTh ? 'ผลงานศิลปกรรม' : 'Artwork Details',
-        artist: capIsTh ? 'ศิลปินผู้สร้างสรรค์' : 'Created by Artist'
+        artist: capIsTh ? 'ศิลปินผู้สร้างสรรค์' : 'Created by Artist',
+        technique: pageIsTh ? 'เทคนิค:' : 'Medium / Technique:',
+        dimensions: pageIsTh ? 'ขนาด:' : 'Dimensions:',
+        year: pageIsTh ? 'ปีที่สร้างสรรค์:' : 'Year Created:',
+        price: pageIsTh ? 'ราคา:' : 'Price:',
+        concept: pageIsTh ? 'แนวคิดผลงาน' : 'Artist Statement'
       };
       const showLabel = s.showLabel !== false;
 
@@ -935,36 +946,41 @@
 
         case 'technique':
           return `
-            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
-              <span class="${fontFam} ${fontWt}">เทคนิค: ${technique}</span>
+            <div class="w-full h-full flex items-center gap-2 ${specJustify}">
+              <span class="text-[10px] text-[var(--text-subtle)] shrink-0">${LABELS.technique}</span>
+              <span class="${fontWt}" style="${fontSize} color: ${color};">${technique}</span>
             </div>
           `;
 
         case 'dimensions':
           return `
-            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
-              <span class="${fontFam} ${fontWt}">ขนาด: ${dimensions}</span>
+            <div class="w-full h-full flex items-center gap-2 ${specJustify}">
+              <span class="text-[10px] text-[var(--text-subtle)] shrink-0">${LABELS.dimensions}</span>
+              <span class="${fontWt}" style="${fontSize} color: ${color};">${dimensions}</span>
             </div>
           `;
 
         case 'year_created':
           return `
-            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
-              <span class="${fontFam} ${fontWt}">ปี: ${year}</span>
+            <div class="w-full h-full flex items-center gap-2 ${specJustify}">
+              <span class="text-[10px] text-[var(--text-subtle)] shrink-0">${LABELS.year}</span>
+              <span class="${fontWt}" style="${fontSize} color: ${color};">${year}</span>
             </div>
           `;
 
         case 'price':
           return `
-            <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
-              <span class="font-mono font-bold text-[var(--color-accent-gold)]">${price}</span>
+            <div class="w-full h-full flex items-center gap-2 ${specJustify}">
+              <span class="text-[10px] text-[var(--text-subtle)] shrink-0">${LABELS.price}</span>
+              <span class="font-mono font-bold text-[var(--color-accent-gold)]" style="${fontSize} ${s.color ? 'color: ' + s.color + ';' : ''}">${price}</span>
             </div>
           `;
 
         case 'concept':
           return `
-            <div class="w-full h-full overflow-hidden ${textAlign}" style="${fontSize} color: ${color};">
-              <p class="${fontFam} ${fontItalic} leading-relaxed border-l-2 border-[var(--border-accent)] pl-2">
+            <div class="w-full h-full overflow-hidden ${textAlign}">
+              <h5 class="text-[9px] uppercase tracking-widest text-[var(--text-subtle)] mb-1.5">${LABELS.concept}</h5>
+              <p class="${fontItalic} leading-relaxed border-l-2 border-[var(--border-accent)] pl-2" style="${fontSize} color: ${color};">
                 "${concept}"
               </p>
             </div>
@@ -1007,7 +1023,7 @@
           return `
             <div class="w-full h-full flex flex-col items-center justify-center border border-[var(--border-subtle)] p-1 bg-white corner-cut-4">
               <div class="text-[8px] font-mono text-slate-400 mb-0.5">3D GALLERY</div>
-              <div class="w-8 h-8 bg-black flex items-center justify-center text-white text-[9px] font-bold">QR</div>
+              <div class="w-8 h-8 bg-black flex items-center justify-center text-fixed-white text-[9px] font-bold">QR</div>
             </div>
           `;
 

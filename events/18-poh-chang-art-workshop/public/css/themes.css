@@ -478,10 +478,19 @@ a[title].group\/art {
   border-radius: 0 0 6px 0 !important;
 }
 
+
+/* Always-white text paired with a self-contained solid/gradient background —
+   must stay white in every theme, unlike the .text-white utility which is
+   theme-adaptive (see white-cube override below). */
+.text-fixed-white {
+  color: #ffffff !important;
+}
 /* ===================================================================
    Specific Scoped Overrides for Light Theme (White Cube)
    =================================================================== */
 [data-theme="white-cube"] .text-white,
+[data-theme="white-cube"] .hover:text-white:hover,
+[data-theme="white-cube"] .group-hover:text-white,
 [data-theme="white-cube"] .text-stone-100,
 [data-theme="white-cube"] .text-stone-200 {
   color: #141416 !important;

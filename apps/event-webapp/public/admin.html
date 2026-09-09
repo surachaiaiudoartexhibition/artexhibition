@@ -1333,7 +1333,7 @@
             </button>
 
             ${sub.status !== "approved" ? `
-              <button onclick="approveArtwork(${sub.id})" class="flex-1 md:flex-initial px-4 py-2 corner-cut-6 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <button onclick="approveArtwork(${sub.id})" class="flex-1 md:flex-initial px-4 py-2 corner-cut-6 bg-emerald-600 hover:bg-emerald-500 text-fixed-white text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
@@ -1346,7 +1346,7 @@
             `}
 
             ${sub.status !== "rejected" ? `
-              <button onclick="rejectArtwork(${sub.id})" class="flex-1 md:flex-initial px-4 py-2 corner-cut-6 bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <button onclick="rejectArtwork(${sub.id})" class="flex-1 md:flex-initial px-4 py-2 corner-cut-6 bg-rose-600/80 hover:bg-rose-600 text-fixed-white text-xs font-medium transition flex items-center justify-center gap-1.5 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -1883,7 +1883,7 @@
     <div class="bg-[var(--bg-surface-solid)] border border-[var(--border-accent)] corner-cut-16 w-full max-w-lg p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
         <h3 id="jury-modal-title" class="font-serif-luxury font-bold text-base text-[var(--text-main)]">เพิ่มผู้ทรงคุณวุฒิ</h3>
-        <button onclick="closeJuryMemberModal()" class="text-slate-400 hover:text-white text-xl leading-none cursor-pointer">&times;</button>
+        <button onclick="closeJuryMemberModal()" class="text-slate-400 hover:text-[var(--text-main)] text-xl leading-none cursor-pointer">&times;</button>
       </div>
       
       <input type="hidden" id="jury-edit-id" value="">
@@ -1919,7 +1919,7 @@
             <!-- Avatar Preview with Remove button -->
             <div class="relative group shrink-0">
               <img id="jury-avatar-preview" src="https://ui-avatars.com/api/?name=Jury&background=13141f&color=D4AF37&bold=true" alt="Preview" class="w-16 h-16 corner-cut-8 object-cover border-2 border-[var(--border-accent)] shadow-md">
-              <button type="button" id="jury-avatar-remove-btn" onclick="clearJuryAvatar()" class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-600 text-white rounded-full text-xs flex items-center justify-center cursor-pointer shadow hover:bg-rose-500" title="ลบรูป">&times;</button>
+              <button type="button" id="jury-avatar-remove-btn" onclick="clearJuryAvatar()" class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-600 text-fixed-white rounded-full text-xs flex items-center justify-center cursor-pointer shadow hover:bg-rose-500" title="ลบรูป">&times;</button>
             </div>
 
             <!-- Upload Area & Controls -->
@@ -1944,7 +1944,7 @@
       </div>
 
       <div class="flex items-center justify-end gap-2 pt-3 border-t border-[var(--border-subtle)] text-xs">
-        <button type="button" onclick="closeJuryMemberModal()" class="px-3 py-1.5 corner-cut-6 border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-white cursor-pointer">ยกเลิก</button>
+        <button type="button" onclick="closeJuryMemberModal()" class="px-3 py-1.5 corner-cut-6 border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer">ยกเลิก</button>
         <button type="button" onclick="saveJuryMemberFromModal()" class="px-4 py-1.5 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-black font-bold cursor-pointer">บันทึกข้อมูลกรรมการ</button>
       </div>
     </div>
@@ -1972,7 +1972,7 @@
             </p>
           </div>
         </div>
-        <button onclick="closeBatchImportModal()" class="text-slate-400 hover:text-white text-2xl leading-none cursor-pointer">&times;</button>
+        <button onclick="closeBatchImportModal()" class="text-slate-400 hover:text-[var(--text-main)] text-2xl leading-none cursor-pointer">&times;</button>
       </div>
 
       <!-- Modal Body (Scrollable) -->
@@ -2310,7 +2310,7 @@
 
       <!-- Modal Footer -->
       <div class="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)] text-xs shrink-0">
-        <button type="button" onclick="closeBatchImportModal()" class="px-4 py-2 corner-cut-8 border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-[var(--text-muted)] hover:text-white cursor-pointer">
+        <button type="button" onclick="closeBatchImportModal()" class="px-4 py-2 corner-cut-8 border border-[var(--border-subtle)] hover:border-[var(--border-accent)] text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-pointer">
           ยกเลิก
         </button>
         <div class="flex items-center gap-3">
