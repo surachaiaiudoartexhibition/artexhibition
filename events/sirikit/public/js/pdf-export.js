@@ -117,6 +117,24 @@
     return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
   }
 
+  // Print production for the catalog must be CMYK, never RGB - screen colors drift
+  // unpredictably once separated for press. jsPDF's 4-argument setFillColor/
+  // setDrawColor/setTextColor(c, m, y, k) writes a real /DeviceCMYK "k"/"K" operator
+  // into the PDF content stream (verified against the bundled jsPDF 4.2.1 source:
+  // it passes all 4 values straight through with no /255 normalization, unlike its
+  // 3-argument RGB path) - so every color in the exported PDF goes through here.
+  function rgbToCmyk(r, g, b) {
+    const rp = r / 255, gp = g / 255, bp = b / 255;
+    const k = 1 - Math.max(rp, gp, bp);
+    if (k >= 1) return [0, 0, 0, 1];
+    return [(1 - rp - k) / (1 - k), (1 - gp - k) / (1 - k), (1 - bp - k) / (1 - k), k];
+  }
+
+  function hexToCmyk(hex) {
+    const [r, g, b] = hexToRgb(hex);
+    return rgbToCmyk(r, g, b);
+  }
+
   async function loadImageResized(url, maxDim) {
     if (!url) return null;
     const cacheKey = url + '|' + maxDim;
@@ -173,7 +191,7 @@
     const r = opts.radius || {};
     const radiusPx = Math.max(r.tl || 0, r.tr || 0, r.br || 0, r.bl || 0);
     const radiusMm = Math.min(radiusPx * 0.3, Math.min(w, h) / 2);
-    const borderRgb = hexToRgb('#B4965A');
+    const borderCmyk = hexToCmyk('#B4965A');
 
     if (fit === 'cover') {
       let drawW, drawH, drawX, drawY;
@@ -208,7 +226,7 @@
     }
 
     if (opts.showBorder) {
-      doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
+      doc.setDrawColor(borderCmyk[0], borderCmyk[1], borderCmyk[2], borderCmyk[3]);
       doc.setLineWidth(0.25);
       if (radiusMm > 0) doc.roundedRect(x, y, w, h, radiusMm, radiusMm);
       else doc.rect(x, y, w, h);
@@ -232,7 +250,8 @@
       if (img) {
         flagW = flagH * (img.width / img.height);
         doc.addImage(img.dataUri, img.format, x, y, flagW, flagH, undefined, 'FAST');
-        doc.setDrawColor(200, 200, 200);
+        const flagBorderCmyk = rgbToCmyk(200, 200, 200);
+        doc.setDrawColor(flagBorderCmyk[0], flagBorderCmyk[1], flagBorderCmyk[2], flagBorderCmyk[3]);
         doc.setLineWidth(0.1);
         doc.rect(x, y, flagW, flagH);
         flagW += 2;
@@ -252,8 +271,8 @@
     doc.setFont(family, availableStyles.includes(style) ? style : (availableStyles[0] || 'normal'));
     const sizePt = opts.fontSizePt || 10;
     doc.setFontSize(sizePt);
-    const rgb = hexToRgb(opts.color || '#171C1A');
-    doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+    const cmyk = hexToCmyk(opts.color || '#171C1A');
+    doc.setTextColor(cmyk[0], cmyk[1], cmyk[2], cmyk[3]);
 
     const lines = doc.splitTextToSize(String(text == null ? '' : text), w);
     const lineHeightMm = sizePt * PT_TO_MM * 1.34;
@@ -333,11 +352,11 @@
   // ---------------------------------------------------------------------
 
   function drawPageChrome(doc, tokens) {
-    const rgb = hexToRgb(tokens.bg);
-    doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+    const cmyk = hexToCmyk(tokens.bg);
+    doc.setFillColor(cmyk[0], cmyk[1], cmyk[2], cmyk[3]);
     doc.rect(0, 0, PAGE_W_MM, PAGE_H_MM, 'F');
-    const borderRgb = hexToRgb(tokens.border);
-    doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
+    const borderCmyk = hexToCmyk(tokens.border);
+    doc.setDrawColor(borderCmyk[0], borderCmyk[1], borderCmyk[2], borderCmyk[3]);
     doc.setLineWidth(0.3);
     doc.rect(6, 6, PAGE_W_MM - 12, PAGE_H_MM - 12);
   }
@@ -357,10 +376,10 @@
 
     const orgLine1 = orgName || '';
     const orgLine2 = orgSub || '';
-    const goldRgb0 = hexToRgb(tokens.gold);
-    doc.setFillColor(goldRgb0[0], goldRgb0[1], goldRgb0[2]);
+    const goldCmyk0 = hexToCmyk(tokens.gold);
+    doc.setFillColor(goldCmyk0[0], goldCmyk0[1], goldCmyk0[2], goldCmyk0[3]);
     doc.rect(margin, 18, 9, 9, 'F');
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(0, 0, 0, 1);
     doc.setFont('CormorantGaramond', 'bold');
     doc.setFontSize(9);
     doc.text('P.C.', margin + 4.5, 23.5, { align: 'center' });
@@ -368,8 +387,8 @@
     if (orgLine2) drawTextBlock(doc, orgLine2, margin + 12, 22.5, 90, { fontFamily: 'Sarabun', fontSizePt: 6.5, color: tokens.gold });
 
     drawTextBlock(doc, 'OFFICIAL CATALOG', PAGE_W_MM - margin - 45, 19, 45, { fontFamily: 'Sarabun', fontSizePt: 8, color: tokens.gold, align: 'right', bold: true });
-    const borderRgb0 = hexToRgb(tokens.border);
-    doc.setDrawColor(borderRgb0[0], borderRgb0[1], borderRgb0[2]);
+    const borderCmyk0 = hexToCmyk(tokens.border);
+    doc.setDrawColor(borderCmyk0[0], borderCmyk0[1], borderCmyk0[2], borderCmyk0[3]);
     doc.line(margin, 30, PAGE_W_MM - margin, 30);
 
     y = 42;
@@ -382,8 +401,8 @@
     drawTextBlock(doc, highlight.toUpperCase(), margin, y, PAGE_W_MM - margin * 2, { fontFamily: 'Cinzel', fontSizePt: 26, color: tokens.gold, align: 'center', bold: true });
 
     y += 20;
-    const goldRgb = hexToRgb(tokens.gold);
-    doc.setDrawColor(goldRgb[0], goldRgb[1], goldRgb[2]);
+    const goldCmyk = hexToCmyk(tokens.gold);
+    doc.setDrawColor(goldCmyk[0], goldCmyk[1], goldCmyk[2], goldCmyk[3]);
     doc.setLineWidth(0.4);
     doc.line(PAGE_W_MM / 2 - 15, y, PAGE_W_MM / 2 + 15, y);
 
@@ -391,8 +410,8 @@
     drawTextBlock(doc, sub, margin + 15, y, PAGE_W_MM - (margin + 15) * 2, { fontFamily: 'CormorantGaramond', fontSizePt: 12, italic: true, color: tokens.sub, align: 'center' });
 
     const footerY = PAGE_H_MM - 24;
-    const subRgb = hexToRgb(tokens.border);
-    doc.setDrawColor(subRgb[0], subRgb[1], subRgb[2]);
+    const subCmyk = hexToCmyk(tokens.border);
+    doc.setDrawColor(subCmyk[0], subCmyk[1], subCmyk[2], subCmyk[3]);
     doc.line(margin, footerY, PAGE_W_MM - margin, footerY);
     drawTextBlock(doc, 'CHIEF CURATOR', margin, footerY + 4, 80, { fontFamily: 'Sarabun', fontSizePt: 7, color: tokens.gold, bold: true });
     drawTextBlock(doc, curator, margin, footerY + 9, 80, { fontFamily: 'Sarabun', fontSizePt: 9, color: tokens.heading });
@@ -414,8 +433,8 @@
     y += 6;
     drawTextBlock(doc, title, margin, y, PAGE_W_MM - margin * 2, { fontFamily: 'CormorantGaramond', fontSizePt: 18, color: tokens.heading, bold: true });
     y += 14;
-    const borderRgb = hexToRgb(tokens.border);
-    doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
+    const borderCmyk = hexToCmyk(tokens.border);
+    doc.setDrawColor(borderCmyk[0], borderCmyk[1], borderCmyk[2], borderCmyk[3]);
     doc.line(margin, y, PAGE_W_MM - margin, y);
 
     y += 12;
@@ -452,8 +471,8 @@
       const hasReal = Boolean(m.avatar_url && String(m.avatar_url).trim() && !String(m.avatar_url).includes('unsplash.com'));
       const avatarUrl = hasReal ? m.avatar_url : `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name_th || 'Jury')}&background=14070a&color=D4AF37&bold=true`;
 
-      const borderRgb = hexToRgb(tokens.border);
-      doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
+      const borderCmyk = hexToCmyk(tokens.border);
+      doc.setDrawColor(borderCmyk[0], borderCmyk[1], borderCmyk[2], borderCmyk[3]);
       doc.setLineWidth(0.25);
       doc.rect(margin, y, PAGE_W_MM - margin * 2, cardH);
 
@@ -500,7 +519,7 @@
     const { templateSource, item, bl, elem, tokens, title, artistName, technique, description, avatar, pageNum, isTh } = ctx;
 
     drawPageChrome(doc, tokens);
-    const goldRgb = hexToRgb(tokens.gold);
+    const goldCmyk = hexToCmyk(tokens.gold);
 
     let usedBlockLayout = false;
     if (templateSource && Array.isArray(templateSource.blocks) && templateSource.blocks.length > 0) {
@@ -578,7 +597,7 @@
             break;
           case 'concept':
             if (elem.showConcept === false || !description) break;
-            doc.setDrawColor(goldRgb[0], goldRgb[1], goldRgb[2]);
+            doc.setDrawColor(goldCmyk[0], goldCmyk[1], goldCmyk[2], goldCmyk[3]);
             doc.setLineWidth(0.5);
             doc.line(x, y, x, y + h);
             drawTextBlock(doc, '"' + description + '"', x + 2.5, y, w - 2.5, Object.assign({ fontSizePt: 9.5, italic: true, color: tokens.concept }, commonOpts, { italic: true }));
@@ -589,7 +608,7 @@
             drawTextBlock(doc, String(pageNum), x, y, w, Object.assign({ fontFamily: 'Sarabun', fontSizePt: 8 }, commonOpts));
             break;
           case 'divider_line': {
-            doc.setDrawColor(goldRgb[0], goldRgb[1], goldRgb[2]);
+            doc.setDrawColor(goldCmyk[0], goldCmyk[1], goldCmyk[2], goldCmyk[3]);
             doc.setLineWidth(0.3);
             doc.line(x, y + h / 2, x + w, y + h / 2);
             break;
@@ -634,7 +653,7 @@
 
       if (elem.showConcept !== false && description) {
         const cX = pct2mm(bl.concept.x, PAGE_W_MM), cY = pct2mm(bl.concept.y, PAGE_H_MM), cW = pct2mm(bl.concept.w, PAGE_W_MM);
-        doc.setDrawColor(goldRgb[0], goldRgb[1], goldRgb[2]);
+        doc.setDrawColor(goldCmyk[0], goldCmyk[1], goldCmyk[2], goldCmyk[3]);
         doc.line(cX, cY, cX, cY + 40);
         drawTextBlock(doc, '"' + description + '"', cX + 2.5, cY, cW - 2.5, { fontFamily: 'NotoSerifThai', fontSizePt: 9.5, italic: true, color: tokens.concept });
       }
