@@ -1261,18 +1261,9 @@
           }
         }).join('');
 
-        // If page_number wasn't in blocks, add pinned page footer
-        let footerHtml = '';
-        if (!hasPageNumBlock && elem.showPageNum !== false) {
-          footerHtml = `
-            <div class="cat-free-footer absolute bottom-5 left-8 right-8 border-t ${borderSubClass} pt-2.5 flex items-center justify-between text-xs ${textSubClass} z-20">
-              <span>${window.tLang('catalog_footer_title', isTh ? 'th' : 'en')}</span>
-              <span>${window.tLang('catalog_page_prefix', isTh ? 'th' : 'en')} ${pageNum}</span>
-            </div>
-          `;
-        }
-
-        return renderedBlocks + footerHtml;
+        // No auto-injected footer - if the admin didn't place a page_number block,
+        // no footer shows. The page shows exactly what was designed, nothing more.
+        return renderedBlocks;
       }
 
       // Fallback: 4-Block Layout
@@ -1686,17 +1677,8 @@
 
         pages.push(`
           <div class="catalog-page cat-free-page catalog-artwork-page corner-cut-12 border ${pageBorderClass} relative ${pageBgClass} overflow-hidden shadow-2xl">
-            <!-- Page Header (Artwork # & Spread) - Absolute Pinned to Top -->
-            ${elem.showPageNum !== false ? `
-              <div class="absolute top-5 left-8 right-8 flex items-center justify-between border-b ${borderSubClass} pb-2.5 text-xs z-20">
-                <span class="font-mono text-[11px] text-[var(--color-accent-gold)] uppercase tracking-wider font-bold">
-                  ${window.tLang('artwork_num_prefix', isTh ? 'th' : 'en')} ${String(index + 1).padStart(2, '0')}
-                </span>
-                <span class="font-mono ${textSubClass}">${window.tLang('catalog_spread_label', isTh ? 'th' : 'en')}</span>
-              </div>
-            ` : ''}
-
-            <!-- Canvas Blocks Container -->
+            <!-- No automatic page header - the page shows only what was actually
+                 designed (blocks), never an auto-injected "Artwork No. / Spread" label. -->
             ${contentBlocksHtml}
           </div>
         `);

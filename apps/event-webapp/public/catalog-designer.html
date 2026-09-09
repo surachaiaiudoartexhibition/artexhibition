@@ -413,6 +413,7 @@
           <button onclick="updateSelectedBlockProp('color', '#FFFFFF')" class="w-4 h-4 corner-cut-2 bg-white border border-slate-400 hover:scale-110 transition" title="ขาวบริสุทธิ์ (Pure White)"></button>
           <input type="color" id="insp-color-picker" onchange="updateSelectedBlockProp('color', this.value)" class="w-5 h-5 rounded-none corner-cut-2 bg-transparent border-0 cursor-pointer p-0" title="เลือกสีอิสระ" />
         </div>
+        <button id="insp-contrast-badge" onclick="autoFixContrast()" class="hidden px-1.5 py-0.5 corner-cut-4 text-[9px] font-mono font-bold cursor-pointer transition" title="คลิกเพื่อปรับสีให้อ่านง่ายอัตโนมัติ"></button>
       </div>
 
       <!-- Group 6b: Image Box URL (image_box only) -->
@@ -450,11 +451,12 @@
         </select>
       </div>
 
-      <!-- Group 8: Rotation (all blocks) -->
+      <!-- Group 8: Rotation (all blocks) - slider for quick eyeballing, number field for exact values -->
       <div class="flex items-center gap-1 pr-2.5 border-r border-[var(--border-subtle)]">
         <span class="text-[10px] text-[var(--text-subtle)] font-mono">Rotate:</span>
-        <input type="range" id="insp-rotation" min="-180" max="180" step="1" value="0" oninput="updateSelectedBlockProp('rotationDeg', parseFloat(this.value)); document.getElementById('insp-rotation-val').textContent = this.value + '°';" class="w-16 accent-[var(--color-accent-gold)] cursor-pointer" />
-        <span id="insp-rotation-val" class="text-[10px] font-mono text-[var(--text-subtle)] w-8">0°</span>
+        <input type="range" id="insp-rotation" min="-180" max="180" step="1" value="0" oninput="updateRotationFromSlider(this.value)" class="w-16 accent-[var(--color-accent-gold)] cursor-pointer" />
+        <input type="number" id="insp-rotation-number" min="-180" max="180" step="1" value="0" onchange="updateRotationFromNumber(this.value)" class="w-12 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] corner-cut-4 px-1 py-1 text-xs text-center font-mono text-[var(--text-main)] focus:outline-none focus:border-[var(--border-accent)]" />
+        <span class="text-[10px] text-[var(--text-subtle)]">°</span>
       </div>
 
       <!-- Group 6: Layer Order & Coordinates -->
@@ -1207,14 +1209,20 @@
       });
     }
 
+    // Any interactive edit made while viewing a specific artwork detaches that page
+    // from the shared master template - it becomes that page's own arrangement, and
+    // stops inheriting later master-template changes (use "revert to master" to undo).
+    // This prevents a spacing/font tweak meant for one artwork from silently mutating
+    // the shared template and shifting every other page that hasn't been customized.
     function syncActiveTemplateToSource() {
       const art = submissions[activeArtworkIndex];
       if (!art) return;
-      const isCustom = Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
-      if (isCustom) {
-        catalogConfig.pageOverrides[art.id] = JSON.parse(JSON.stringify(activeTemplate));
-      } else {
-        catalogConfig.masterTemplate = JSON.parse(JSON.stringify(activeTemplate));
+      if (!catalogConfig.pageOverrides) catalogConfig.pageOverrides = {};
+      const wasCustom = Boolean(catalogConfig.pageOverrides[art.id]);
+      catalogConfig.pageOverrides[art.id] = JSON.parse(JSON.stringify(activeTemplate));
+      if (!wasCustom) {
+        updateOverrideUI(true);
+        renderPagesDrawerList();
       }
     }
 
@@ -1265,6 +1273,7 @@
       if (fontGroup) fontGroup.style.display = isText ? 'flex' : 'none';
       if (sizeGroup) sizeGroup.style.display = isText ? 'flex' : 'none';
       if (alignGroup) alignGroup.style.display = isText ? 'flex' : 'none';
+      updateContrastBadge(isText ? (s.color || '#1F1C17') : null);
 
       // Image Box URL (image_box only)
       const isImageBox = block.type === 'image_box';
@@ -1301,11 +1310,86 @@
 
       // Rotation (all block types)
       const rotationInput = document.getElementById('insp-rotation');
-      const rotationVal = document.getElementById('insp-rotation-val');
-      if (rotationInput) {
-        rotationInput.value = s.rotationDeg || 0;
-        if (rotationVal) rotationVal.textContent = (s.rotationDeg || 0) + '°';
+      const rotationNumber = document.getElementById('insp-rotation-number');
+      if (rotationInput) rotationInput.value = s.rotationDeg || 0;
+      if (rotationNumber) rotationNumber.value = s.rotationDeg || 0;
+    }
+
+    // Rotation: slider drives quick eyeballing, number field takes an exact typed value -
+    // both stay in sync since a hand-dragged slider isn't precise enough on its own.
+    function updateRotationFromSlider(val) {
+      const deg = parseFloat(val) || 0;
+      document.getElementById('insp-rotation-number').value = deg;
+      updateSelectedBlockProp('rotationDeg', deg);
+    }
+
+    function updateRotationFromNumber(val) {
+      let deg = parseFloat(val);
+      if (isNaN(deg)) deg = 0;
+      deg = Math.max(-180, Math.min(180, deg));
+      document.getElementById('insp-rotation-number').value = deg;
+      document.getElementById('insp-rotation').value = deg;
+      updateSelectedBlockProp('rotationDeg', deg);
+    }
+
+    // ---------------------------------------------------------------------
+    // Readability: live WCAG contrast check between a text block's color and
+    // the page background, since a color picked in isolation can easily turn
+    // out unreadable once actually placed on the paper.
+    // ---------------------------------------------------------------------
+    function hexToRgbArr(hex) {
+      const m = String(hex || '').replace('#', '');
+      const full = m.length === 3 ? m.split('').map(c => c + c).join('') : m;
+      const num = parseInt(full, 16);
+      if (isNaN(num) || full.length !== 6) return [0, 0, 0];
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+
+    function relativeLuminance([r, g, b]) {
+      const chan = (c) => {
+        const v = c / 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      };
+      const [rl, gl, bl] = [chan(r), chan(g), chan(b)];
+      return 0.2126 * rl + 0.7152 * gl + 0.0722 * bl;
+    }
+
+    function contrastRatio(hexA, hexB) {
+      const lA = relativeLuminance(hexToRgbArr(hexA));
+      const lB = relativeLuminance(hexToRgbArr(hexB));
+      const lighter = Math.max(lA, lB);
+      const darker = Math.min(lA, lB);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    function updateContrastBadge(textColor) {
+      const badge = document.getElementById('insp-contrast-badge');
+      if (!badge) return;
+      if (!textColor) { badge.classList.add('hidden'); return; }
+      const ratio = contrastRatio(textColor, canvasBgColor);
+      badge.classList.remove('hidden');
+      badge.dataset.ratio = ratio.toFixed(2);
+      if (ratio >= 4.5) {
+        badge.textContent = '✓ ' + ratio.toFixed(1) + ':1 อ่านง่าย';
+        badge.className = 'px-1.5 py-0.5 corner-cut-4 text-[9px] font-mono font-bold cursor-pointer transition bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+      } else if (ratio >= 3) {
+        badge.textContent = '◐ ' + ratio.toFixed(1) + ':1 ค่อนข้างจาง';
+        badge.className = 'px-1.5 py-0.5 corner-cut-4 text-[9px] font-mono font-bold cursor-pointer transition bg-amber-500/15 text-amber-400 border border-amber-500/30';
+      } else {
+        badge.textContent = '⚠ ' + ratio.toFixed(1) + ':1 อ่านยาก - แก้';
+        badge.className = 'px-1.5 py-0.5 corner-cut-4 text-[9px] font-mono font-bold cursor-pointer transition bg-rose-500/15 text-rose-400 border border-rose-500/30 animate-pulse';
       }
+    }
+
+    function autoFixContrast() {
+      const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
+      if (!block) return;
+      // Whichever of pure black/white contrasts more against the current page
+      // background wins - always crosses the readable (4.5:1) threshold.
+      const bestColor = contrastRatio('#000000', canvasBgColor) >= contrastRatio('#FFFFFF', canvasBgColor) ? '#171C1A' : '#FFFFFF';
+      updateSelectedBlockProp('color', bestColor);
+      document.getElementById('insp-color-picker').value = bestColor;
+      showToast('ปรับสีตัวอักษรให้อ่านง่ายขึ้นแล้ว');
     }
 
     function updateSelectedBlockRadius(corner, val) {

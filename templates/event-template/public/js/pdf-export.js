@@ -605,9 +605,8 @@
         }
       }
 
-      if (!hasPageNumBlock && elem.showPageNum !== false) {
-        drawTextBlock(doc, (isTh ? 'หน้า' : 'Page') + ' ' + pageNum, PAGE_W_MM - 40, PAGE_H_MM - 16, 30, { fontFamily: 'Sarabun', fontSizePt: 7.5, color: tokens.sub, align: 'right' });
-      }
+      // No auto-injected footer here either - matches catalog.html: if there's no
+      // explicit page_number block, nothing is drawn.
     }
 
     if (!usedBlockLayout) {
@@ -654,9 +653,8 @@
         await drawCountryFlagChip(doc, item.nationality, ax, ay, { fontSizePt: 7.5, color: tokens.sub, isTh });
       }
 
-      if (elem.showPageNum !== false) {
-        drawTextBlock(doc, (isTh ? 'หน้า' : 'Page') + ' ' + pageNum, PAGE_W_MM - 40, PAGE_H_MM - 16, 30, { fontFamily: 'Sarabun', fontSizePt: 7.5, color: tokens.sub, align: 'right' });
-      }
+      // No auto-injected page number here either - only an explicit page_number
+      // block ever draws one, matching catalog.html.
     }
   }
 
