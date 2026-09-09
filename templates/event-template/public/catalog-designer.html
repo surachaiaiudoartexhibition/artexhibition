@@ -117,6 +117,16 @@
 
     <!-- Center Zone: Artwork Navigator & Page Switcher -->
     <div class="flex items-center gap-1.5 shrink-0">
+      <!-- Master Template Mode: design the shared default here. Editing it directly
+           affects every page still locked to it. Selecting any artwork below switches
+           back to page mode. -->
+      <button id="btn-edit-master" onclick="editMasterTemplate()" class="flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-bold transition border cursor-pointer" title="แก้ไขแม่แบบหลักที่ทุกหน้าใช้ร่วมกัน">
+        <span>🌐</span>
+        <span class="hidden md:inline">แม่แบบหลัก</span>
+      </button>
+
+      <div class="h-4 w-px bg-[var(--border-subtle)]"></div>
+
       <!-- Pager Pill -->
       <div class="flex items-center gap-1.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-2 py-1 corner-cut-6 text-xs shadow-inner">
         <button onclick="changeArtworkSample(-1)" class="w-6 h-6 corner-cut-4 hover:bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-main)] transition flex items-center justify-center cursor-pointer" title="ผลงานก่อนหน้า (Previous)">
@@ -139,11 +149,13 @@
 
     <!-- Right Zone: Mode Override, View Catalog, Save & Language -->
     <div class="flex items-center gap-2 shrink-0">
-      <!-- Page Override Mode Controls -->
+      <!-- Page Lock Controls: locked (🔒) pages always follow the master template and
+           can't be edited directly; unlocking (🔓) detaches this one page into its own
+           override so edits here never drift other pages that stayed locked. -->
       <div id="page-override-controls" class="flex items-center gap-1.5">
         <button id="btn-toggle-override" onclick="toggleCurrentPageOverride()" class="flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-semibold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)]">
-          <span id="override-icon">🔓</span>
-          <span id="override-text" class="hidden md:inline" data-i18n="designer_unlock_page">ปลดล็อคจัดเฉพาะหน้านี้</span>
+          <span id="override-icon">🔒</span>
+          <span id="override-text" class="hidden md:inline" data-i18n="designer_unlock_page">ล็อคตามแม่แบบหลัก (คลิกเพื่อปลดล็อค)</span>
         </button>
         <button id="btn-revert-master" onclick="revertCurrentPageToMaster()" class="text-[11px] text-[var(--text-muted)] hover:text-rose-400 hover:underline transition hidden cursor-pointer" data-i18n="designer_reset_master" title="ยกเลิกจัดเฉพาะหน้า คืนค่าแม่แบบหลัก">
           คืนค่าแม่แบบหลัก
@@ -314,7 +326,7 @@
     <!-- Group C: Mode Status Badge & Shortcut Hints -->
     <div class="hidden lg:flex items-center gap-2 shrink-0">
       <div id="canvas-mode-indicator" class="corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)]">
-        🌐 MASTER TEMPLATE
+        🔒 ตามแม่แบบหลัก
       </div>
       <span class="text-[10px] font-mono text-[var(--text-subtle)] hidden xl:inline">Ctrl+S เซฟ • Del ลบ • Ctrl+D ก๊อปปี้</span>
     </div>
@@ -519,6 +531,7 @@
     let catalogConfig = null;
     let submissions = [];
     let activeArtworkIndex = 0;
+    let isEditingMaster = false; // true = designing the shared master template itself
     let selectedBlockId = null;
     let zoomLevel = 100;
     let isDragging = false;
@@ -735,6 +748,7 @@
 
     function selectArtworkSample(idx) {
       activeArtworkIndex = idx;
+      isEditingMaster = false;
       const art = submissions[idx];
       if (!art) return;
 
@@ -742,53 +756,108 @@
       document.getElementById('artwork-sample-title').textContent = window.getField ? window.getField(art, 'title') : (art.title || '');
 
       const isCustom = Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
-      updateOverrideUI(isCustom);
-
       if (isCustom) {
         activeTemplate = JSON.parse(JSON.stringify(catalogConfig.pageOverrides[art.id]));
       } else {
         activeTemplate = JSON.parse(JSON.stringify(catalogConfig.masterTemplate));
       }
 
+      updateOverrideUI();
       renderCanvasBlocks();
       renderPagesDrawerList();
       deselectAllBlocks();
     }
 
-    function updateOverrideUI(isCustom) {
+    // Switches into Master Template mode: edits here go straight into the shared
+    // template that every locked page inherits. Picking any artwork above switches
+    // back out of this mode automatically (see selectArtworkSample).
+    function editMasterTemplate() {
+      isEditingMaster = true;
+      activeTemplate = JSON.parse(JSON.stringify(catalogConfig.masterTemplate));
+      updateOverrideUI();
+      renderCanvasBlocks();
+      renderPagesDrawerList();
+      deselectAllBlocks();
+    }
+
+    // Locked = this page has no override yet and simply mirrors the master template;
+    // it cannot be edited directly until explicitly unlocked. Editing the master
+    // template itself is never "locked".
+    function isCurrentPageLocked() {
+      if (isEditingMaster) return false;
+      const art = submissions[activeArtworkIndex];
+      if (!art) return false;
+      return !Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
+    }
+
+    // Guard placed at the start of every block-mutating action (drag, resize, inspector
+    // fields, keyboard shortcuts, add/delete/duplicate, presets) so a locked page can
+    // never silently drift from the master template it's supposed to be following.
+    function requireEditable() {
+      if (isCurrentPageLocked()) {
+        showToast('หน้านี้ล็อคตามแม่แบบหลักอยู่ - กด 🔒 เพื่อปลดล็อคก่อนจึงจะปรับแต่งเฉพาะหน้านี้ได้', true);
+        return false;
+      }
+      return true;
+    }
+
+    function updateOverrideUI() {
       const btnToggle = document.getElementById('btn-toggle-override');
       const btnRevert = document.getElementById('btn-revert-master');
       const indicator = document.getElementById('canvas-mode-indicator');
+      const inspectorBar = document.getElementById('block-inspector-bar');
+      const btnEditMaster = document.getElementById('btn-edit-master');
 
+      if (isEditingMaster) {
+        btnEditMaster.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-bold transition border cursor-pointer bg-[var(--color-accent-glow)] border-[var(--border-accent)] text-[var(--color-accent-light)] shadow-sm';
+        btnToggle.classList.add('hidden');
+        btnRevert.classList.add('hidden');
+        indicator.textContent = '🌐 กำลังแก้ไขแม่แบบหลัก';
+        indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)]';
+        if (inspectorBar) inspectorBar.classList.remove('pointer-events-none', 'opacity-50', 'grayscale');
+        return;
+      }
+
+      btnEditMaster.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-bold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)]';
+
+      const isCustom = isPageOverridden();
       if (isCustom) {
-        btnToggle.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-bold transition border cursor-pointer bg-[var(--color-accent-glow)] border-[var(--border-accent)] text-[var(--color-accent-light)] shadow-sm';
-        document.getElementById('override-icon').textContent = '✨';
-        document.getElementById('override-text').textContent = 'จัดเฉพาะหน้านี้ (Custom Page)';
+        btnToggle.classList.add('hidden');
         btnRevert.classList.remove('hidden');
-        indicator.textContent = '✨ CUSTOM PAGE #' + (activeArtworkIndex + 1);
-        indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)] animate-pulse';
+        indicator.textContent = '🔓 ปลดล็อค - หน้า #' + (activeArtworkIndex + 1);
+        indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--color-accent-glow)] border border-[var(--border-accent)] text-[var(--color-accent-light)]';
+        if (inspectorBar) inspectorBar.classList.remove('pointer-events-none', 'opacity-50', 'grayscale');
       } else {
         btnToggle.className = 'flex items-center gap-1.5 px-2.5 py-1.5 corner-cut-6 text-xs font-semibold transition border cursor-pointer bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--text-main)]';
-        document.getElementById('override-icon').textContent = '🔓';
-        document.getElementById('override-text').textContent = 'ปลดล็อคจัดเฉพาะหน้านี้';
+        document.getElementById('override-icon').textContent = '🔒';
+        document.getElementById('override-text').textContent = 'ล็อคตามแม่แบบหลัก (คลิกเพื่อปลดล็อค)';
         btnRevert.classList.add('hidden');
-        indicator.textContent = '🌐 MASTER TEMPLATE';
+        indicator.textContent = '🔒 ตามแม่แบบหลัก';
         indicator.className = 'corner-cut-4 px-2 py-0.5 text-[10px] font-mono font-bold bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)]';
+        if (inspectorBar) inspectorBar.classList.add('pointer-events-none', 'opacity-50', 'grayscale');
       }
     }
 
+    function isPageOverridden() {
+      const art = submissions[activeArtworkIndex];
+      if (!art) return false;
+      return Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
+    }
+
+    // The only place that detaches a page from the master template - a deliberate,
+    // explicit admin action, never a side-effect of an edit or a save.
     function toggleCurrentPageOverride() {
+      if (isEditingMaster) return;
       const art = submissions[activeArtworkIndex];
       if (!art) return;
 
-      const isCustom = Boolean(catalogConfig.pageOverrides && catalogConfig.pageOverrides[art.id]);
-      if (!isCustom) {
+      if (!isPageOverridden()) {
         if (!catalogConfig.pageOverrides) catalogConfig.pageOverrides = {};
         catalogConfig.pageOverrides[art.id] = JSON.parse(JSON.stringify(activeTemplate));
-        updateOverrideUI(true);
-        showToast('ปลดล็อคจัดเฉพาะหน้า #' + (activeArtworkIndex + 1) + ' เรียบร้อยแล้ว');
+        updateOverrideUI();
+        renderPagesDrawerList();
+        showToast('ปลดล็อคหน้า #' + (activeArtworkIndex + 1) + ' แล้ว ตอนนี้ปรับแต่งเฉพาะหน้านี้ได้');
       }
-      renderPagesDrawerList();
     }
 
     function revertCurrentPageToMaster() {
@@ -799,7 +868,8 @@
           delete catalogConfig.pageOverrides[art.id];
         }
         activeTemplate = JSON.parse(JSON.stringify(catalogConfig.masterTemplate));
-        updateOverrideUI(false);
+        deselectAllBlocks();
+        updateOverrideUI();
         renderCanvasBlocks();
         renderPagesDrawerList();
         showToast('คืนค่าหน้า #' + (activeArtworkIndex + 1) + ' กลับเป็นแม่แบบหลักแล้ว');
@@ -812,13 +882,14 @@
 
       const art = submissions[activeArtworkIndex] || {};
       const blocks = activeTemplate.blocks || [];
+      const locked = isCurrentPageLocked();
 
       blocks.forEach(block => {
         const el = document.createElement('div');
         el.id = 'blk-' + block.id;
-        el.className = 'absolute select-none cursor-move transition-shadow ' + (
-          selectedBlockId === block.id 
-            ? 'ring-2 ring-[var(--color-accent-gold)] z-50 bg-[var(--color-accent-glow)]' 
+        el.className = 'absolute select-none transition-shadow ' + (locked ? 'cursor-not-allowed' : 'cursor-move') + ' ' + (
+          selectedBlockId === block.id
+            ? 'ring-2 ring-[var(--color-accent-gold)] z-50 bg-[var(--color-accent-glow)]'
             : 'hover:ring-1 hover:ring-[var(--border-accent)]'
         );
         
@@ -1061,6 +1132,7 @@
     }
 
     function startDraggingBlock(e, block) {
+      if (!requireEditable()) return;
       isDragging = true;
       isResizing = false;
       dragStartX = e.clientX;
@@ -1069,6 +1141,7 @@
     }
 
     function startResizingBlock(e, block, handle) {
+      if (!requireEditable()) return;
       isResizing = true;
       isDragging = false;
       resizeHandle = handle;
@@ -1225,21 +1298,21 @@
       });
     }
 
-    // Any interactive edit made while viewing a specific artwork detaches that page
-    // from the shared master template - it becomes that page's own arrangement, and
-    // stops inheriting later master-template changes (use "revert to master" to undo).
-    // This prevents a spacing/font tweak meant for one artwork from silently mutating
-    // the shared template and shifting every other page that hasn't been customized.
+    // Writes the in-memory edit buffer back to whichever real config object it belongs
+    // to. In Master Template mode that's catalogConfig.masterTemplate directly. On a
+    // specific artwork page it's that page's own pageOverrides entry - but ONLY if the
+    // page was already explicitly unlocked (see toggleCurrentPageOverride). A locked
+    // page never gets an override created here: unlocking is the one deliberate action
+    // that detaches a page, never a side-effect of dragging a block or hitting save.
     function syncActiveTemplateToSource() {
+      if (isEditingMaster) {
+        catalogConfig.masterTemplate = JSON.parse(JSON.stringify(activeTemplate));
+        return;
+      }
       const art = submissions[activeArtworkIndex];
       if (!art) return;
-      if (!catalogConfig.pageOverrides) catalogConfig.pageOverrides = {};
-      const wasCustom = Boolean(catalogConfig.pageOverrides[art.id]);
+      if (!catalogConfig.pageOverrides || !catalogConfig.pageOverrides[art.id]) return;
       catalogConfig.pageOverrides[art.id] = JSON.parse(JSON.stringify(activeTemplate));
-      if (!wasCustom) {
-        updateOverrideUI(true);
-        renderPagesDrawerList();
-      }
     }
 
     function selectBlock(id) {
@@ -1409,6 +1482,7 @@
     }
 
     function updateSelectedBlockRadius(corner, val) {
+      if (!requireEditable()) return;
       const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
       if (!block) return;
       if (!block.style) block.style = {};
@@ -1426,6 +1500,7 @@
     }
 
     function updateSelectedBlockProp(prop, val) {
+      if (!requireEditable()) return;
       const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
       if (!block) return;
       if (!block.style) block.style = {};
@@ -1437,6 +1512,7 @@
     // Sets a top-level field on the block itself (not nested under .style) -
     // used for content-ish data like a custom image URL rather than a visual style.
     function updateSelectedBlockField(field, val) {
+      if (!requireEditable()) return;
       const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
       if (!block) return;
       block[field] = val;
@@ -1445,6 +1521,7 @@
     }
 
     function toggleSelectedBlockProp(prop, valA, valB) {
+      if (!requireEditable()) return;
       const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
       if (!block) return;
       if (!block.style) block.style = {};
@@ -1454,6 +1531,7 @@
     }
 
     function bringBlockToFront() {
+      if (!requireEditable()) return;
       const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
       if (!block) return;
       const maxZ = Math.max(0, ...activeTemplate.blocks.map(b => b.zIndex || 1));
@@ -1464,6 +1542,7 @@
     }
 
     function sendBlockToBack() {
+      if (!requireEditable()) return;
       const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
       if (!block) return;
       const minZ = Math.min(1, ...activeTemplate.blocks.map(b => b.zIndex || 1));
@@ -1474,6 +1553,7 @@
     }
 
     function changeBlockZIndex(delta) {
+      if (!requireEditable()) return;
       const block = activeTemplate.blocks.find(b => b.id === selectedBlockId);
       if (!block) return;
       block.zIndex = Math.max(0, (block.zIndex || 1) + delta);
@@ -1482,6 +1562,7 @@
     }
 
     function duplicateSelectedBlock() {
+      if (!requireEditable()) return;
       const src = activeTemplate.blocks.find(b => b.id === selectedBlockId);
       if (!src) return;
       const copy = JSON.parse(JSON.stringify(src));
@@ -1495,6 +1576,7 @@
     }
 
     function deleteSelectedBlock() {
+      if (!requireEditable()) return;
       if (!selectedBlockId) return;
       activeTemplate.blocks = activeTemplate.blocks.filter(b => b.id !== selectedBlockId);
       deselectAllBlocks();
@@ -1503,6 +1585,7 @@
     }
 
     function addBlockElement(type) {
+      if (!requireEditable()) return;
       const labels = {
         artwork_image: 'ภาพผลงาน',
         artwork_title: 'ชื่องานศิลปะ',
@@ -1548,6 +1631,7 @@
     }
 
     function applyPresetStyle(preset) {
+      if (!requireEditable()) return;
       if (preset === 'split') {
         activeTemplate.blocks = JSON.parse(JSON.stringify(DEFAULT_MASTER_BLOCKS));
       } else if (preset === 'hero') {
@@ -1643,16 +1727,36 @@
       const overrideCount = Object.keys(overrides).length;
       document.getElementById('drawer-override-count').textContent = overrideCount + ' หน้า';
 
+      // Master Template pseudo-page pinned at the top - not tied to any one artwork.
+      const masterItem = document.createElement('div');
+      masterItem.className = 'p-2 corner-cut-6 border transition flex items-center gap-3 cursor-pointer ' + (
+        isEditingMaster
+          ? 'bg-[var(--color-accent-glow)] border-[var(--border-accent)] ring-1 ring-[var(--border-accent)]'
+          : 'bg-[var(--bg-surface-elevated)] border-[var(--border-subtle)] hover:border-[var(--border-accent)]/50'
+      );
+      masterItem.innerHTML = `
+        <div class="w-12 h-16 corner-cut-4 border border-[var(--border-subtle)] shrink-0 flex items-center justify-center text-xl bg-black/20">🌐</div>
+        <div class="min-w-0 flex-1">
+          <h4 class="text-xs font-bold text-[var(--text-main)] truncate">แม่แบบหลัก (Master Template)</h4>
+          <p class="text-[11px] text-[var(--text-muted)] truncate mt-0.5">ใช้เป็นค่าเริ่มต้นของทุกหน้าที่ล็อคอยู่</p>
+        </div>
+      `;
+      masterItem.addEventListener('click', () => {
+        editMasterTemplate();
+        togglePagesDrawer();
+      });
+      container.appendChild(masterItem);
+
       submissions.forEach((art, idx) => {
-        const isActive = idx === activeArtworkIndex;
+        const isActive = !isEditingMaster && idx === activeArtworkIndex;
         const isCustom = Boolean(overrides[art.id]);
         const title = window.getField ? window.getField(art, 'title') : (art.title || 'Untitled');
         const imgUrl = art.thumbnail_url || art.image_url || '';
 
         const item = document.createElement('div');
         item.className = 'p-2 corner-cut-6 border transition flex items-center gap-3 cursor-pointer ' + (
-          isActive 
-            ? 'bg-[var(--color-accent-glow)] border-[var(--border-accent)] ring-1 ring-[var(--border-accent)]' 
+          isActive
+            ? 'bg-[var(--color-accent-glow)] border-[var(--border-accent)] ring-1 ring-[var(--border-accent)]'
             : isCustom
             ? 'bg-[var(--bg-surface-elevated)] border-[var(--border-accent)]/50 hover:border-[var(--border-accent)]'
             : 'bg-[var(--bg-surface-elevated)]/60 border-[var(--border-subtle)] hover:border-[var(--border-accent)]/50'
@@ -1666,10 +1770,10 @@
           <div class="min-w-0 flex-1">
             <div class="flex items-center justify-between gap-1">
               <h4 class="text-xs font-bold text-[var(--text-main)] truncate">${title}</h4>
-              ${isCustom ? `<span class="text-[9px] font-bold text-[var(--color-accent-light)] bg-[var(--color-accent-glow)] border border-[var(--border-accent)] px-1.5 py-0.2 corner-cut-4 shrink-0">✨ เฉพาะ</span>` : ''}
+              ${isCustom ? `<span class="text-[9px] font-bold text-[var(--color-accent-light)] bg-[var(--color-accent-glow)] border border-[var(--border-accent)] px-1.5 py-0.2 corner-cut-4 shrink-0">🔓 เฉพาะ</span>` : `<span class="text-[9px] font-bold text-[var(--text-subtle)] px-1.5 py-0.2 shrink-0">🔒</span>`}
             </div>
             <p class="text-[11px] text-[var(--text-muted)] truncate mt-0.5">${art.artist_name || ''}</p>
-            <span class="text-[9px] font-mono text-[var(--text-subtle)]">${isCustom ? 'Custom Layout' : 'Master Layout'}</span>
+            <span class="text-[9px] font-mono text-[var(--text-subtle)]">${isCustom ? 'Custom Layout' : 'Locked to Master'}</span>
           </div>
         `;
 
@@ -1686,11 +1790,18 @@
     // choice here, independent of a visitor's own TH/EN toggle on the live site.
     function updateCatalogLanguage(value) {
       catalogConfig.language = value || null;
-      syncActiveTemplateToSource();
       showToast(value ? ('ล็อกภาษาสูจิบัตรเป็น ' + (value === 'th' ? 'ไทย' : 'English') + ' แล้ว (บันทึกเพื่อยืนยัน)') : 'สูจิบัตรจะตามภาษาเว็บไซต์ (บันทึกเพื่อยืนยัน)');
     }
 
     async function saveDesignerLayout() {
+      // What gets persisted depends entirely on the current mode - never a guess:
+      // Master Template mode writes catalogConfig.masterTemplate (affects every page
+      // still locked to it); an unlocked page writes only its own pageOverrides entry;
+      // a locked page writes neither (syncActiveTemplateToSource no-ops for it), so
+      // "revert to master" then "save" reliably stays on the master template.
+      const savingMaster = isEditingMaster;
+      const savingCustomPage = !isEditingMaster && isPageOverridden();
+      const savedPageNum = activeArtworkIndex + 1;
       syncActiveTemplateToSource();
 
       try {
@@ -1709,7 +1820,7 @@
         const payload = {
           config: {
             ...catalogConfig,
-            masterTemplate: activeTemplate,
+            masterTemplate: catalogConfig.masterTemplate,
             pageOverrides: catalogConfig.pageOverrides || {},
             freeLayout: {
               theme: (canvasBgColor === '#13141c' || canvasBgColor === '#090a0d') ? 'luxury-dark' : (canvasBgColor === '#FFFFFF' ? 'fine-white' : 'heritage'),
@@ -1737,7 +1848,13 @@
           try {
             localStorage.setItem('catalog_layout_updated', Date.now().toString());
           } catch (_) {}
-          showToast('บันทึกเลย์เอาต์สูจิบัตรลงฐานข้อมูลเรียบร้อยแล้ว');
+          if (savingMaster) {
+            showToast('บันทึกทับแม่แบบหลักเรียบร้อยแล้ว (มีผลกับทุกหน้าที่ยังล็อคตามแม่แบบอยู่)');
+          } else if (savingCustomPage) {
+            showToast('บันทึกเป็นแม่แบบเฉพาะหน้า #' + savedPageNum + ' เรียบร้อยแล้ว (ไม่กระทบหน้าอื่น)');
+          } else {
+            showToast('บันทึกเรียบร้อยแล้ว');
+          }
         } else {
           showToast('บันทึกล้มเหลว: ' + (resJson.error || 'Unknown error'), true);
         }
