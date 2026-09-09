@@ -417,6 +417,7 @@
   </footer>
 
   <script src="/js/cloudinary-upload.js"></script>
+  <script src="/js/image-size.js"></script>
   <script src="/js/api.js"></script>
   <script>
     let allArtists = [];
@@ -630,7 +631,8 @@
         const validArtworks = (artist.artworks || []).filter(art => Boolean((art.thumbnail_url || art.image_url || '').trim()));
         const artThumbs = validArtworks.slice(0, 3).map(art => {
           const artTitle = window.getField(art, 'title');
-          const imgSrc = art.thumbnail_url || art.image_url;
+          const rawSrc = art.thumbnail_url || art.image_url;
+          const imgSrc = window.cloudinaryThumb ? window.cloudinaryThumb(rawSrc, 300) : rawSrc;
           return `
             <a href="/artwork.html?id=${art.id}" class="relative aspect-square corner-cut-8 overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-surface-solid)] group/art block" title="${artTitle}">
               <img src="${imgSrc}" alt="${artTitle}" class="w-full h-full object-cover group-hover/art:scale-110 transition-transform duration-300" onerror="this.parentElement.style.display='none';">
@@ -652,7 +654,7 @@
                 <div class="flex items-center gap-3 min-w-0">
                   ${hasAvatar ? `
                     <div class="relative w-14 h-14 corner-cut-12 overflow-hidden border-2 border-[var(--border-accent)] shadow-md shrink-0 bg-[var(--mat-bg)]">
-                      <img src="${artist.artist_avatar_url}" alt="${artistName}" class="w-full h-full object-cover">
+                      <img src="${window.cloudinaryThumb ? window.cloudinaryThumb(artist.artist_avatar_url, 150) : artist.artist_avatar_url}" alt="${artistName}" class="w-full h-full object-cover">
                     </div>
                   ` : ''}
                   <div class="min-w-0">
@@ -720,7 +722,7 @@
             <td class="py-3 px-4 sm:px-6">
               <div class="flex items-center gap-3">
                 ${hasAvatar ? `
-                  <img src="${artist.artist_avatar_url}" alt="" class="w-9 h-9 corner-cut-8 object-cover border border-[var(--border-accent)] shrink-0 bg-[var(--mat-bg)]">
+                  <img src="${window.cloudinaryThumb ? window.cloudinaryThumb(artist.artist_avatar_url, 100) : artist.artist_avatar_url}" alt="" class="w-9 h-9 corner-cut-8 object-cover border border-[var(--border-accent)] shrink-0 bg-[var(--mat-bg)]">
                 ` : ''}
                 <span class="font-semibold text-[var(--text-main)]">${artistName}</span>
               </div>
@@ -770,7 +772,7 @@
       const modalAvatar = document.getElementById('modal-avatar');
 
       if (hasAvatar) {
-        modalAvatar.src = artist.artist_avatar_url;
+        modalAvatar.src = window.cloudinaryThumb ? window.cloudinaryThumb(artist.artist_avatar_url, 250) : artist.artist_avatar_url;
         modalAvatar.classList.remove('hidden');
       } else {
         modalAvatar.src = '';
@@ -795,7 +797,7 @@
         const artPrice = parsePrice(art);
         return `
           <div class="p-3 corner-cut-12 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] flex gap-3 group/item">
-            <img src="${art.thumbnail_url || art.image_url}" alt="${artTitle}" class="w-20 h-20 corner-cut-8 object-cover border border-[var(--border-subtle)] shrink-0 bg-[var(--mat-bg)]">
+            <img src="${window.cloudinaryThumb ? window.cloudinaryThumb(art.thumbnail_url || art.image_url, 250) : (art.thumbnail_url || art.image_url)}" alt="${artTitle}" class="w-20 h-20 corner-cut-8 object-cover border border-[var(--border-subtle)] shrink-0 bg-[var(--mat-bg)]">
             <div class="min-w-0 flex flex-col justify-between">
               <div>
                 <h5 class="font-serif-luxury font-bold text-sm text-[var(--text-main)] truncate group-hover/item:text-[var(--color-accent-gold)] transition-colors">${artTitle}</h5>
@@ -860,7 +862,7 @@
       const hasAvatar = Boolean(artist.artist_avatar_url && artist.artist_avatar_url.trim() && !artist.artist_avatar_url.includes('unsplash.com'));
       const previewEl = document.getElementById('artist-edit-avatar-preview');
       if (hasAvatar) {
-        previewEl.src = artist.artist_avatar_url;
+        previewEl.src = window.cloudinaryThumb ? window.cloudinaryThumb(artist.artist_avatar_url, 250) : artist.artist_avatar_url;
         document.getElementById('artist-edit-avatar-status').textContent = 'มีรูปถ่ายแล้ว';
       } else {
         previewEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.artist_name || 'Artist')}&background=13141f&color=D4AF37&bold=true`;

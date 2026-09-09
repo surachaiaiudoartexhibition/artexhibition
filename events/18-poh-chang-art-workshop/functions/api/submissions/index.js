@@ -42,6 +42,12 @@ export async function onRequestGet(context) {
     const stmt = env.DB.prepare(query).bind(...params);
     const result = await stmt.all();
 
+    // Admin reads (curator dashboard, right after approving/rejecting something) must
+    // never be cached - they need to see their own change immediately. Public reads
+    // (every visitor loading the catalog/gallery) are safe to cache briefly: a change
+    // an admin makes shows up for the public within this window regardless, and a
+    // short shared window is what actually protects D1's daily row-read quota when
+    // many visitors hit the same page at once (e.g. an opening-day traffic spike).
     return new Response(JSON.stringify({
       success: true,
       submissions: result.results || [],
@@ -49,7 +55,9 @@ export async function onRequestGet(context) {
     }), {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-store, no-cache, must-revalidate"
+        "Cache-Control": isAdmin
+          ? "no-store, no-cache, must-revalidate"
+          : "public, max-age=30, s-maxage=30"
       }
     });
   } catch (err) {

@@ -239,6 +239,7 @@
     </div>
   </footer>
 
+  <script src="/js/image-size.js"></script>
   <script src="/js/api.js"></script>
   <script>
     let currentArt = null;
@@ -314,8 +315,9 @@
 
       // Images
       const img = document.getElementById("artwork-image");
-      img.src = art.image_url;
+      img.src = window.cloudinaryFull ? window.cloudinaryFull(art.image_url, 2000) : art.image_url;
       img.alt = title;
+      // "Raw" link intentionally links the untransformed original, not the display copy.
       document.getElementById("artwork-raw-link").href = art.image_url;
 
       // Artist Info
@@ -325,7 +327,7 @@
 
       const avatarEl = document.getElementById("artist-avatar");
       if (art.artist_avatar_url && art.artist_avatar_url.trim() && !art.artist_avatar_url.includes('unsplash.com')) {
-        avatarEl.src = art.artist_avatar_url;
+        avatarEl.src = window.cloudinaryThumb ? window.cloudinaryThumb(art.artist_avatar_url, 150) : art.artist_avatar_url;
         avatarEl.classList.remove("hidden");
       } else {
         avatarEl.classList.add("hidden");

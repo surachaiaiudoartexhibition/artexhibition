@@ -12,10 +12,15 @@ export async function onRequestGet(context) {
     masterPortalUrl: env.MASTER_PORTAL_URL || ""
   };
 
+  // Pure env-var config (no D1 read at all) that every page loads on every visit -
+  // a short edge cache here cuts Pages Functions invocations for free, with no
+  // staleness risk worth worrying about: these values only change when an admin
+  // edits Cloudflare Pages' own environment variables, which is rare and doesn't
+  // need to be reflected within seconds.
   return new Response(JSON.stringify(publicConfig), {
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "no-store, no-cache, must-revalidate"
+      "Cache-Control": "public, max-age=60, s-maxage=60"
     }
   });
 }
