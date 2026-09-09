@@ -207,7 +207,7 @@ async function runBatchImport() {
     INSERT INTO submissions (
       title, artist_name, description,
       image_url, thumbnail_url,
-      artist_avatar_url, artist_bio,
+      artist_avatar_url, artist_bio, artist_email,
       nationality, technique, dimensions,
       year_created, price, status, display_order,
       title_th, artist_name_th, artist_bio_th,
@@ -215,7 +215,7 @@ async function runBatchImport() {
     ) VALUES (
       ?, ?, ?,
       ?, ?,
-      ?, ?,
+      ?, ?, ?,
       ?, ?, ?,
       ?, ?, ?, ?,
       ?, ?, ?,
@@ -240,6 +240,7 @@ async function runBatchImport() {
     let price = '-';
     let bio = '-';
     let concept = '-';
+    let email = '-';
 
     for (const [k, v] of Object.entries(row)) {
       const val = cleanDash(v);
@@ -254,7 +255,12 @@ async function runBatchImport() {
       else if (['price', 'ราคา'].includes(ck)) price = val;
       else if (['bio', 'ประวัติ', 'ประวัติศิลปิน'].includes(ck)) bio = val;
       else if (['concept', 'description', 'แนวคิด', 'คำอธิบาย'].includes(ck)) concept = val;
+      else if (['email', 'artistemail', 'อีเมล', 'อีเมล์'].includes(ck)) email = val;
     }
+
+    // Never carry the placeholder dash into a real email column - the catalog hides
+    // the email block whenever artist_email is empty, so leave it truly blank instead.
+    if (email === '-') email = '';
 
     if (artworkTitle === '-' && artistName === '-') continue;
 
@@ -343,6 +349,7 @@ async function runBatchImport() {
       finalArtworkUrl,
       finalArtistAvatar,
       bio,
+      email,
       nationality,
       medium,
       dimensions,
@@ -361,6 +368,7 @@ async function runBatchImport() {
     console.log(`  [OK #${successCount}] "${artworkTitle}" โดย ${artistName}`);
     console.log(`         🎨 รูปผลงาน : ${matchedArtworkPath ? path.basename(matchedArtworkPath) + ' [' + artworkMatchMethod + ']' : 'ภาพตัวอย่างนิทรรศการ'}`);
     console.log(`         👤 รูปศิลปิน : ${matchedArtistPath ? path.basename(matchedArtistPath) + ' [' + artistMatchMethod + ']' : 'ภาพตัวอย่างนิทรรศการ'}`);
+    console.log(`         ✉️  อีเมล    : ${email || '(ไม่มีในตาราง - จะไม่แสดงกล่องอีเมลในสูจิบัตร)'}`);
   }
 
   console.log('\\n' + '='.repeat(72));

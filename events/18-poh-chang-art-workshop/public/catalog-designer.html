@@ -997,7 +997,7 @@
         case 'artist_email':
           return `
             <div class="w-full h-full flex items-center ${textAlign}" style="${fontSize} color: ${color};">
-              <span class="${fontFam} ${fontWt} truncate">✉️ ${email || 'artist@email.com'}</span>
+              <span class="${fontFam} ${fontWt} truncate">${email || 'artist@email.com'}</span>
             </div>
           `;
 

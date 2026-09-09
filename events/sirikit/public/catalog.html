@@ -1107,7 +1107,7 @@
               if (elem.showEmail === false || !item.artist_email) return '';
               return `
                 <div class="cat-free-block ${textAlign}" style="${posStyle}">
-                  <span class="${fontFam} ${fontWt} text-xs truncate block" style="${customInlineStyle}">✉️ ${item.artist_email}</span>
+                  <span class="${fontFam} ${fontWt} text-xs truncate block" style="${customInlineStyle}">${item.artist_email}</span>
                 </div>
               `;
             }
