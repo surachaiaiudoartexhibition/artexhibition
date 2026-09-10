@@ -153,7 +153,7 @@
 
         <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Skeleton Loading -->
-          <div class="event-card rounded-3xl p-6 animate-pulse">
+          <div class="event-card rounded-2xl p-6 animate-pulse">
             <div class="h-44 bg-[#F4EFE6] rounded-2xl mb-4"></div>
             <div class="h-5 bg-[#F4EFE6] rounded w-3/4 mb-3"></div>
             <div class="h-4 bg-[#F4EFE6] rounded w-1/2 mb-6"></div>
@@ -661,73 +661,55 @@
         const worksSuffix = window.t('event_artworks_count_suffix');
 
         const card = document.createElement("div");
-        card.className = "event-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group shadow-xs";
+        card.className = "event-card rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 group";
 
         card.innerHTML = `
           <div>
-            <!-- Header badge & count -->
-            <div class="flex items-center justify-between mb-4">
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold bg-[#FAF3E3] text-[#8C6D2D] border border-[#E5D5B2]">
-                ${ev.event_id}
-              </span>
-              <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#EBF2EE] text-[#1F3128] border border-[#C8DBD2]">
-                ${worksCount} ${worksSuffix}
-              </span>
+            <!-- Preview strip, flush to the card edge -->
+            <div id="preview-strip-${ev.event_id}" class="grid grid-cols-3 gap-px h-28 overflow-hidden bg-[#E8E0D2]">
+              <div class="bg-[#F4EFE6] animate-pulse"></div>
+              <div class="bg-[#F4EFE6] animate-pulse"></div>
+              <div class="bg-[#F4EFE6] animate-pulse"></div>
             </div>
 
-            <!-- Event Title -->
-            <h3 class="text-xl sm:text-2xl font-normal text-[#171C1A] font-serif-luxury group-hover:text-[#9A7833] transition leading-snug">
-              ${title}
-            </h3>
+            <div class="p-6 sm:p-7">
+              <!-- Meta row: plain text, no badges -->
+              <div class="flex items-center justify-between text-[10px] font-mono text-[#9A7833] tracking-wide mb-3">
+                <span>${ev.event_id}</span>
+                <span>${worksCount} ${worksSuffix}</span>
+              </div>
 
-            <p class="text-xs text-[#64736C] mt-2 font-light leading-relaxed line-clamp-2">
-              ${desc}
-            </p>
+              <!-- Event Title -->
+              <h3 class="text-xl font-normal text-[#171C1A] font-serif-luxury group-hover:text-[#9A7833] transition leading-snug">
+                ${title}
+              </h3>
 
-            <!-- Preview Artwork Collage Container -->
-            <div id="preview-strip-${ev.event_id}" class="mt-5 grid grid-cols-3 gap-2.5 h-24 overflow-hidden rounded-xl bg-[#F4EFE6] border border-[#E8E0D2]">
-              <div class="bg-[#E8E0D2]/60 rounded-lg animate-pulse"></div>
-              <div class="bg-[#E8E0D2]/60 rounded-lg animate-pulse"></div>
-              <div class="bg-[#E8E0D2]/60 rounded-lg animate-pulse"></div>
+              <p class="text-xs text-[#64736C] mt-2 font-light leading-relaxed line-clamp-2">
+                ${desc}
+              </p>
             </div>
           </div>
 
-          <!-- Actions -->
-          <div class="mt-6 pt-5 border-t border-[#E8E0D2] flex flex-col gap-2.5">
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="selectEvent('${ev.event_id}')"
-                class="min-h-[44px] py-2.5 px-3 rounded-xl bg-[#1A2822] hover:bg-[#273B32] text-white font-semibold text-xs text-center border border-[#1A2822] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
-                <svg class="w-3.5 h-3.5 text-[#E8C87A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                </svg>
-                <span>${window.t('btn_view_details')}</span>
-              </button>
-
-              <a href="/gallery-3d.html?event_id=${encodeURIComponent(ev.event_id)}"
-                class="min-h-[44px] py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs text-center shadow-md shadow-[#C5A059]/20 transition flex items-center justify-center gap-1.5 cursor-pointer">
-                <svg class="w-3.5 h-3.5 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
-                </svg>
-                <span>${window.t('nav_3d_gallery')}</span>
-              </a>
-            </div>
-
-            <!-- E-Catalogue Companion Action Button -->
-            <button onclick="openGlobalCatalogModal('${ev.catalog_url}', '${title.replace(/'/g, "\\'")}')"
-              class="w-full min-h-[44px] py-2.5 px-3 rounded-xl bg-[#FAF3E3] hover:bg-[#F5ECD5] text-[#8C6D2D] font-semibold text-xs border border-[#E5D5B2] transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer">
-              <svg class="w-3.5 h-3.5 text-[#9A7833]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              <span>${window.t('modal_btn_catalog')}</span>
+          <!-- Actions: one primary button, the rest as plain text links -->
+          <div class="px-6 sm:px-7 pb-6 sm:pb-7 pt-5 border-t border-[#E8E0D2] flex flex-col gap-3.5">
+            <button onclick="selectEvent('${ev.event_id}')"
+              class="w-full py-2.5 rounded-lg bg-[#1A2822] hover:bg-[#273B32] text-white font-medium text-xs text-center transition cursor-pointer">
+              ${window.t('btn_view_details')}
             </button>
 
-            <a href="${ev.portal_url}" target="_blank" rel="noopener"
-              class="text-[11px] text-[#64736C] hover:text-[#9A7833] text-center transition flex items-center justify-center gap-1 py-0.5">
-              <span>${window.t('nav_event_webapp')}</span>
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
+            <div class="flex items-center justify-center gap-4 text-[11px] text-[#64736C]">
+              <a href="/gallery-3d.html?event_id=${encodeURIComponent(ev.event_id)}" class="hover:text-[#9A7833] transition">
+                ${window.t('nav_3d_gallery')}
+              </a>
+              <span class="text-[#E8E0D2]">&bull;</span>
+              <button onclick="openGlobalCatalogModal('${ev.catalog_url}', '${title.replace(/'/g, "\\'")}')" class="hover:text-[#9A7833] transition cursor-pointer">
+                ${window.t('modal_btn_catalog')}
+              </button>
+              <span class="text-[#E8E0D2]">&bull;</span>
+              <a href="${ev.portal_url}" target="_blank" rel="noopener" class="hover:text-[#9A7833] transition">
+                ${window.t('nav_event_webapp')}
+              </a>
+            </div>
           </div>
         `;
 
@@ -974,59 +956,48 @@
         );
 
         const card = document.createElement("div");
-        card.className = "bg-white rounded-2xl overflow-hidden hover:border-[#C5A059] hover:shadow-xl hover:shadow-[#C5A059]/15 transition-all duration-300 group flex flex-col border border-[#E8E0D2] shadow-xs";
+        card.className = "bg-white rounded-xl overflow-hidden hover:border-[#C5A059] transition-all duration-300 group flex flex-col border border-[#E8E0D2]";
 
         card.innerHTML = `
-          <!-- Artwork Image Display with Clean Light Curatorial Surface -->
-          <div class="relative aspect-[4/3] bg-[#F7F4EC] p-3 sm:p-4 flex items-center justify-center overflow-hidden border-b border-[#E8E0D2]">
-            <!-- Top Badges Overlay -->
-            <div class="absolute top-2.5 inset-x-2.5 flex items-center justify-between z-10 pointer-events-none gap-2">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#1A2822]/90 text-[#E8C87A] border border-[#C5A059]/40 backdrop-blur-xs flex items-center gap-1.5 shadow-xs truncate max-w-[180px]">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0"></span>
-                <span class="truncate">${zone}</span>
-              </span>
-              ${year ? `
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-[#1A2822]/90 text-[#C8DBD2] border border-[#355246] backdrop-blur-xs shadow-xs shrink-0">
-                  ${year}
-                </span>
-              ` : ''}
-            </div>
-
+          <!-- Artwork Image: flush to the card edge -->
+          <div class="aspect-[4/3] overflow-hidden bg-[#F7F4EC]">
             <img src="${imageUrl}" alt="${title}" data-raw-src="${rawImageUrl}" onerror="window.cloudinaryFallback && window.cloudinaryFallback(this, this.dataset.rawSrc)"
                  onclick="openArtworkDetailModal('${art.global_id}')"
-                 class="max-h-full max-w-full object-contain rounded-xs drop-shadow-[0_4px_16px_rgba(0,0,0,0.08)] group-hover:scale-[1.03] transition-transform duration-500 ease-out cursor-pointer" loading="lazy">
+                 class="w-full h-full object-cover cursor-pointer group-hover:scale-[1.02] transition-transform duration-500 ease-out" loading="lazy">
           </div>
 
-          <!-- Card Museum Plaque Content -->
-          <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-white">
-            <div class="space-y-1.5">
-              <!-- Title: 2 lines max, no abrupt truncation -->
-              <h3 onclick="openArtworkDetailModal('${art.global_id}')" 
-                  class="font-serif-luxury text-lg sm:text-xl text-[#171C1A] group-hover:text-[#9A7833] transition line-clamp-2 leading-snug font-medium cursor-pointer" 
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <!-- Zone & year: plain text, no badges -->
+              <div class="flex items-center justify-between text-[10px] font-mono text-[#9A7833] tracking-wide mb-2">
+                <span class="truncate">${zone}</span>
+                ${year ? `<span class="shrink-0">${year}</span>` : ''}
+              </div>
+
+              <h3 onclick="openArtworkDetailModal('${art.global_id}')"
+                  class="font-serif-luxury text-lg text-[#171C1A] group-hover:text-[#9A7833] transition line-clamp-2 leading-snug cursor-pointer"
                   title="${title}">
                 ${title}
               </h3>
 
-              <!-- Technique & Dimensions: crisp contrast, no orphan '-' -->
-              <div class="text-xs text-[#4A5852] font-normal leading-relaxed">
+              <div class="text-xs text-[#64736C] font-light mt-1.5 leading-relaxed">
                 ${technique ? `<span>${technique}</span>` : '<span>ภาพพิมพ์และสื่อผสมร่วมสมัย</span>'}
-                ${dimensions ? `<span class="text-[#9A7833] mx-1.5 font-bold">&bull;</span><span class="font-mono text-[#5C6E66]">${dimensions}</span>` : ''}
+                ${dimensions ? `<span class="mx-1.5 text-[#E8E0D2]">&bull;</span><span class="font-mono">${dimensions}</span>` : ''}
               </div>
 
-              <!-- Curatorial Statement Excerpt (only if real text exists) -->
               ${desc ? `
-                <p class="text-xs text-[#5C6E66] font-light leading-relaxed line-clamp-2 italic pt-1.5 border-t border-[#E8E0D2]/50 mt-1.5" title="${desc}">
+                <p class="text-xs text-[#64736C] font-light leading-relaxed line-clamp-2 italic mt-2" title="${desc}">
                   "${desc}"
                 </p>
               ` : ''}
             </div>
 
-            <div class="mt-4 pt-3.5 border-t border-[#E8E0D2] space-y-3">
+            <div class="mt-4 pt-4 border-t border-[#E8E0D2]">
               <!-- Artist Profile Row: Shows photo only if real portrait exists, otherwise clean icon/text -->
               <div class="flex items-center gap-2.5">
                 ${hasRealAvatar ? `
                   <img src="${window.cloudinaryThumb ? window.cloudinaryThumb(art.artist_avatar_url, 100) : art.artist_avatar_url}" alt="${artistName}" data-raw-src="${art.artist_avatar_url}" onerror="window.cloudinaryFallback && window.cloudinaryFallback(this, this.dataset.rawSrc)"
-                       class="w-8 h-8 rounded-full object-cover border border-[#C5A059]/50 shrink-0 shadow-2xs">
+                       class="w-8 h-8 rounded-full object-cover shrink-0">
                 ` : `
                   <span class="text-[#9A7833] shrink-0 opacity-80">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1046,23 +1017,14 @@
                 </div>
               </div>
 
-              <!-- Action Buttons Row: 2 Clean, Balanced Buttons -->
-              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#E8E0D2]/60">
-                <button onclick="openArtworkDetailModal('${art.global_id}')"
-                  class="min-h-[38px] py-1.5 px-2 rounded-xl border border-[#C5A059]/60 hover:border-[#C5A059] bg-[#FAF3E3]/80 hover:bg-[#FAF3E3] text-[#8C6D2D] hover:text-[#6D531F] text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs whitespace-nowrap">
-                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <span>ดูรายละเอียด</span>
+              <!-- Actions: plain text links -->
+              <div class="flex items-center gap-4 mt-3 text-[11px] text-[#64736C]">
+                <button onclick="openArtworkDetailModal('${art.global_id}')" class="hover:text-[#9A7833] transition cursor-pointer">
+                  ดูรายละเอียด
                 </button>
-
-                <a href="/gallery-3d.html?event_id=${encodeURIComponent(currentEventId || art.event_id)}"
-                   class="min-h-[38px] py-1.5 px-2 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#A38038] text-[#141E19] font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5 whitespace-nowrap">
-                  <svg class="w-3.5 h-3.5 shrink-0 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
-                  </svg>
-                  <span>ห้องจัดแสดง 3D</span>
+                <span class="text-[#E8E0D2]">&bull;</span>
+                <a href="/gallery-3d.html?event_id=${encodeURIComponent(currentEventId || art.event_id)}" class="hover:text-[#9A7833] transition">
+                  ห้องจัดแสดง 3D
                 </a>
               </div>
             </div>
