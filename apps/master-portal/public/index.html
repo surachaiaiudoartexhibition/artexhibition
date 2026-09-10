@@ -53,6 +53,48 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    /* Icon-only action links: hover/focus bubble shows the label */
+    .icon-tip {
+      position: relative;
+    }
+    .icon-tip::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      white-space: nowrap;
+      background: #1A2822;
+      color: #F4EFE6;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 8px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 20;
+    }
+    .icon-tip::before {
+      content: "";
+      position: absolute;
+      bottom: calc(100% + 3px);
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #1A2822;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 20;
+    }
+    .icon-tip:hover::after, .icon-tip:focus-visible::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .icon-tip:hover::before, .icon-tip:focus-visible::before {
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="min-h-full flex flex-col selection:bg-[#C5A059] selection:text-[#1A2822] bg-[#FBF9F4] text-[#171C1A]">
@@ -697,24 +739,19 @@
               ${window.t('btn_view_details')}
             </button>
 
-            <div class="flex items-center justify-center gap-4 text-[11px] text-[#64736C]">
-              <a href="/gallery-3d.html?event_id=${encodeURIComponent(ev.event_id)}" class="flex items-center gap-1.5 hover:text-[#9A7833] transition">
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center justify-center gap-5 text-[#64736C]">
+              <a href="/gallery-3d.html?event_id=${encodeURIComponent(ev.event_id)}" class="icon-tip hover:text-[#9A7833] transition" data-tip="${window.t('nav_3d_gallery')}" aria-label="${window.t('nav_3d_gallery')}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
                 </svg>
-                <span>${window.t('nav_3d_gallery')}</span>
               </a>
-              <span class="text-[#E8E0D2]">&bull;</span>
-              <button onclick="openGlobalCatalogModal('${ev.catalog_url}', '${title.replace(/'/g, "\\'")}')" class="flex items-center gap-1.5 hover:text-[#9A7833] transition cursor-pointer">
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button onclick="openGlobalCatalogModal('${ev.catalog_url}', '${title.replace(/'/g, "\\'")}')" class="icon-tip hover:text-[#9A7833] transition cursor-pointer" data-tip="${window.t('modal_btn_catalog')}" aria-label="${window.t('modal_btn_catalog')}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
-                <span>${window.t('modal_btn_catalog')}</span>
               </button>
-              <span class="text-[#E8E0D2]">&bull;</span>
-              <a href="${ev.portal_url}" target="_blank" rel="noopener" class="flex items-center gap-1.5 hover:text-[#9A7833] transition">
-                <span>${window.t('nav_event_webapp')}</span>
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="${ev.portal_url}" target="_blank" rel="noopener" class="icon-tip hover:text-[#9A7833] transition" data-tip="${window.t('nav_event_webapp')}" aria-label="${window.t('nav_event_webapp')}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </a>
@@ -1026,21 +1063,18 @@
                 </div>
               </div>
 
-              <!-- Actions: plain text links with small inline icons -->
-              <div class="flex items-center gap-4 mt-3 text-[11px] text-[#64736C]">
-                <button onclick="openArtworkDetailModal('${art.global_id}')" class="flex items-center gap-1.5 hover:text-[#9A7833] transition cursor-pointer">
-                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- Actions: icon-only links, label shown as a hover/focus bubble -->
+              <div class="flex items-center gap-4 mt-3 text-[#64736C]">
+                <button onclick="openArtworkDetailModal('${art.global_id}')" class="icon-tip hover:text-[#9A7833] transition cursor-pointer" data-tip="ดูรายละเอียด" aria-label="ดูรายละเอียด">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
-                  <span>ดูรายละเอียด</span>
                 </button>
-                <span class="text-[#E8E0D2]">&bull;</span>
-                <a href="/gallery-3d.html?event_id=${encodeURIComponent(currentEventId || art.event_id)}" class="flex items-center gap-1.5 hover:text-[#9A7833] transition">
-                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="/gallery-3d.html?event_id=${encodeURIComponent(currentEventId || art.event_id)}" class="icon-tip hover:text-[#9A7833] transition" data-tip="ห้องจัดแสดง 3D" aria-label="ห้องจัดแสดง 3D">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
                   </svg>
-                  <span>ห้องจัดแสดง 3D</span>
                 </a>
               </div>
             </div>
