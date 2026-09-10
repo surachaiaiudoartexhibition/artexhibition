@@ -59,7 +59,7 @@
 
   <!-- Hero Section -->
   <main class="flex-1">
-    <section class="relative py-24 sm:py-32 overflow-hidden border-b border-white/[0.06]">
+    <section class="relative py-24 sm:py-32 overflow-hidden border-b border-[var(--border-subtle)]">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
         <!-- Dignified Curatorial Kicker (No generic pill / no pulsing dot) -->
         <div class="text-[11px] font-mono tracking-[0.25em] text-[#C5A059] uppercase mb-5 font-normal">
@@ -651,8 +651,8 @@
         if (!data.submissions || data.submissions.length === 0) {
           container.innerHTML = `
             <div class="col-span-full text-center py-16 gallery-surface rounded-sm">
-              <p class="text-stone-400 font-light">${window.t('empty_gallery')}</p>
-              <a href="/submit.html" class="inline-block mt-4 text-[#d4af37] hover:underline text-sm font-medium tracking-wide">${window.t('btn_submit_cta')}</a>
+              <p class="text-[var(--text-muted)] font-light">${window.t('empty_gallery')}</p>
+              <a href="/submit.html" class="inline-block mt-4 text-[#9A7833] hover:underline text-sm font-medium tracking-wide">${window.t('btn_submit_cta')}</a>
             </div>
           `;
           return;
@@ -679,8 +679,8 @@
         console.error("Preview load error:", err);
         container.innerHTML = `
           <div class="col-span-full text-center py-16 gallery-surface rounded-sm space-y-3">
-            <p class="text-stone-400 font-light text-sm">${window.i18n.getLang() === 'th' ? 'ไม่สามารถโหลดผลงานเด่นได้ชั่วคราว' : 'Unable to load curatorial highlights at this moment.'}</p>
-            <button onclick="loadHighlights()" class="px-4 py-2 rounded-sm border border-[#c5a059]/40 text-[#e2c792] hover:bg-[#c5a059]/10 text-xs tracking-wider uppercase transition cursor-pointer">
+            <p class="text-[var(--text-muted)] font-light text-sm">${window.i18n.getLang() === 'th' ? 'ไม่สามารถโหลดผลงานเด่นได้ชั่วคราว' : 'Unable to load curatorial highlights at this moment.'}</p>
+            <button onclick="loadHighlights()" class="px-4 py-2 rounded-sm border border-[#c5a059]/40 text-[#9A7833] hover:bg-[#c5a059]/10 text-xs tracking-wider uppercase transition cursor-pointer">
               ${window.i18n.getLang() === 'th' ? 'ลองใหม่อีกครั้ง (Retry)' : 'Retry'}
             </button>
           </div>
