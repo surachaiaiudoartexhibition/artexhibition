@@ -34,14 +34,28 @@
     return applyTransform(url, `f_auto,q_auto,w_${maxWidth || 2000},c_limit`);
   };
 
+  // Strips any existing transform segment, guaranteeing a genuinely bare URL.
+  // Needed because the stored image_url/thumbnail_url/artist_avatar_url values
+  // themselves now already carry a transform (the D1 rows were fixed directly) -
+  // so a caller's "raw" variable is often actually that SAME transformed URL, not
+  // a true original. Falling back to it would just retry the exact URL that just
+  // failed and do nothing. cloudinaryFallback always strips first so it can never
+  // fall back to a broken transform by accident, no matter what the caller passes.
+  function stripTransform(url) {
+    if (!url || typeof url !== 'string') return url;
+    if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+    return url.replace(/\/upload\/[a-z_]+_[^/]+\//, '/upload/');
+  }
+  window.cloudinaryRaw = stripTransform;
+
   // Some Cloudinary accounts have "Strict Transformations" enabled (blocks any
-  // on-the-fly transform that wasn't pre-approved) - confirmed live on one of this
-  // project's own events, where a transformed URL 404s even though the original
-  // loads fine. Every <img> using the helpers above must wire this in as its
-  // onerror handler so a blocked/failed transform degrades to the original image
-  // instead of breaking, regardless of which account or reason caused the failure.
-  window.cloudinaryFallback = function (el, rawUrl) {
+  // on-the-fly transform that wasn't pre-approved), or show other intermittent
+  // failures on transformed URLs even though the bare original loads fine -
+  // confirmed live on this project's own accounts. Every <img> using the helpers
+  // above must wire this in as its onerror handler so a blocked/failed transform
+  // degrades to the real original image instead of breaking.
+  window.cloudinaryFallback = function (el, url) {
     el.onerror = null;
-    el.src = rawUrl;
+    el.src = stripTransform(url);
   };
 })();
