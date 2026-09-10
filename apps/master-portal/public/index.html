@@ -785,7 +785,7 @@
           img.src = window.cloudinaryThumb ? window.cloudinaryThumb(raw, 300) : raw;
           img.onerror = () => window.cloudinaryFallback && window.cloudinaryFallback(img, raw);
           img.alt = art.title;
-          img.className = "w-full h-full object-cover rounded-lg";
+          img.className = "w-full h-full object-cover object-top rounded-lg";
           img.loading = "lazy";
           strip.appendChild(img);
         });
@@ -1009,7 +1009,7 @@
           <div class="aspect-[4/3] overflow-hidden bg-[#F7F4EC]">
             <img src="${imageUrl}" alt="${title}" data-raw-src="${rawImageUrl}" onerror="window.cloudinaryFallback && window.cloudinaryFallback(this, this.dataset.rawSrc)"
                  onclick="openArtworkDetailModal('${art.global_id}')"
-                 class="w-full h-full object-cover cursor-pointer group-hover:scale-[1.02] transition-transform duration-500 ease-out" loading="lazy">
+                 class="w-full h-full object-cover object-top cursor-pointer group-hover:scale-[1.02] transition-transform duration-500 ease-out" loading="lazy">
           </div>
 
           <div class="p-5 flex-1 flex flex-col justify-between">
@@ -1056,7 +1056,7 @@
                     ${artistName}
                   </span>
                   ${nationality ? `
-                    <span class="text-[11px] text-[#7A8B84] truncate block mt-0.5">${nationality}</span>
+                    <span class="block mt-0.5">${window.getCountryFlagBadge ? window.getCountryFlagBadge(nationality, { size: 'xs' }) : `<span class="text-[11px] text-[#7A8B84]">${nationality}</span>`}</span>
                   ` : `
                     <span class="text-[10px] font-mono text-[#9A7833] tracking-wider block mt-0.5">ARTIST</span>
                   `}
@@ -1260,7 +1260,10 @@
       }
 
       document.getElementById("detail-art-artist-name").textContent = artistName;
-      document.getElementById("detail-art-artist-nationality").textContent = nationality;
+      const modalNationalityEl = document.getElementById("detail-art-artist-nationality");
+      modalNationalityEl.innerHTML = nationality
+        ? (window.getCountryFlagBadge ? window.getCountryFlagBadge(nationality, { size: 'sm' }) : nationality)
+        : "";
 
       document.getElementById("detail-art-btn-3d").href = `/gallery-3d.html?event_id=${encodeURIComponent(currentEventId)}`;
 

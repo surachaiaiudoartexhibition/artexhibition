@@ -314,7 +314,7 @@
           img.src = window.cloudinaryThumb ? window.cloudinaryThumb(raw, 300) : raw;
           img.onerror = () => window.cloudinaryFallback && window.cloudinaryFallback(img, raw);
           img.alt = art.title;
-          img.className = "w-full h-full object-cover rounded-lg";
+          img.className = "w-full h-full object-cover object-top rounded-lg";
           img.loading = "lazy";
           strip.appendChild(img);
         });

@@ -561,3 +561,550 @@ window.formatPrice = (val, lang) => window.i18n.formatPrice(val, lang);
 document.addEventListener('DOMContentLoaded', () => {
   window.i18n.apply();
 });
+
+// ==========================================
+// Country Flag Detection & Rendering Engine
+// ==========================================
+const COUNTRY_FLAG_MAP = {
+  "af": "af", "afghanistan": "af", "islamic republic of afghanistan": "af", "afghan": "af", "อัฟกานิสถาน": "af",
+  "al": "al", "albania": "al", "republic of albania": "al", "albanian": "al", "แอลเบเนีย": "al",
+  "dz": "dz", "algeria": "dz", "people's democratic republic of algeria": "dz", "algerian": "dz", "แอลจีเรีย": "dz",
+  "as": "as", "american samoa": "as", "american samoan": "as", "อเมริกันซามัว": "as",
+  "ad": "ad", "andorra": "ad", "principality of andorra": "ad", "andorran": "ad", "อันดอร์รา": "ad",
+  "ao": "ao", "angola": "ao", "republic of angola": "ao", "angolan": "ao", "แองโกลา": "ao",
+  "ag": "ag", "antigua and barbuda": "ag", "antiguan": "ag", "barbudan": "ag", "แอนติกาและบาร์บูดา": "ag",
+  "ar": "ar", "argentina": "ar", "argentine republic": "ar", "argentine": "ar", "อาร์เจนตินา": "ar", "arg": "ar",
+  "am": "am", "armenia": "am", "republic of armenia": "am", "armenian": "am", "อาร์เมเนีย": "am",
+  "aw": "aw", "aruba": "aw", "aruban": "aw", "อารูบา": "aw",
+  "au": "au", "australia": "au", "commonwealth of australia": "au", "australian": "au", "ออสเตรเลีย": "au", "aus": "au",
+  "at": "at", "austria": "at", "republic of austria": "at", "austrian": "at", "ออสเตรีย": "at", "aut": "at",
+  "az": "az", "azerbaijan": "az", "republic of azerbaijan": "az", "azerbaijani": "az", "อาเซอร์ไบจาน": "az",
+  "bs": "bs", "bahamas": "bs", "commonwealth of the bahamas": "bs", "bahamian": "bs", "บาฮามาส": "bs",
+  "bh": "bh", "bahrain": "bh", "kingdom of bahrain": "bh", "bahraini": "bh", "บาห์เรน": "bh",
+  "bd": "bd", "bangladesh": "bd", "people's republic of bangladesh": "bd", "bangladeshi": "bd", "บังกลาเทศ": "bd",
+  "bb": "bb", "barbados": "bb", "barbadian": "bb", "บาร์เบโดส": "bb",
+  "by": "by", "belarus": "by", "republic of belarus": "by", "belarusian": "by", "เบลารุส": "by",
+  "be": "be", "belgium": "be", "kingdom of belgium": "be", "belgian": "be", "เบลเยียม": "be", "bel": "be",
+  "bz": "bz", "belize": "bz", "belizean": "bz", "เบลีซ": "bz",
+  "bj": "bj", "benin": "bj", "republic of benin": "bj", "beninese": "bj", "เบนิน": "bj",
+  "bm": "bm", "bermuda": "bm", "bermudian": "bm", "เบอร์มิวดา": "bm",
+  "bt": "bt", "bhutan": "bt", "kingdom of bhutan": "bt", "bhutanese": "bt", "ภูฏาน": "bt",
+  "bo": "bo", "bolivia": "bo", "plurinational state of bolivia": "bo", "bolivian": "bo", "โบลิเวีย": "bo",
+  "ba": "ba", "bosnia and herzegovina": "ba", "bosnian": "ba", "herzegovinian": "ba", "บอสเนียและเฮอร์เซโกวีนา": "ba",
+  "bw": "bw", "botswana": "bw", "republic of botswana": "bw", "motswana": "bw", "บอตสวานา": "bw",
+  "br": "br", "brazil": "br", "federative republic of brazil": "br", "brazilian": "br", "บราซิล": "br", "bra": "br",
+  "vg": "vg", "british virgin islands": "vg", "virgin islands": "vg", "virgin islander": "vg", "หมู่เกาะบริติชเวอร์จิน": "vg",
+  "bn": "bn", "brunei": "bn", "nation of brunei, abode of peace": "bn", "bruneian": "bn", "บรูไน": "bn",
+  "bg": "bg", "bulgaria": "bg", "republic of bulgaria": "bg", "bulgarian": "bg", "บัลแกเรีย": "bg",
+  "bf": "bf", "burkina faso": "bf", "burkinabe": "bf", "บูร์กินาฟาโซ": "bf",
+  "bi": "bi", "burundi": "bi", "republic of burundi": "bi", "burundian": "bi", "บุรุนดี": "bi",
+  "kh": "kh", "cambodia": "kh", "kingdom of cambodia": "kh", "cambodian": "kh", "กัมพูชา": "kh", "khm": "kh",
+  "cm": "cm", "cameroon": "cm", "republic of cameroon": "cm", "cameroonian": "cm", "แคเมอรูน": "cm",
+  "ca": "ca", "canada": "ca", "canadian": "ca", "แคนาดา": "ca", "can": "ca",
+  "cv": "cv", "cape verde": "cv", "republic of cabo verde": "cv", "cape verdian": "cv", "เคปเวิร์ด": "cv",
+  "ky": "ky", "cayman islands": "ky", "caymanian": "ky", "หมู่เกาะเคย์แมน": "ky",
+  "cf": "cf", "central african republic": "cf", "central african": "cf", "สาธารณรัฐแอฟริกากลาง": "cf",
+  "td": "td", "chad": "td", "republic of chad": "td", "chadian": "td", "ชาด": "td",
+  "cl": "cl", "chile": "cl", "republic of chile": "cl", "chilean": "cl", "ชิลี": "cl",
+  "cn": "cn", "china": "cn", "people's republic of china": "cn", "chinese": "cn", "จีน": "cn", "chn": "cn", "ประเทศจีน": "cn",
+  "co": "co", "colombia": "co", "republic of colombia": "co", "colombian": "co", "โคลอมเบีย": "co",
+  "km": "km", "comoros": "km", "union of the comoros": "km", "comoran": "km", "คอโมโรส": "km",
+  "cg": "cg", "congo": "cg", "congolese": "cg", "คองโก": "cg",
+  "ck": "ck", "cook islands": "ck", "cook islander": "ck", "หมู่เกาะคุก": "ck",
+  "cr": "cr", "costa rica": "cr", "republic of costa rica": "cr", "costa rican": "cr", "คอสตาริกา": "cr",
+  "hr": "hr", "croatia": "hr", "republic of croatia": "hr", "croatian": "hr", "โครเอเชีย": "hr",
+  "cu": "cu", "cuba": "cu", "republic of cuba": "cu", "cuban": "cu", "คิวบา": "cu",
+  "cy": "cy", "cyprus": "cy", "republic of cyprus": "cy", "cypriot": "cy", "ไซปรัส": "cy",
+  "cz": "cz", "czechia": "cz", "czech republic": "cz", "czech": "cz", "สาธารณรัฐเช็ก": "cz",
+  "dk": "dk", "denmark": "dk", "kingdom of denmark": "dk", "danish": "dk", "เดนมาร์ก": "dk", "dnk": "dk",
+  "dj": "dj", "djibouti": "dj", "republic of djibouti": "dj", "จิบูตี": "dj",
+  "dm": "dm", "dominica": "dm", "commonwealth of dominica": "dm", "dominican": "dm", "โดมินิกา": "dm",
+  "do": "do", "dominican republic": "do", "สาธารณรัฐโดมินิกัน": "do",
+  "cd": "cd", "dr congo": "cd", "democratic republic of the congo": "cd", "สาธารณรัฐประชาธิปไตยคองโก": "cd",
+  "ec": "ec", "ecuador": "ec", "republic of ecuador": "ec", "ecuadorean": "ec", "เอกวาดอร์": "ec",
+  "eg": "eg", "egypt": "eg", "arab republic of egypt": "eg", "egyptian": "eg", "อียิปต์": "eg",
+  "sv": "sv", "el salvador": "sv", "republic of el salvador": "sv", "salvadoran": "sv", "เอลซัลวาดอร์": "sv",
+  "gq": "gq", "equatorial guinea": "gq", "republic of equatorial guinea": "gq", "equatorial guinean": "gq", "อิเควทอเรียลกินี": "gq",
+  "er": "er", "eritrea": "er", "state of eritrea": "er", "eritrean": "er", "เอริเทรีย": "er",
+  "ee": "ee", "estonia": "ee", "republic of estonia": "ee", "estonian": "ee", "เอสโตเนีย": "ee",
+  "sz": "sz", "eswatini": "sz", "kingdom of eswatini": "sz", "swazi": "sz", "เอสวาตินี": "sz",
+  "et": "et", "ethiopia": "et", "federal democratic republic of ethiopia": "et", "ethiopian": "et", "เอธิโอเปีย": "et",
+  "fj": "fj", "fiji": "fj", "republic of fiji": "fj", "fijian": "fj", "ฟิจิ": "fj",
+  "fi": "fi", "finland": "fi", "republic of finland": "fi", "finnish": "fi", "ฟินแลนด์": "fi", "fin": "fi",
+  "fr": "fr", "france": "fr", "french republic": "fr", "french": "fr", "ฝรั่งเศส": "fr", "fra": "fr", "ประเทศฝรั่งเศส": "fr",
+  "ga": "ga", "gabon": "ga", "gabonese republic": "ga", "gabonese": "ga", "กาบอง": "ga",
+  "gm": "gm", "gambia": "gm", "republic of the gambia": "gm", "gambian": "gm", "แกมเบีย": "gm",
+  "ge": "ge", "georgia": "ge", "georgian": "ge", "จอร์เจีย": "ge",
+  "de": "de", "germany": "de", "federal republic of germany": "de", "german": "de", "เยอรมนี": "de", "deu": "de", "เยอรมัน": "de",
+  "gh": "gh", "ghana": "gh", "republic of ghana": "gh", "ghanaian": "gh", "กานา": "gh",
+  "gi": "gi", "gibraltar": "gi", "ยิบรอลตาร์": "gi",
+  "gr": "gr", "greece": "gr", "hellenic republic": "gr", "greek": "gr", "กรีซ": "gr", "grc": "gr",
+  "gl": "gl", "greenland": "gl", "greenlandic": "gl", "กรีนแลนด์": "gl",
+  "gd": "gd", "grenada": "gd", "grenadian": "gd", "เกรเนดา": "gd",
+  "gu": "gu", "guam": "gu", "guamanian": "gu", "กวม": "gu",
+  "gt": "gt", "guatemala": "gt", "republic of guatemala": "gt", "guatemalan": "gt", "กัวเตมาลา": "gt",
+  "gn": "gn", "guinea": "gn", "republic of guinea": "gn", "guinean": "gn", "กินี": "gn",
+  "gw": "gw", "guinea-bissau": "gw", "republic of guinea-bissau": "gw", "guinea-bissauan": "gw", "กินี-บิสเซา": "gw",
+  "gy": "gy", "guyana": "gy", "co-operative republic of guyana": "gy", "guyanese": "gy", "กายอานา": "gy",
+  "ht": "ht", "haiti": "ht", "republic of haiti": "ht", "haitian": "ht", "เฮติ": "ht",
+  "hn": "hn", "honduras": "hn", "republic of honduras": "hn", "honduran": "hn", "ฮอนดูรัส": "hn",
+  "hk": "hk", "hong kong": "hk", "hong kong special administrative region of the people's republic of china": "hk", "hong konger": "hk", "ฮ่องกง": "hk", "hkg": "hk",
+  "hu": "hu", "hungary": "hu", "hungarian": "hu", "ฮังการี": "hu",
+  "is": "is", "iceland": "is", "icelander": "is", "ไอซ์แลนด์": "is",
+  "in": "in", "india": "in", "republic of india": "in", "indian": "in", "อินเดีย": "in", "ind": "in",
+  "id": "id", "indonesia": "id", "republic of indonesia": "id", "indonesian": "id", "อินโดนีเซีย": "id", "idn": "id",
+  "ir": "ir", "iran": "ir", "islamic republic of iran": "ir", "iranian": "ir", "อิหร่าน": "ir",
+  "iq": "iq", "iraq": "iq", "republic of iraq": "iq", "iraqi": "iq", "อิรัก": "iq",
+  "ie": "ie", "ireland": "ie", "republic of ireland": "ie", "irish": "ie", "ไอร์แลนด์": "ie", "irl": "ie",
+  "il": "il", "israel": "il", "state of israel": "il", "israeli": "il", "อิสราเอล": "il",
+  "it": "it", "italy": "it", "italian republic": "it", "italian": "it", "อิตาลี": "it", "ita": "it",
+  "ci": "ci", "ivory coast": "ci", "republic of côte d'ivoire": "ci", "ivorian": "ci", "โกตดิวัวร์": "ci",
+  "jm": "jm", "jamaica": "jm", "jamaican": "jm", "จาเมกา": "jm",
+  "jp": "jp", "japan": "jp", "japanese": "jp", "ญี่ปุ่น": "jp", "jpn": "jp", "ประเทศญี่ปุ่น": "jp",
+  "jo": "jo", "jordan": "jo", "hashemite kingdom of jordan": "jo", "jordanian": "jo", "จอร์แดน": "jo",
+  "kz": "kz", "kazakhstan": "kz", "republic of kazakhstan": "kz", "kazakhstani": "kz", "คาซัคสถาน": "kz",
+  "ke": "ke", "kenya": "ke", "republic of kenya": "ke", "kenyan": "ke", "เคนยา": "ke",
+  "ki": "ki", "kiribati": "ki", "independent and sovereign republic of kiribati": "ki", "i-kiribati": "ki", "คิริบาส": "ki",
+  "xk": "xk", "kosovo": "xk", "republic of kosovo": "xk", "kosovar": "xk", "โคโซโว": "xk",
+  "kw": "kw", "kuwait": "kw", "state of kuwait": "kw", "kuwaiti": "kw", "คูเวต": "kw",
+  "kg": "kg", "kyrgyzstan": "kg", "kyrgyz republic": "kg", "kirghiz": "kg", "คีร์กีซสถาน": "kg",
+  "la": "la", "laos": "la", "lao people's democratic republic": "la", "laotian": "la", "ลาว": "la", "lao": "la",
+  "lv": "lv", "latvia": "lv", "republic of latvia": "lv", "latvian": "lv", "ลัตเวีย": "lv",
+  "lb": "lb", "lebanon": "lb", "lebanese republic": "lb", "lebanese": "lb", "เลบานอน": "lb",
+  "ls": "ls", "lesotho": "ls", "kingdom of lesotho": "ls", "mosotho": "ls", "เลโซโท": "ls",
+  "lr": "lr", "liberia": "lr", "republic of liberia": "lr", "liberian": "lr", "ไลบีเรีย": "lr",
+  "ly": "ly", "libya": "ly", "state of libya": "ly", "libyan": "ly", "ลิเบีย": "ly",
+  "li": "li", "liechtenstein": "li", "principality of liechtenstein": "li", "liechtensteiner": "li", "ลิกเตนสไตน์": "li",
+  "lt": "lt", "lithuania": "lt", "republic of lithuania": "lt", "lithuanian": "lt", "ลิทัวเนีย": "lt",
+  "lu": "lu", "luxembourg": "lu", "grand duchy of luxembourg": "lu", "luxembourger": "lu", "ลักเซมเบิร์ก": "lu",
+  "mo": "mo", "macau": "mo", "macao special administrative region of the people's republic of china": "mo", "macanese": "mo", "มาเก๊า": "mo",
+  "mg": "mg", "madagascar": "mg", "republic of madagascar": "mg", "malagasy": "mg", "มาดากัสการ์": "mg",
+  "mw": "mw", "malawi": "mw", "republic of malawi": "mw", "malawian": "mw", "มาลาวี": "mw",
+  "my": "my", "malaysia": "my", "malaysian": "my", "มาเลเซีย": "my", "mys": "my",
+  "mv": "mv", "maldives": "mv", "republic of the maldives": "mv", "maldivan": "mv", "มัลดีฟส์": "mv",
+  "ml": "ml", "mali": "ml", "republic of mali": "ml", "malian": "ml", "มาลี": "ml",
+  "mt": "mt", "malta": "mt", "republic of malta": "mt", "maltese": "mt", "มอลตา": "mt",
+  "mh": "mh", "marshall islands": "mh", "republic of the marshall islands": "mh", "marshallese": "mh", "หมู่เกาะมาร์แชลล์": "mh",
+  "mr": "mr", "mauritania": "mr", "islamic republic of mauritania": "mr", "mauritanian": "mr", "มอริเตเนีย": "mr",
+  "mu": "mu", "mauritius": "mu", "republic of mauritius": "mu", "mauritian": "mu", "มอริเชียส": "mu",
+  "mx": "mx", "mexico": "mx", "united mexican states": "mx", "mexican": "mx", "เม็กซิโก": "mx", "mex": "mx",
+  "fm": "fm", "micronesia": "fm", "federated states of micronesia": "fm", "micronesian": "fm", "ไมโครนีเซีย": "fm",
+  "md": "md", "moldova": "md", "republic of moldova": "md", "moldovan": "md", "มอลโดวา": "md",
+  "mc": "mc", "monaco": "mc", "principality of monaco": "mc", "monegasque": "mc", "โมนาโก": "mc",
+  "mn": "mn", "mongolia": "mn", "mongolian": "mn", "มองโกเลีย": "mn",
+  "me": "me", "montenegro": "me", "montenegrin": "me", "มอนเตเนโกร": "me",
+  "ma": "ma", "morocco": "ma", "kingdom of morocco": "ma", "moroccan": "ma", "โมร็อกโก": "ma",
+  "mz": "mz", "mozambique": "mz", "republic of mozambique": "mz", "mozambican": "mz", "โมซัมบิก": "mz",
+  "mm": "mm", "myanmar": "mm", "republic of the union of myanmar": "mm", "burmese": "mm", "เมียนมา": "mm", "burma": "mm", "mmr": "mm", "พม่า": "mm",
+  "na": "na", "namibia": "na", "republic of namibia": "na", "namibian": "na", "นามิเบีย": "na",
+  "nr": "nr", "nauru": "nr", "republic of nauru": "nr", "nauruan": "nr", "นาอูรู": "nr",
+  "np": "np", "nepal": "np", "federal democratic republic of nepal": "np", "nepalese": "np", "เนปาล": "np",
+  "nl": "nl", "netherlands": "nl", "kingdom of the netherlands": "nl", "dutch": "nl", "เนเธอร์แลนด์": "nl", "holland": "nl", "nld": "nl", "ฮอลแลนด์": "nl",
+  "nz": "nz", "new zealand": "nz", "new zealander": "nz", "นิวซีแลนด์": "nz", "nzl": "nz",
+  "ni": "ni", "nicaragua": "ni", "republic of nicaragua": "ni", "nicaraguan": "ni", "นิการากัว": "ni",
+  "ne": "ne", "niger": "ne", "republic of niger": "ne", "nigerien": "ne", "ไนเจอร์": "ne",
+  "ng": "ng", "nigeria": "ng", "federal republic of nigeria": "ng", "nigerian": "ng", "ไนจีเรีย": "ng",
+  "kp": "kp", "north korea": "kp", "democratic people's republic of korea": "kp", "north korean": "kp", "เกาหลีเหนือ": "kp",
+  "mk": "mk", "north macedonia": "mk", "republic of north macedonia": "mk", "macedonian": "mk", "มาซิโดเนียเหนือ": "mk",
+  "no": "no", "norway": "no", "kingdom of norway": "no", "norwegian": "no", "นอร์เวย์": "no", "nor": "no",
+  "om": "om", "oman": "om", "sultanate of oman": "om", "omani": "om", "โอมาน": "om",
+  "pk": "pk", "pakistan": "pk", "islamic republic of pakistan": "pk", "pakistani": "pk", "ปากีสถาน": "pk",
+  "pw": "pw", "palau": "pw", "republic of palau": "pw", "palauan": "pw", "ปาเลา": "pw",
+  "ps": "ps", "palestine": "ps", "state of palestine": "ps", "palestinian": "ps", "ปาเลสไตน์": "ps",
+  "pa": "pa", "panama": "pa", "republic of panama": "pa", "panamanian": "pa", "ปานามา": "pa",
+  "pg": "pg", "papua new guinea": "pg", "independent state of papua new guinea": "pg", "papua new guinean": "pg", "ปาปัวนิวกินี": "pg",
+  "py": "py", "paraguay": "py", "republic of paraguay": "py", "paraguayan": "py", "ปารากวัย": "py",
+  "pe": "pe", "peru": "pe", "republic of peru": "pe", "peruvian": "pe", "เปรู": "pe",
+  "ph": "ph", "philippines": "ph", "republic of the philippines": "ph", "filipino": "ph", "ฟิลิปปินส์": "ph", "phl": "ph",
+  "pl": "pl", "poland": "pl", "republic of poland": "pl", "polish": "pl", "โปแลนด์": "pl", "pol": "pl",
+  "pt": "pt", "portugal": "pt", "portuguese republic": "pt", "portuguese": "pt", "โปรตุเกส": "pt", "prt": "pt",
+  "pr": "pr", "puerto rico": "pr", "commonwealth of puerto rico": "pr", "puerto rican": "pr", "เปอร์โตริโก": "pr",
+  "qa": "qa", "qatar": "qa", "state of qatar": "qa", "qatari": "qa", "กาตาร์": "qa",
+  "ro": "ro", "romania": "ro", "romanian": "ro", "โรมาเนีย": "ro",
+  "ru": "ru", "russia": "ru", "russian federation": "ru", "russian": "ru", "รัสเซีย": "ru", "rus": "ru",
+  "rw": "rw", "rwanda": "rw", "republic of rwanda": "rw", "rwandan": "rw", "รวันดา": "rw",
+  "kn": "kn", "saint kitts and nevis": "kn", "federation of saint christopher and nevis": "kn", "kittitian or nevisian": "kn", "เซนต์คิตส์และเนวิส": "kn",
+  "lc": "lc", "saint lucia": "lc", "saint lucian": "lc", "เซนต์ลูเซีย": "lc",
+  "vc": "vc", "saint vincent and the grenadines": "vc", "saint vincentian": "vc", "เซนต์วินเซนต์และเกรนาดีนส์": "vc",
+  "ws": "ws", "samoa": "ws", "independent state of samoa": "ws", "samoan": "ws", "ซามัว": "ws",
+  "sm": "sm", "san marino": "sm", "most serene republic of san marino": "sm", "sammarinese": "sm", "ซานมารีโน": "sm",
+  "st": "st", "são tomé and príncipe": "st", "democratic republic of são tomé and príncipe": "st", "sao tomean": "st", "เซาตูเมและปรินซิปี": "st",
+  "sa": "sa", "saudi arabia": "sa", "kingdom of saudi arabia": "sa", "saudi arabian": "sa", "ซาอุดีอาระเบีย": "sa",
+  "sn": "sn", "senegal": "sn", "republic of senegal": "sn", "senegalese": "sn", "เซเนกัล": "sn",
+  "rs": "rs", "serbia": "rs", "republic of serbia": "rs", "serbian": "rs", "เซอร์เบีย": "rs",
+  "sc": "sc", "seychelles": "sc", "republic of seychelles": "sc", "seychellois": "sc", "เซเชลส์": "sc",
+  "sl": "sl", "sierra leone": "sl", "republic of sierra leone": "sl", "sierra leonean": "sl", "เซียร์ราลีโอน": "sl",
+  "sg": "sg", "singapore": "sg", "republic of singapore": "sg", "singaporean": "sg", "สิงคโปร์": "sg", "sgp": "sg",
+  "sk": "sk", "slovakia": "sk", "slovak republic": "sk", "slovak": "sk", "สโลวาเกีย": "sk",
+  "si": "si", "slovenia": "si", "republic of slovenia": "si", "slovene": "si", "สโลวีเนีย": "si",
+  "sb": "sb", "solomon islands": "sb", "solomon islander": "sb", "หมู่เกาะโซโลมอน": "sb",
+  "so": "so", "somalia": "so", "federal republic of somalia": "so", "somali": "so", "โซมาเลีย": "so",
+  "za": "za", "south africa": "za", "republic of south africa": "za", "south african": "za", "แอฟริกาใต้": "za",
+  "kr": "kr", "south korea": "kr", "republic of korea": "kr", "south korean": "kr", "เกาหลีใต้": "kr", "korea": "kr", "korean": "kr", "kor": "kr", "เกาหลี": "kr",
+  "ss": "ss", "south sudan": "ss", "republic of south sudan": "ss", "south sudanese": "ss", "ซูดานใต้": "ss",
+  "es": "es", "spain": "es", "kingdom of spain": "es", "spanish": "es", "สเปน": "es", "esp": "es",
+  "lk": "lk", "sri lanka": "lk", "democratic socialist republic of sri lanka": "lk", "sri lankan": "lk", "ศรีลังกา": "lk",
+  "sd": "sd", "sudan": "sd", "republic of the sudan": "sd", "sudanese": "sd", "ซูดาน": "sd",
+  "sr": "sr", "suriname": "sr", "republic of suriname": "sr", "surinamer": "sr", "ซูรินาเม": "sr",
+  "se": "se", "sweden": "se", "kingdom of sweden": "se", "swedish": "se", "สวีเดน": "se", "swe": "se",
+  "ch": "ch", "switzerland": "ch", "swiss confederation": "ch", "swiss": "ch", "สวิตเซอร์แลนด์": "ch", "che": "ch", "สวิส": "ch",
+  "sy": "sy", "syria": "sy", "syrian arab republic": "sy", "syrian": "sy", "ซีเรีย": "sy",
+  "tw": "tw", "taiwan": "tw", "republic of china (taiwan)": "tw", "taiwanese": "tw", "ไต้หวัน": "tw", "twn": "tw",
+  "tj": "tj", "tajikistan": "tj", "republic of tajikistan": "tj", "tadzhik": "tj", "ทาจิกิสถาน": "tj",
+  "tz": "tz", "tanzania": "tz", "united republic of tanzania": "tz", "tanzanian": "tz", "แทนซาเนีย": "tz",
+  "th": "th", "thailand": "th", "kingdom of thailand": "th", "thai": "th", "ไทย": "th", "ประเทศไทย": "th", "สัญชาติไทย": "th", "คนไทย": "th",
+  "tl": "tl", "timor-leste": "tl", "democratic republic of timor-leste": "tl", "east timorese": "tl", "ติมอร์-เลสเต": "tl",
+  "tg": "tg", "togo": "tg", "togolese republic": "tg", "togolese": "tg", "โตโก": "tg",
+  "to": "to", "tonga": "to", "kingdom of tonga": "to", "tongan": "to", "ตองงา": "to",
+  "tt": "tt", "trinidad and tobago": "tt", "republic of trinidad and tobago": "tt", "trinidadian": "tt", "ตรินิแดดและโตเบโก": "tt",
+  "tn": "tn", "tunisia": "tn", "tunisian republic": "tn", "tunisian": "tn", "ตูนิเซีย": "tn",
+  "tr": "tr", "türkiye": "tr", "republic of türkiye": "tr", "turkey": "tr", "turkish": "tr", "ตุรกี": "tr",
+  "tm": "tm", "turkmenistan": "tm", "turkmen": "tm", "เติร์กเมนิสถาน": "tm",
+  "tv": "tv", "tuvalu": "tv", "tuvaluan": "tv", "ตูวาลู": "tv",
+  "ug": "ug", "uganda": "ug", "republic of uganda": "ug", "ugandan": "ug", "ยูกันดา": "ug",
+  "ua": "ua", "ukraine": "ua", "ukrainian": "ua", "ยูเครน": "ua",
+  "ae": "ae", "united arab emirates": "ae", "emirati": "ae", "สหรัฐอาหรับเอมิเรตส์": "ae",
+  "gb": "gb", "united kingdom": "gb", "united kingdom of great britain and northern ireland": "gb", "british": "gb", "สหราชอาณาจักร": "gb", "uk": "gb", "great britain": "gb", "britain": "gb", "england": "gb", "gbr": "gb", "อังกฤษ": "gb",
+  "us": "us", "united states": "us", "united states of america": "us", "american": "us", "สหรัฐอเมริกา": "us", "usa": "us", "america": "us", "สหรัฐ": "us", "อเมริกา": "us",
+  "uy": "uy", "uruguay": "uy", "oriental republic of uruguay": "uy", "uruguayan": "uy", "อุรุกวัย": "uy",
+  "uz": "uz", "uzbekistan": "uz", "republic of uzbekistan": "uz", "uzbekistani": "uz", "อุซเบกิสถาน": "uz",
+  "vu": "vu", "vanuatu": "vu", "republic of vanuatu": "vu", "ni-vanuatu": "vu", "วานูอาตู": "vu",
+  "va": "va", "vatican city": "va", "vatican city state": "va", "vatican": "va", "นครรัฐวาติกัน": "va",
+  "ve": "ve", "venezuela": "ve", "bolivarian republic of venezuela": "ve", "venezuelan": "ve", "เวเนซุเอลา": "ve",
+  "vn": "vn", "vietnam": "vn", "socialist republic of vietnam": "vn", "vietnamese": "vn", "เวียดนาม": "vn", "vnm": "vn",
+  "ye": "ye", "yemen": "ye", "republic of yemen": "ye", "yemeni": "ye", "เยเมน": "ye",
+  "zm": "zm", "zambia": "zm", "republic of zambia": "zm", "zambian": "zm", "แซมเบีย": "zm",
+  "zw": "zw", "zimbabwe": "zw", "republic of zimbabwe": "zw", "zimbabwean": "zw", "ซิมบับเว": "zw"
+};
+
+const COUNTRY_NAMES = {
+  "af": { th: "อัฟกานิสถาน", en: "Afghanistan" },
+  "al": { th: "แอลเบเนีย", en: "Albania" },
+  "dz": { th: "แอลจีเรีย", en: "Algeria" },
+  "as": { th: "อเมริกันซามัว", en: "American Samoa" },
+  "ad": { th: "อันดอร์รา", en: "Andorra" },
+  "ao": { th: "แองโกลา", en: "Angola" },
+  "ag": { th: "แอนติกาและบาร์บูดา", en: "Antigua and Barbuda" },
+  "ar": { th: "อาร์เจนตินา", en: "Argentina" },
+  "am": { th: "อาร์เมเนีย", en: "Armenia" },
+  "aw": { th: "อารูบา", en: "Aruba" },
+  "au": { th: "ออสเตรเลีย", en: "Australia" },
+  "at": { th: "ออสเตรีย", en: "Austria" },
+  "az": { th: "อาเซอร์ไบจาน", en: "Azerbaijan" },
+  "bs": { th: "บาฮามาส", en: "Bahamas" },
+  "bh": { th: "บาห์เรน", en: "Bahrain" },
+  "bd": { th: "บังกลาเทศ", en: "Bangladesh" },
+  "bb": { th: "บาร์เบโดส", en: "Barbados" },
+  "by": { th: "เบลารุส", en: "Belarus" },
+  "be": { th: "เบลเยียม", en: "Belgium" },
+  "bz": { th: "เบลีซ", en: "Belize" },
+  "bj": { th: "เบนิน", en: "Benin" },
+  "bm": { th: "เบอร์มิวดา", en: "Bermuda" },
+  "bt": { th: "ภูฏาน", en: "Bhutan" },
+  "bo": { th: "โบลิเวีย", en: "Bolivia" },
+  "ba": { th: "บอสเนียและเฮอร์เซโกวีนา", en: "Bosnia and Herzegovina" },
+  "bw": { th: "บอตสวานา", en: "Botswana" },
+  "br": { th: "บราซิล", en: "Brazil" },
+  "vg": { th: "หมู่เกาะบริติชเวอร์จิน", en: "British Virgin Islands" },
+  "bn": { th: "บรูไน", en: "Brunei" },
+  "bg": { th: "บัลแกเรีย", en: "Bulgaria" },
+  "bf": { th: "บูร์กินาฟาโซ", en: "Burkina Faso" },
+  "bi": { th: "บุรุนดี", en: "Burundi" },
+  "kh": { th: "กัมพูชา", en: "Cambodia" },
+  "cm": { th: "แคเมอรูน", en: "Cameroon" },
+  "ca": { th: "แคนาดา", en: "Canada" },
+  "cv": { th: "เคปเวิร์ด", en: "Cape Verde" },
+  "ky": { th: "หมู่เกาะเคย์แมน", en: "Cayman Islands" },
+  "cf": { th: "สาธารณรัฐแอฟริกากลาง", en: "Central African Republic" },
+  "td": { th: "ชาด", en: "Chad" },
+  "cl": { th: "ชิลี", en: "Chile" },
+  "cn": { th: "จีน", en: "China" },
+  "co": { th: "โคลอมเบีย", en: "Colombia" },
+  "km": { th: "คอโมโรส", en: "Comoros" },
+  "cg": { th: "คองโก", en: "Congo" },
+  "ck": { th: "หมู่เกาะคุก", en: "Cook Islands" },
+  "cr": { th: "คอสตาริกา", en: "Costa Rica" },
+  "hr": { th: "โครเอเชีย", en: "Croatia" },
+  "cu": { th: "คิวบา", en: "Cuba" },
+  "cy": { th: "ไซปรัส", en: "Cyprus" },
+  "cz": { th: "สาธารณรัฐเช็ก", en: "Czech Republic" },
+  "dk": { th: "เดนมาร์ก", en: "Denmark" },
+  "dj": { th: "จิบูตี", en: "Djibouti" },
+  "dm": { th: "โดมินิกา", en: "Dominica" },
+  "do": { th: "สาธารณรัฐโดมินิกัน", en: "Dominican Republic" },
+  "cd": { th: "สาธารณรัฐประชาธิปไตยคองโก", en: "DR Congo" },
+  "ec": { th: "เอกวาดอร์", en: "Ecuador" },
+  "eg": { th: "อียิปต์", en: "Egypt" },
+  "sv": { th: "เอลซัลวาดอร์", en: "El Salvador" },
+  "gq": { th: "อิเควทอเรียลกินี", en: "Equatorial Guinea" },
+  "er": { th: "เอริเทรีย", en: "Eritrea" },
+  "ee": { th: "เอสโตเนีย", en: "Estonia" },
+  "sz": { th: "เอสวาตินี", en: "Eswatini" },
+  "et": { th: "เอธิโอเปีย", en: "Ethiopia" },
+  "fj": { th: "ฟิจิ", en: "Fiji" },
+  "fi": { th: "ฟินแลนด์", en: "Finland" },
+  "fr": { th: "ฝรั่งเศส", en: "France" },
+  "ga": { th: "กาบอง", en: "Gabon" },
+  "gm": { th: "แกมเบีย", en: "Gambia" },
+  "ge": { th: "จอร์เจีย", en: "Georgia" },
+  "de": { th: "เยอรมนี", en: "Germany" },
+  "gh": { th: "กานา", en: "Ghana" },
+  "gi": { th: "ยิบรอลตาร์", en: "Gibraltar" },
+  "gr": { th: "กรีซ", en: "Greece" },
+  "gl": { th: "กรีนแลนด์", en: "Greenland" },
+  "gd": { th: "เกรเนดา", en: "Grenada" },
+  "gu": { th: "กวม", en: "Guam" },
+  "gt": { th: "กัวเตมาลา", en: "Guatemala" },
+  "gn": { th: "กินี", en: "Guinea" },
+  "gw": { th: "กินี-บิสเซา", en: "Guinea-Bissau" },
+  "gy": { th: "กายอานา", en: "Guyana" },
+  "ht": { th: "เฮติ", en: "Haiti" },
+  "hn": { th: "ฮอนดูรัส", en: "Honduras" },
+  "hk": { th: "ฮ่องกง", en: "Hong Kong" },
+  "hu": { th: "ฮังการี", en: "Hungary" },
+  "is": { th: "ไอซ์แลนด์", en: "Iceland" },
+  "in": { th: "อินเดีย", en: "India" },
+  "id": { th: "อินโดนีเซีย", en: "Indonesia" },
+  "ir": { th: "อิหร่าน", en: "Iran" },
+  "iq": { th: "อิรัก", en: "Iraq" },
+  "ie": { th: "ไอร์แลนด์", en: "Ireland" },
+  "il": { th: "อิสราเอล", en: "Israel" },
+  "it": { th: "อิตาลี", en: "Italy" },
+  "ci": { th: "โกตดิวัวร์", en: "Ivory Coast" },
+  "jm": { th: "จาเมกา", en: "Jamaica" },
+  "jp": { th: "ญี่ปุ่น", en: "Japan" },
+  "jo": { th: "จอร์แดน", en: "Jordan" },
+  "kz": { th: "คาซัคสถาน", en: "Kazakhstan" },
+  "ke": { th: "เคนยา", en: "Kenya" },
+  "ki": { th: "คิริบาส", en: "Kiribati" },
+  "xk": { th: "โคโซโว", en: "Kosovo" },
+  "kw": { th: "คูเวต", en: "Kuwait" },
+  "kg": { th: "คีร์กีซสถาน", en: "Kyrgyzstan" },
+  "la": { th: "ลาว", en: "Laos" },
+  "lv": { th: "ลัตเวีย", en: "Latvia" },
+  "lb": { th: "เลบานอน", en: "Lebanon" },
+  "ls": { th: "เลโซโท", en: "Lesotho" },
+  "lr": { th: "ไลบีเรีย", en: "Liberia" },
+  "ly": { th: "ลิเบีย", en: "Libya" },
+  "li": { th: "ลิกเตนสไตน์", en: "Liechtenstein" },
+  "lt": { th: "ลิทัวเนีย", en: "Lithuania" },
+  "lu": { th: "ลักเซมเบิร์ก", en: "Luxembourg" },
+  "mo": { th: "มาเก๊า", en: "Macau" },
+  "mg": { th: "มาดากัสการ์", en: "Madagascar" },
+  "mw": { th: "มาลาวี", en: "Malawi" },
+  "my": { th: "มาเลเซีย", en: "Malaysia" },
+  "mv": { th: "มัลดีฟส์", en: "Maldives" },
+  "ml": { th: "มาลี", en: "Mali" },
+  "mt": { th: "มอลตา", en: "Malta" },
+  "mh": { th: "หมู่เกาะมาร์แชลล์", en: "Marshall Islands" },
+  "mr": { th: "มอริเตเนีย", en: "Mauritania" },
+  "mu": { th: "มอริเชียส", en: "Mauritius" },
+  "mx": { th: "เม็กซิโก", en: "Mexico" },
+  "fm": { th: "ไมโครนีเซีย", en: "Micronesia" },
+  "md": { th: "มอลโดวา", en: "Moldova" },
+  "mc": { th: "โมนาโก", en: "Monaco" },
+  "mn": { th: "มองโกเลีย", en: "Mongolia" },
+  "me": { th: "มอนเตเนโกร", en: "Montenegro" },
+  "ma": { th: "โมร็อกโก", en: "Morocco" },
+  "mz": { th: "โมซัมบิก", en: "Mozambique" },
+  "mm": { th: "เมียนมา", en: "Myanmar" },
+  "na": { th: "นามิเบีย", en: "Namibia" },
+  "nr": { th: "นาอูรู", en: "Nauru" },
+  "np": { th: "เนปาล", en: "Nepal" },
+  "nl": { th: "เนเธอร์แลนด์", en: "Netherlands" },
+  "nz": { th: "นิวซีแลนด์", en: "New Zealand" },
+  "ni": { th: "นิการากัว", en: "Nicaragua" },
+  "ne": { th: "ไนเจอร์", en: "Niger" },
+  "ng": { th: "ไนจีเรีย", en: "Nigeria" },
+  "kp": { th: "เกาหลีเหนือ", en: "North Korea" },
+  "mk": { th: "มาซิโดเนียเหนือ", en: "North Macedonia" },
+  "no": { th: "นอร์เวย์", en: "Norway" },
+  "om": { th: "โอมาน", en: "Oman" },
+  "pk": { th: "ปากีสถาน", en: "Pakistan" },
+  "pw": { th: "ปาเลา", en: "Palau" },
+  "ps": { th: "ปาเลสไตน์", en: "Palestine" },
+  "pa": { th: "ปานามา", en: "Panama" },
+  "pg": { th: "ปาปัวนิวกินี", en: "Papua New Guinea" },
+  "py": { th: "ปารากวัย", en: "Paraguay" },
+  "pe": { th: "เปรู", en: "Peru" },
+  "ph": { th: "ฟิลิปปินส์", en: "Philippines" },
+  "pl": { th: "โปแลนด์", en: "Poland" },
+  "pt": { th: "โปรตุเกส", en: "Portugal" },
+  "pr": { th: "เปอร์โตริโก", en: "Puerto Rico" },
+  "qa": { th: "กาตาร์", en: "Qatar" },
+  "ro": { th: "โรมาเนีย", en: "Romania" },
+  "ru": { th: "รัสเซีย", en: "Russia" },
+  "rw": { th: "รวันดา", en: "Rwanda" },
+  "kn": { th: "เซนต์คิตส์และเนวิส", en: "Saint Kitts and Nevis" },
+  "lc": { th: "เซนต์ลูเซีย", en: "Saint Lucia" },
+  "vc": { th: "เซนต์วินเซนต์และเกรนาดีนส์", en: "Saint Vincent and the Grenadines" },
+  "ws": { th: "ซามัว", en: "Samoa" },
+  "sm": { th: "ซานมารีโน", en: "San Marino" },
+  "st": { th: "เซาตูเมและปรินซิปี", en: "São Tomé and Príncipe" },
+  "sa": { th: "ซาอุดีอาระเบีย", en: "Saudi Arabia" },
+  "sn": { th: "เซเนกัล", en: "Senegal" },
+  "rs": { th: "เซอร์เบีย", en: "Serbia" },
+  "sc": { th: "เซเชลส์", en: "Seychelles" },
+  "sl": { th: "เซียร์ราลีโอน", en: "Sierra Leone" },
+  "sg": { th: "สิงคโปร์", en: "Singapore" },
+  "sk": { th: "สโลวาเกีย", en: "Slovakia" },
+  "si": { th: "สโลวีเนีย", en: "Slovenia" },
+  "sb": { th: "หมู่เกาะโซโลมอน", en: "Solomon Islands" },
+  "so": { th: "โซมาเลีย", en: "Somalia" },
+  "za": { th: "แอฟริกาใต้", en: "South Africa" },
+  "kr": { th: "เกาหลีใต้", en: "South Korea" },
+  "ss": { th: "ซูดานใต้", en: "South Sudan" },
+  "es": { th: "สเปน", en: "Spain" },
+  "lk": { th: "ศรีลังกา", en: "Sri Lanka" },
+  "sd": { th: "ซูดาน", en: "Sudan" },
+  "sr": { th: "ซูรินาเม", en: "Suriname" },
+  "se": { th: "สวีเดน", en: "Sweden" },
+  "ch": { th: "สวิตเซอร์แลนด์", en: "Switzerland" },
+  "sy": { th: "ซีเรีย", en: "Syria" },
+  "tw": { th: "ไต้หวัน", en: "Taiwan" },
+  "tj": { th: "ทาจิกิสถาน", en: "Tajikistan" },
+  "tz": { th: "แทนซาเนีย", en: "Tanzania" },
+  "th": { th: "ไทย", en: "Thailand" },
+  "tl": { th: "ติมอร์-เลสเต", en: "Timor-Leste" },
+  "tg": { th: "โตโก", en: "Togo" },
+  "to": { th: "ตองงา", en: "Tonga" },
+  "tt": { th: "ตรินิแดดและโตเบโก", en: "Trinidad and Tobago" },
+  "tn": { th: "ตูนิเซีย", en: "Tunisia" },
+  "tr": { th: "ตุรกี", en: "Turkey" },
+  "tm": { th: "เติร์กเมนิสถาน", en: "Turkmenistan" },
+  "tv": { th: "ตูวาลู", en: "Tuvalu" },
+  "ug": { th: "ยูกันดา", en: "Uganda" },
+  "ua": { th: "ยูเครน", en: "Ukraine" },
+  "ae": { th: "สหรัฐอาหรับเอมิเรตส์", en: "United Arab Emirates" },
+  "gb": { th: "สหราชอาณาจักร", en: "United Kingdom" },
+  "us": { th: "สหรัฐอเมริกา", en: "United States" },
+  "uy": { th: "อุรุกวัย", en: "Uruguay" },
+  "uz": { th: "อุซเบกิสถาน", en: "Uzbekistan" },
+  "vu": { th: "วานูอาตู", en: "Vanuatu" },
+  "va": { th: "นครรัฐวาติกัน", en: "Vatican City" },
+  "ve": { th: "เวเนซุเอลา", en: "Venezuela" },
+  "vn": { th: "เวียดนาม", en: "Vietnam" },
+  "ye": { th: "เยเมน", en: "Yemen" },
+  "zm": { th: "แซมเบีย", en: "Zambia" },
+  "zw": { th: "ซิมบับเว", en: "Zimbabwe" }
+};
+
+const SORTED_COUNTRY_KEYS = Object.keys(COUNTRY_FLAG_MAP).sort((a, b) => b.length - a.length);
+
+/**
+ * Case-insensitive, robust country matching engine
+ * Tolerates any casing (TH, th, tH, THAILAND, thailand, tHaIlAnD, ญี่ปุ่น, Sweden, etc.)
+ */
+function resolveCountryCode(input) {
+  if (!input) return 'th';
+  const str = String(input).trim();
+  if (!str) return 'th';
+
+  const lower = str.toLowerCase();
+  // 1. Direct match in dictionary
+  if (COUNTRY_FLAG_MAP[lower]) return COUNTRY_FLAG_MAP[lower];
+
+  // 2. Stripped alphanumeric match (e.g. "U.S.A." -> "usa", "(TH)" -> "th")
+  const stripped = lower.replace(/[^a-z0-9\u0E00-\u0E7F]/g, '');
+  if (COUNTRY_FLAG_MAP[stripped]) return COUNTRY_FLAG_MAP[stripped];
+
+  // 3. Cleaned punctuation & symbols
+  const cleaned = lower.replace(/[()[\]{},;:.!?'"\\/|#*&^%$@~`+=\-_]/g, ' ').trim();
+  if (COUNTRY_FLAG_MAP[cleaned]) return COUNTRY_FLAG_MAP[cleaned];
+
+  // 4. Token-based word match (e.g. "TH / Thailand" -> checks "th", "thailand")
+  const tokens = cleaned.split(/\s+/).filter(Boolean);
+  for (const token of tokens) {
+    if (COUNTRY_FLAG_MAP[token]) return COUNTRY_FLAG_MAP[token];
+  }
+
+  // 5. Substring search in order of key length (e.g. "Born in South Korea", "สัญชาติไทย")
+  for (const key of SORTED_COUNTRY_KEYS) {
+    if (key.length >= 3 && lower.includes(key)) {
+      return COUNTRY_FLAG_MAP[key];
+    }
+  }
+
+  // 6. Fallback standard 2-letter ISO
+  if (/^[a-z]{2}$/.test(cleaned)) return cleaned;
+  if (/^[a-z]{2}$/.test(stripped)) return stripped;
+
+  return null;
+}
+
+/**
+ * Helper to get user-facing full country display name in Thai or English
+ */
+function getCountryDisplayName(country, lang = null) {
+  const currentLang = lang || (window.i18n ? window.i18n.getLang() : 'th');
+  const code = resolveCountryCode(country);
+  if (!code) return country || 'Unknown';
+  if (COUNTRY_NAMES[code]) {
+    return COUNTRY_NAMES[code][currentLang] || COUNTRY_NAMES[code]['en'];
+  }
+  return country || code.toUpperCase();
+}
+
+function isoToEmoji(code) {
+  if (!code || code.length !== 2) return '🌐';
+  const c = code.toUpperCase();
+  return String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65, 0x1F1E6 + c.charCodeAt(1) - 65);
+}
+
+function getFlagEmoji(country) {
+  const code = resolveCountryCode(country);
+  if (!code) return '🌐';
+  return isoToEmoji(code);
+}
+
+/**
+ * Generates National Flag badge.
+ * Replaces abbreviations completely with crisp, high-DPI National Flag.
+ * If showName is requested, shows full localized country name (never abbreviations like TH, JP).
+ */
+function getCountryFlagBadge(country, options = {}) {
+  const rawCountry = (country || 'Thailand').trim();
+  const code = resolveCountryCode(rawCountry);
+  const currentLang = (window.i18n && window.i18n.getLang()) || 'th';
+  const fullName = getCountryDisplayName(code || rawCountry, currentLang);
+  const showName = options.showName === true;
+  
+  const size = options.size || 'sm';
+  let imgSizeClass = 'w-5 h-3.5';
+  let badgePadding = 'px-1.5 py-0.5';
+  if (size === 'xs') {
+    imgSizeClass = 'w-4 h-2.5';
+    badgePadding = 'px-1 py-0.5';
+  } else if (size === 'md') {
+    imgSizeClass = 'w-6 h-4';
+    badgePadding = 'px-2 py-0.5';
+  } else if (size === 'lg') {
+    imgSizeClass = 'w-8 h-5.5';
+    badgePadding = 'px-2.5 py-1';
+  }
+
+  if (!code) {
+    if (!showName) return `<span class="text-xs align-middle" title="${rawCountry}">🌐</span>`;
+    return `<span class="inline-flex items-center gap-1.5 ${badgePadding} rounded bg-slate-900/80 border border-slate-700/80 text-xs text-slate-300 align-middle" title="${rawCountry}">🌐 ${fullName}</span>`;
+  }
+
+  const flagUrl = `https://flagcdn.com/w40/${code}.png`;
+  const flagUrl2x = `https://flagcdn.com/w80/${code}.png`;
+  const svgUrl = `https://flagcdn.com/${code}.svg`;
+
+  if (!showName) {
+    return `<img src="${flagUrl}" srcset="${flagUrl2x} 2x" alt="${fullName}" title="${fullName}" class="${imgSizeClass} object-cover rounded-xs border border-black/10 inline-block align-middle shrink-0" loading="lazy" onerror="this.onerror=null; this.src='${svgUrl}';">`;
+  }
+
+  return `
+    <span class="inline-flex items-center gap-1.5 ${badgePadding} rounded bg-slate-900/90 border border-slate-700/70 shadow-sm align-middle group/flag hover:border-amber-400/50 transition-colors" title="${fullName}">
+      <img src="${flagUrl}" srcset="${flagUrl2x} 2x" alt="${fullName}" class="${imgSizeClass} object-cover rounded-xs shadow-xs border border-slate-700/80 shrink-0 inline-block align-middle" loading="lazy" onerror="this.onerror=null; this.src='${svgUrl}';">
+      <span class="text-xs text-slate-200 font-medium align-middle">${fullName}</span>
+    </span>
+  `.trim();
+}
+
+window.resolveCountryCode = resolveCountryCode;
+window.getCountryDisplayName = getCountryDisplayName;
+window.getFlagEmoji = getFlagEmoji;
+window.getCountryFlagBadge = getCountryFlagBadge;
