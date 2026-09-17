@@ -130,7 +130,9 @@
     .spot-media {
       position: relative; flex: 0 0 auto; width: 100%; aspect-ratio: 1 / 1; overflow: hidden;
     }
-    @media (min-width: 640px) { .spot-media { width: 360px; height: 100%; aspect-ratio: auto; } }
+    /* 2x the original 360px square - stays true 1:1 (not stretched to the panel's
+       height) so the crop stays gentle regardless of card height */
+    @media (min-width: 640px) { .spot-media { width: 720px; aspect-ratio: 1 / 1; } }
     /* within an exhibition's active window, its own cover photo also cycles through
        a few of its real artworks (spot-img-1/2/3) — keeps a long-running exhibition
        from just sitting on one static photo. Title/description/count stay put. */
