@@ -96,6 +96,107 @@
     .icon-tip:hover::before, .icon-tip:focus-visible::before {
       opacity: 1;
     }
+
+    /* ============ Spotlight: rotating featured-exhibition banner ============
+       Whole exhibitions cross-fade as a unit (image, title, description, count) —
+       not a photo slideshow inside one card. Built for 2 or 3 featured events;
+       fewer than 2 falls back to a single static slide (see renderSpotlight()). */
+    .spotlight {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      min-height: 320px;
+      box-shadow: 0 22px 44px -22px rgba(26, 40, 34, 0.28);
+      transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (min-width: 640px) { .spotlight { min-height: 400px; } }
+    .spotlight:hover, .spotlight:focus-within {
+      transform: translateY(-4px);
+      box-shadow: 0 30px 54px -20px rgba(26, 40, 34, 0.34);
+    }
+    .spotlight-slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      opacity: 0; pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .spotlight-slide:first-of-type { opacity: 1; pointer-events: auto; }
+    }
+    .spotlight-slide img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+      background: var(--bg-surface-elevated, #F4EFE6);
+      transition: transform .8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .spotlight:hover .spotlight-slide img, .spotlight:focus-within .spotlight-slide img { transform: scale(1.06); }
+    .spotlight-scrim {
+      position: absolute; inset: 0;
+      background: linear-gradient(195deg, transparent 25%, rgba(10,14,12,0.58) 66%, rgba(8,11,10,0.9) 100%);
+      transition: background .5s ease;
+    }
+    .spotlight:hover .spotlight-scrim, .spotlight:focus-within .spotlight-scrim {
+      background: linear-gradient(195deg, transparent 12%, rgba(10,14,12,0.66) 60%, rgba(8,11,10,0.94) 100%);
+    }
+    .spotlight-content {
+      position: relative; padding: 22px 24px 26px; max-width: 640px; color: #F5F1E6;
+      transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (min-width: 640px) { .spotlight-content { padding: 30px 36px 34px; } }
+    .spotlight:hover .spotlight-content, .spotlight:focus-within .spotlight-content { transform: translateY(-4px); }
+    .spotlight-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .spotlight-chip {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .06em;
+      color: #1A2822; background: #E8C87A; padding: 4px 10px; border-radius: 999px;
+    }
+    .spotlight-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .04em; color: #D8D2C2; }
+    .spotlight-content h3 {
+      font-family: 'Cormorant Garamond', 'Noto Serif Thai', serif; font-weight: 600;
+      font-size: 26px; line-height: 1.15; margin: 0 0 8px; color: #FBF9F4;
+    }
+    @media (min-width: 640px) { .spotlight-content h3 { font-size: 32px; } }
+    .spotlight-content p {
+      font-size: 13px; color: #D8D2C2; line-height: 1.65; margin: 0 0 18px; max-width: 50ch;
+    }
+    .spotlight-link {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 12.5px; font-weight: 700; color: #E8C87A; text-decoration: none;
+    }
+    .spotlight-link .arrow { display: inline-block; transition: transform .35s cubic-bezier(0.16, 1, 0.3, 1); }
+    .spotlight:hover .spotlight-link .arrow, .spotlight:focus-within .spotlight-link .arrow { transform: translateX(4px); }
+    .spotlight-progress { position: absolute; top: 0; left: 0; right: 0; z-index: 2; display: flex; gap: 5px; padding: 16px 24px 0; }
+    @media (min-width: 640px) { .spotlight-progress { padding: 20px 36px 0; } }
+    .spotlight-bar { flex: 1; max-width: 120px; height: 2px; background: rgba(255,255,255,.3); border-radius: 2px; overflow: hidden; }
+    .spotlight-bar i { display: block; height: 100%; width: 0%; background: #E8C87A; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      /* two featured exhibitions */
+      .spotlight[data-count="2"] .spotlight-slide:nth-of-type(1) { animation: spot2A 9s ease infinite; }
+      .spotlight[data-count="2"] .spotlight-slide:nth-of-type(2) { animation: spot2B 9s ease infinite; }
+      .spotlight[data-count="2"] .spotlight-bar:nth-child(1) i { animation: spotBar2A 9s linear infinite; }
+      .spotlight[data-count="2"] .spotlight-bar:nth-child(2) i { animation: spotBar2B 9s linear infinite; }
+      @keyframes spot2A { 0%{opacity:1;pointer-events:auto;} 44%{opacity:1;} 50%{opacity:0;pointer-events:none;} 94%{opacity:0;} 100%{opacity:1;pointer-events:auto;} }
+      @keyframes spot2B { 0%{opacity:0;pointer-events:none;} 44%{opacity:0;} 50%{opacity:1;pointer-events:auto;} 94%{opacity:1;} 100%{opacity:0;pointer-events:none;} }
+      @keyframes spotBar2A { 0%{width:0%;} 44%{width:100%;} 50%,100%{width:0%;} }
+      @keyframes spotBar2B { 0%,50%{width:0%;} 94%{width:100%;} 100%{width:0%;} }
+
+      /* three featured exhibitions */
+      .spotlight[data-count="3"] .spotlight-slide:nth-of-type(1) { animation: spot3A 12s ease infinite; }
+      .spotlight[data-count="3"] .spotlight-slide:nth-of-type(2) { animation: spot3B 12s ease infinite; }
+      .spotlight[data-count="3"] .spotlight-slide:nth-of-type(3) { animation: spot3C 12s ease infinite; }
+      .spotlight[data-count="3"] .spotlight-bar:nth-child(1) i { animation: spotBar3A 12s linear infinite; }
+      .spotlight[data-count="3"] .spotlight-bar:nth-child(2) i { animation: spotBar3B 12s linear infinite; }
+      .spotlight[data-count="3"] .spotlight-bar:nth-child(3) i { animation: spotBar3C 12s linear infinite; }
+      /* windows overlap on purpose so two slides are never both at opacity 0 at once —
+         a pause mid-crossfade (hover lands exactly on a boundary) must never show a blank card */
+      @keyframes spot3A { 0%{opacity:1;pointer-events:auto;} 25%{opacity:1;} 33%{opacity:0;pointer-events:none;} 92%{opacity:0;} 100%{opacity:1;pointer-events:auto;} }
+      @keyframes spot3B { 0%,25%{opacity:0;pointer-events:none;} 33%{opacity:1;pointer-events:auto;} 58%{opacity:1;} 66%{opacity:0;pointer-events:none;} 100%{opacity:0;} }
+      @keyframes spot3C { 0%,58%{opacity:0;pointer-events:none;} 66%{opacity:1;pointer-events:auto;} 91%{opacity:1;} 100%{opacity:0;pointer-events:none;} }
+      @keyframes spotBar3A { 0%{width:0%;} 30%{width:100%;} 33%,100%{width:0%;} }
+      @keyframes spotBar3B { 0%,33%{width:0%;} 63%{width:100%;} 66%,100%{width:0%;} }
+      @keyframes spotBar3C { 0%,66%{width:0%;} 96%{width:100%;} 99%,100%{width:0%;} }
+
+      .spotlight:hover .spotlight-slide, .spotlight:focus-within .spotlight-slide,
+      .spotlight:hover .spotlight-bar i, .spotlight:focus-within .spotlight-bar i { animation-play-state: paused; }
+    }
   </style>
 </head>
 <body class="min-h-full flex flex-col selection:bg-[var(--color-accent-gold)] selection:text-[var(--color-accent)] bg-[var(--bg-base)] text-[var(--text-main)]">
@@ -175,6 +276,11 @@
           <!-- Toast Notification -->
           <div id="quick-pull-toast" class="hidden mt-4 p-3 rounded-xl text-xs font-mono max-w-lg mx-auto border transition-all"></div>
         </div>
+      </section>
+
+      <!-- Spotlight: rotates through the most active exhibitions -->
+      <section id="spotlight-wrap" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 sm:pb-10">
+        <div id="spotlight" class="spotlight"></div>
       </section>
 
       <!-- Exhibition Events Grid -->
@@ -672,9 +778,67 @@
         registeredEvents = res.events || [];
         document.getElementById("events-count-badge").textContent = registeredEvents.length;
         renderEventsGrid();
+        renderSpotlight();
       } catch (err) {
         console.error("Failed to load events:", err);
       }
+    }
+
+    // Spotlight: rotates through the exhibitions with the most published works.
+    // Fewer than 2 qualifying exhibitions -> hide the banner rather than show a
+    // one-item "carousel" that never moves.
+    async function renderSpotlight() {
+      const wrap = document.getElementById("spotlight-wrap");
+      const mount = document.getElementById("spotlight");
+      const featured = registeredEvents
+        .filter(ev => (ev.artwork_count || 0) > 0)
+        .sort((a, b) => (b.artwork_count || 0) - (a.artwork_count || 0))
+        .slice(0, 3);
+
+      if (featured.length < 2) {
+        wrap.classList.add("hidden");
+        return;
+      }
+
+      wrap.classList.remove("hidden");
+      mount.dataset.count = String(featured.length);
+
+      const slides = await Promise.all(featured.map(async (ev, i) => {
+        const title = window.getField(ev, 'event_title', ev.event_id);
+        const desc = window.getField(ev, 'description', window.t('hero_desc'));
+        const worksCount = ev.artwork_count || 0;
+        const worksSuffix = window.t('event_artworks_count_suffix');
+        let imageUrl = '';
+        try {
+          const res = await MasterPortalAPI.getArtworks({ event_id: ev.event_id, limit: 1 });
+          const art = (res.artworks || [])[0];
+          const raw = art && (art.thumbnail_url || art.image_url);
+          imageUrl = raw ? (window.cloudinaryThumb ? window.cloudinaryThumb(raw, 1200) : raw) : '';
+        } catch (e) { /* fall back to the plain scrim background below */ }
+
+        return `
+          <div class="spotlight-slide">
+            ${imageUrl ? `<img src="${imageUrl}" alt="${title}" loading="${i === 0 ? 'eager' : 'lazy'}">` : ''}
+            <div class="spotlight-scrim"></div>
+            <div class="spotlight-content">
+              <div class="spotlight-meta">
+                <span class="spotlight-chip">${ev.event_id}</span>
+                <span class="spotlight-count">${worksCount} ${worksSuffix}</span>
+              </div>
+              <h3>${title}</h3>
+              <p>${desc}</p>
+              <a class="spotlight-link" href="#" onclick="selectEvent('${ev.event_id}'); return false;">
+                ${window.t('btn_view_details')} <span class="arrow">→</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }));
+
+      mount.innerHTML = `
+        <div class="spotlight-progress">${featured.map(() => `<span class="spotlight-bar"><i></i></span>`).join('')}</div>
+        ${slides.join('')}
+      `;
     }
 
     // 2. Render Events Grid with Rich Cards & Artwork Previews
@@ -998,11 +1162,11 @@
         );
 
         const card = document.createElement("div");
-        card.className = "bg-white rounded-xl overflow-hidden hover:border-[#C5A059] transition-all duration-300 group flex flex-col border border-[#E8E0D2]";
+        card.className = "bg-white rounded-xl hover:border-[#C5A059] transition-all duration-300 group flex flex-col border border-[#E8E0D2]";
 
         card.innerHTML = `
-          <!-- Artwork Image: flush to the card edge -->
-          <div class="aspect-[4/3] overflow-hidden bg-[#F7F4EC]">
+          <!-- Artwork Image: flush to the card edge (rounded on its own so the card can stay overflow:visible for the action tooltips below) -->
+          <div class="aspect-[4/3] overflow-hidden rounded-t-xl bg-[#F7F4EC]">
             <img src="${imageUrl}" alt="${title}" data-raw-src="${rawImageUrl}" onerror="window.cloudinaryFallback && window.cloudinaryFallback(this, this.dataset.rawSrc)"
                  onclick="openArtworkDetailModal('${art.global_id}')"
                  class="w-full h-full object-cover object-top cursor-pointer group-hover:scale-[1.02] transition-transform duration-500 ease-out" loading="lazy">
