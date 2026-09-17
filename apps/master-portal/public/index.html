@@ -120,7 +120,7 @@
       opacity: 0; pointer-events: none;
     }
     @media (prefers-reduced-motion: reduce) {
-      .spotlight-slide:first-of-type { opacity: 1; pointer-events: auto; }
+      .spot-slide-1 { opacity: 1; pointer-events: auto; }
     }
     .spotlight-slide img {
       position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
@@ -169,8 +169,8 @@
 
     @media (prefers-reduced-motion: no-preference) {
       /* two featured exhibitions */
-      .spotlight[data-count="2"] .spotlight-slide:nth-of-type(1) { animation: spot2A 9s ease infinite; }
-      .spotlight[data-count="2"] .spotlight-slide:nth-of-type(2) { animation: spot2B 9s ease infinite; }
+      .spotlight[data-count="2"] .spot-slide-1 { animation: spot2A 9s ease infinite; }
+      .spotlight[data-count="2"] .spot-slide-2 { animation: spot2B 9s ease infinite; }
       .spotlight[data-count="2"] .spotlight-bar:nth-child(1) i { animation: spotBar2A 9s linear infinite; }
       .spotlight[data-count="2"] .spotlight-bar:nth-child(2) i { animation: spotBar2B 9s linear infinite; }
       @keyframes spot2A { 0%{opacity:1;pointer-events:auto;} 44%{opacity:1;} 50%{opacity:0;pointer-events:none;} 94%{opacity:0;} 100%{opacity:1;pointer-events:auto;} }
@@ -179,9 +179,9 @@
       @keyframes spotBar2B { 0%,50%{width:0%;} 94%{width:100%;} 100%{width:0%;} }
 
       /* three featured exhibitions */
-      .spotlight[data-count="3"] .spotlight-slide:nth-of-type(1) { animation: spot3A 12s ease infinite; }
-      .spotlight[data-count="3"] .spotlight-slide:nth-of-type(2) { animation: spot3B 12s ease infinite; }
-      .spotlight[data-count="3"] .spotlight-slide:nth-of-type(3) { animation: spot3C 12s ease infinite; }
+      .spotlight[data-count="3"] .spot-slide-1 { animation: spot3A 12s ease infinite; }
+      .spotlight[data-count="3"] .spot-slide-2 { animation: spot3B 12s ease infinite; }
+      .spotlight[data-count="3"] .spot-slide-3 { animation: spot3C 12s ease infinite; }
       .spotlight[data-count="3"] .spotlight-bar:nth-child(1) i { animation: spotBar3A 12s linear infinite; }
       .spotlight[data-count="3"] .spotlight-bar:nth-child(2) i { animation: spotBar3B 12s linear infinite; }
       .spotlight[data-count="3"] .spotlight-bar:nth-child(3) i { animation: spotBar3C 12s linear infinite; }
@@ -817,7 +817,7 @@
         } catch (e) { /* fall back to the plain scrim background below */ }
 
         return `
-          <div class="spotlight-slide">
+          <div class="spotlight-slide spot-slide-${i + 1}">
             ${imageUrl ? `<img src="${imageUrl}" alt="${title}" loading="${i === 0 ? 'eager' : 'lazy'}">` : ''}
             <div class="spotlight-scrim"></div>
             <div class="spotlight-content">
