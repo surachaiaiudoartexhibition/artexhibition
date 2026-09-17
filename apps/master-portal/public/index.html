@@ -100,28 +100,37 @@
     /* ============ Spotlight: rotating featured-exhibition banner ============
        Whole exhibitions cross-fade as a unit (image, title, description, count) —
        not a photo slideshow inside one card. Built for 2 or 3 featured events;
-       fewer than 2 falls back to a single static slide (see renderSpotlight()). */
+       fewer than 2 falls back to a single static slide (see renderSpotlight()).
+       Media is a fixed square, not full-bleed: a wide banner center-crops tall
+       portrait artworks straight through the subject's head — a square frame
+       leaves far more headroom regardless of the artwork's own aspect ratio. */
     .spotlight {
       position: relative;
+      display: grid; /* every slide shares grid-area 1/1, so the track sizes to the
+                         tallest slide's own content - a plain position:absolute stack
+                         has nothing left in normal flow to size the container by */
       border-radius: 20px;
       overflow: hidden;
-      min-height: 320px;
       box-shadow: 0 22px 44px -22px rgba(26, 40, 34, 0.28);
       transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .5s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    @media (min-width: 640px) { .spotlight { min-height: 400px; } }
     .spotlight:hover, .spotlight:focus-within {
       transform: translateY(-4px);
       box-shadow: 0 30px 54px -20px rgba(26, 40, 34, 0.34);
     }
     .spotlight-slide {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; justify-content: flex-end;
+      grid-area: 1 / 1;
+      display: flex; flex-direction: column;
       opacity: 0; pointer-events: none;
     }
+    @media (min-width: 640px) { .spotlight-slide { flex-direction: row; } }
     @media (prefers-reduced-motion: reduce) {
       .spot-slide-1 { opacity: 1; pointer-events: auto; }
     }
+    .spot-media {
+      position: relative; flex: 0 0 auto; width: 100%; aspect-ratio: 1 / 1; overflow: hidden;
+    }
+    @media (min-width: 640px) { .spot-media { width: 360px; height: 100%; aspect-ratio: auto; } }
     /* within an exhibition's active window, its own cover photo also cycles through
        a few of its real artworks (spot-img-1/2/3) — keeps a long-running exhibition
        from just sitting on one static photo. Title/description/count stay put. */
@@ -136,33 +145,27 @@
     @media (prefers-reduced-motion: reduce) {
       .spot-img:not(.spot-img-1) { opacity: 0 !important; }
     }
-    .spotlight-scrim {
-      position: absolute; inset: 0;
-      background: linear-gradient(195deg, transparent 25%, rgba(10,14,12,0.58) 66%, rgba(8,11,10,0.9) 100%);
-      transition: background .5s ease;
+    .spot-panel {
+      position: relative; flex: 1 1 auto; min-width: 0;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 22px 24px 26px; color: #F5F1E6;
+      background: linear-gradient(160deg, #1A2822 0%, #20312A 55%, #141E19 100%);
     }
-    .spotlight:hover .spotlight-scrim, .spotlight:focus-within .spotlight-scrim {
-      background: linear-gradient(195deg, transparent 12%, rgba(10,14,12,0.66) 60%, rgba(8,11,10,0.94) 100%);
-    }
-    .spotlight-content {
-      position: relative; padding: 22px 24px 26px; max-width: 640px; color: #F5F1E6;
-      transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @media (min-width: 640px) { .spotlight-content { padding: 30px 36px 34px; } }
-    .spotlight:hover .spotlight-content, .spotlight:focus-within .spotlight-content { transform: translateY(-4px); }
+    @media (min-width: 640px) { .spot-panel { padding: 30px 36px; } }
     .spotlight-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .spotlight-chip {
       font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .06em;
       color: #1A2822; background: #E8C87A; padding: 4px 10px; border-radius: 999px;
     }
     .spotlight-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .04em; color: #D8D2C2; }
-    .spotlight-content h3 {
+    .spot-panel h3 {
       font-family: 'Cormorant Garamond', 'Noto Serif Thai', serif; font-weight: 600;
-      font-size: 26px; line-height: 1.15; margin: 0 0 8px; color: #FBF9F4;
+      font-size: 24px; line-height: 1.15; margin: 0 0 8px; color: #FBF9F4;
     }
-    @media (min-width: 640px) { .spotlight-content h3 { font-size: 32px; } }
-    .spotlight-content p {
-      font-size: 13px; color: #D8D2C2; line-height: 1.65; margin: 0 0 18px; max-width: 50ch;
+    @media (min-width: 640px) { .spot-panel h3 { font-size: 28px; } }
+    .spot-panel p {
+      font-size: 13px; color: #D8D2C2; line-height: 1.65; margin: 0 0 18px; max-width: 48ch;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
     .spotlight-link {
       display: inline-flex; align-items: center; gap: 7px;
@@ -848,9 +851,8 @@
 
         return `
           <div class="spotlight-slide spot-slide-${i + 1}" data-imgs="${imageUrls.length}">
-            ${imagesHTML}
-            <div class="spotlight-scrim"></div>
-            <div class="spotlight-content">
+            <div class="spot-media">${imagesHTML}</div>
+            <div class="spot-panel">
               <div class="spotlight-meta">
                 <span class="spotlight-chip">${ev.event_id}</span>
                 <span class="spotlight-count">${worksCount} ${worksSuffix}</span>
