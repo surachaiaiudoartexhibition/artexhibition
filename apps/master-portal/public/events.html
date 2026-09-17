@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th" class="h-full bg-[#FBF9F4] text-[#171C1A]">
+<html lang="th" class="h-full bg-[var(--bg-base)] text-[var(--text-main)]">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Noto+Serif+Thai:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/themes.css">
   <style>
     body { font-family: 'Plus Jakarta Sans', 'Sarabun', sans-serif; }
     .font-serif-luxury { font-family: 'Cormorant Garamond', 'Noto Serif Thai', Georgia, serif; }
@@ -71,34 +72,31 @@
     }
   </style>
 </head>
-<body class="min-h-full flex flex-col selection:bg-[#C5A059] selection:text-[#1A2822] bg-[#FBF9F4] text-[#171C1A]">
+<body class="min-h-full flex flex-col selection:bg-[var(--color-accent-gold)] selection:text-[var(--color-accent)] bg-[var(--bg-base)] text-[var(--text-main)]">
   <!-- Navbar (Deep Celadon Lacquer with Fine Gold Accents) -->
-  <header class="sticky top-0 z-50 bg-[#1A2822]/95 backdrop-blur-md border-b border-[#355246]/50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <a href="/" class="flex items-center space-x-3 group">
-        <div class="w-9 h-9 rounded-xl bg-[#14201B] border border-[#C5A059]/70 flex items-center justify-center font-serif-luxury font-bold text-[#E8C87A] shadow-md group-hover:scale-105 transition">
-          MP
-        </div>
-        <div>
-          <span class="text-sm font-semibold tracking-wide text-white block font-serif-luxury" data-i18n="nav_brand_title">Master Exhibition Portal</span>
-          <span class="text-[10px] text-[#C5A059] font-mono tracking-wider" data-i18n="nav_brand_sub">Event Directory</span>
+  <header class="master-navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center space-x-3 group shrink-0">
+        <div class="master-brand-badge">MP</div>
+        <div class="min-w-0">
+          <span class="text-sm font-semibold tracking-wide text-[var(--text-main)] block font-serif-luxury truncate" data-i18n="nav_brand_title">Master Exhibition Portal</span>
+          <span class="text-[10px] text-[var(--color-accent-gold)] font-mono tracking-wider block leading-none mt-0.5" data-i18n="nav_brand_sub">Event Directory</span>
         </div>
       </a>
-      <nav class="flex items-center space-x-2.5 sm:space-x-4 text-sm font-medium">
-        <a href="/" class="text-[#C8DBD2] hover:text-white transition" data-i18n="nav_home">เลือกชมนิทรรศการ</a>
-        <a href="/gallery-3d.html" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#B38F46] text-[#141E19] font-bold transition flex items-center gap-1.5 shadow-sm shadow-[#C5A059]/20">
+      <nav class="flex items-center space-x-1 sm:space-x-1.5 text-sm font-medium">
+        <a href="/" class="master-nav-link" data-i18n="nav_home">เลือกชมนิทรรศการ</a>
+        <a href="/gallery-3d.html" class="ml-1 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[var(--color-accent-gold)] to-[#9A7833] hover:from-[#D4AF37] hover:to-[#B38F46] text-[#141E19] font-bold transition flex items-center gap-1.5 shadow-sm shadow-[#C5A059]/20">
           <span class="w-2 h-2 rounded-full bg-[#141E19]"></span>
           <svg class="w-4 h-4 text-[#141E19]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
           </svg>
           <span data-i18n="nav_3d_gallery">ห้องนิทรรศการ 3D</span>
         </a>
-        <a href="/events.html" class="text-[#E8C87A] font-semibold flex items-center gap-1.5 border-b-2 border-[#C5A059] pb-0.5">
-          <span data-i18n="nav_events">ทำเนียบนิทรรศการ</span>
-        </a>
-        <a href="/admin.html" class="text-xs text-[#C8DBD2] hover:text-[#E8C87A] border border-[#355246] hover:border-[#C5A059]/50 px-2.5 py-1.5 rounded-xl transition" data-i18n="nav_admin">จัดการอีเวนต์</a>
+        <a href="/events.html" class="master-nav-link active" aria-current="page" data-i18n="nav_events">ทำเนียบนิทรรศการ</a>
+        <a href="/admin.html" class="master-admin-btn" data-i18n="nav_admin">จัดการอีเวนต์</a>
+        <div class="h-4 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
         <!-- Bilingual Language Switcher -->
-        <div id="lang-switcher" class="ml-1 sm:ml-2 shrink-0"></div>
+        <div id="lang-switcher" class="shrink-0"></div>
       </nav>
     </div>
   </header>
