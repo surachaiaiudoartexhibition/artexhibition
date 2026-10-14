@@ -435,7 +435,9 @@
     async function loadArtists() {
       checkAdminAuth();
       try {
-        const res = await fetch('/api/artists');
+        let artistHeaders = {};
+        try { const k = sessionStorage.getItem('curator_admin_key'); if (k) artistHeaders = { 'x-admin-key': k }; } catch (_) {}
+        const res = await fetch('/api/artists', { headers: artistHeaders });
         const data = await res.json();
 
         if (!data.success || !data.artists) {

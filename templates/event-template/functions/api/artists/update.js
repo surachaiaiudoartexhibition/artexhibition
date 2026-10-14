@@ -1,3 +1,4 @@
+import { sanitizeInput, badInput } from '../../_shared/sanitize.js';
 // Cloudflare Pages Function: /api/artists/update
 // POST: Update artist details (name, academic title, bio, avatar, contact) across all submissions,
 // clean up replaced avatar from Cloudinary, and update D1.
@@ -96,6 +97,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
+    try { sanitizeInput(body); } catch (inputErr) { return badInput(inputErr); }
     const oldArtistName = (body.old_artist_name || body.artist_name || '').trim();
 
     if (!oldArtistName) {

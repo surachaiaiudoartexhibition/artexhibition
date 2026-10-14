@@ -1,3 +1,4 @@
+import { sanitizeInput, badInput } from '../../_shared/sanitize.js';
 /**
  * Cloudflare Pages Function: Batch Submissions Import API
  * POST /api/submissions/batch
@@ -24,6 +25,7 @@ export async function onRequestPost(context) {
     });
   }
 
+  try { sanitizeInput(body); } catch (inputErr) { return badInput(inputErr); }
   const items = body.items || [];
   if (!Array.isArray(items) || items.length === 0) {
     return new Response(JSON.stringify({ success: false, error: 'No items provided' }), {

@@ -1052,5 +1052,25 @@
       });
     })();
   </script>
+  <script>
+    /* admin-key-ascii-check */
+    (function () {
+      var input = document.getElementById('master-admin-key');
+      if (!input) return;
+      var note = document.createElement('div');
+      note.setAttribute('role', 'alert');
+      note.style.cssText = 'display:none;position:fixed;top:64px;right:16px;z-index:9999;max-width:320px;padding:10px 14px;border-radius:8px;background:#fff1f2;color:#9f1239;border:1px solid #fda4af;font-size:13px;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,.15)';
+      note.textContent = 'รหัสมีอักษรภาษาไทยหรืออักขระพิเศษ กรุณาเปลี่ยนคีย์บอร์ดเป็นภาษาอังกฤษแล้วพิมพ์ใหม่';
+      document.body.appendChild(note);
+      function check() {
+        var bad = /[^\x20-\x7E]/.test(input.value);
+        note.style.display = bad ? 'block' : 'none';
+        input.style.outline = bad ? '2px solid #e11d48' : '';
+      }
+      input.addEventListener('input', check);
+      input.addEventListener('change', check);
+      check();
+    })();
+  </script>
 </body>
 </html>

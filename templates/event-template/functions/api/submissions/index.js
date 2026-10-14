@@ -1,3 +1,4 @@
+import { sanitizeInput, badInput } from '../../_shared/sanitize.js';
 // Cloudflare Pages Function: /api/submissions
 // GET: List submissions (filtered by status or all for admin)
 // POST: Submit new artwork (status: 'pending')
@@ -50,7 +51,9 @@ export async function onRequestGet(context) {
     // many visitors hit the same page at once (e.g. an opening-day traffic spike).
     return new Response(JSON.stringify({
       success: true,
-      submissions: result.results || [],
+      submissions: isAdmin
+        ? (result.results || [])
+        : (result.results || []).map(({ artist_phone, ...pub }) => pub),
       isAdmin
     }), {
       headers: {
@@ -76,6 +79,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
+    try { sanitizeInput(body); } catch (inputErr) { return badInput(inputErr); }
     const {
       title,
       artist_name,

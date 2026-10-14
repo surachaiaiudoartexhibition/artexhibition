@@ -1,8 +1,9 @@
+import { isAdminRequest } from '../../../_shared/sanitize.js';
 // Cloudflare Pages Function: /api/submissions/:id
 // GET: Retrieve single artwork by ID
 
 export async function onRequestGet(context) {
-  const { params, env } = context;
+  const { request, params, env } = context;
   const id = params.id;
 
   try {
@@ -10,7 +11,13 @@ export async function onRequestGet(context) {
       "SELECT * FROM submissions WHERE id = ?"
     ).bind(id);
 
-    const submission = await stmt.first();
+    let submission = await stmt.first();
+
+    const isAdmin = isAdminRequest(request, env);
+    if (submission && !isAdmin) {
+      if (submission.status !== 'approved') submission = null;
+      else delete submission.artist_phone;
+    }
 
     if (!submission) {
       return new Response(JSON.stringify({
@@ -26,7 +33,7 @@ export async function onRequestGet(context) {
       success: true,
       submission
     }), {
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json", "Cache-Control": isAdmin ? "no-store" : "public, max-age=30" }
     });
   } catch (err) {
     return new Response(JSON.stringify({

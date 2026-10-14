@@ -1,8 +1,10 @@
+import { isAdminRequest } from '../../_shared/sanitize.js';
 // Cloudflare Pages Function: /api/artists
 // GET: Returns list of approved artists with their profile and list of approved artworks
 
 export async function onRequestGet(context) {
-  const { env } = context;
+  const { request, env } = context;
+  const isAdmin = isAdminRequest(request, env);
 
   try {
     const stmt = env.DB.prepare(`
@@ -29,7 +31,7 @@ export async function onRequestGet(context) {
           artist_bio: row.artist_bio || "",
           nationality: row.nationality || "Thailand",
           artist_email: row.artist_email || "",
-          artist_phone: row.artist_phone || "",
+          artist_phone: isAdmin ? (row.artist_phone || "") : "",
           artworks_count: 0,
           artworks: []
         });

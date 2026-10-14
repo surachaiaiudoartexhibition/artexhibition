@@ -36,7 +36,9 @@ const EventAPI = {
   },
 
   async getArtwork(id) {
-    const res = await fetch(`/api/submissions/${encodeURIComponent(id)}`);
+    const headers = {};
+    try { const k = sessionStorage.getItem('curator_admin_key'); if (k) headers['x-admin-key'] = k; } catch (_) {}
+    const res = await fetch(`/api/submissions/${encodeURIComponent(id)}`, { headers });
     return await res.json();
   },
 

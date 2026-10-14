@@ -1,3 +1,4 @@
+import { sanitizeInput, badInput } from '../../../_shared/sanitize.js';
 // Cloudflare Pages Function: /api/submissions/:id/update
 // POST: Update artwork submission details, replace images, delete replaced images from Cloudinary, and update D1
 
@@ -96,6 +97,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
+    try { sanitizeInput(body); } catch (inputErr) { return badInput(inputErr); }
 
     // 1. Fetch current submission
     const current = await env.DB.prepare("SELECT * FROM submissions WHERE id = ?").bind(id).first();

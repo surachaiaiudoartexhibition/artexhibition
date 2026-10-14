@@ -34,6 +34,13 @@ Read this file before changing the repository. It records work already completed
 - Local testing: put the values in a git-ignored `.dev.vars` file next to `wrangler.toml`.
 - `GLOBAL_SYNC_SECRET` should stay unset in production so Master only accepts per-event tokens.
 
+## Input Hardening (2026-10-14)
+
+- Every write endpoint (public submit, update, artist update, batch, Master `/api/sync`) runs `functions/_shared/sanitize.js`: `< > " ' \``` become look-alike characters, entity-like `&` is escaped, image URLs must be http(s), site-relative, or `data:image/*;base64`, text is capped at 20k chars. Pages still render with `innerHTML`, so keep new write paths going through `sanitizeInput`.
+- Public API: `/api/submissions/:id` returns approved works only without the admin key; `artist_phone` is hidden from the public. Artist emails stay public (artists consented, per the organizer).
+- Master `/api/sync` upsert only updates rows whose `event_id` matches the sending event.
+- Deploys: all three Pages projects are Git-connected to `main` (push = deploy). Secrets live in Cloudflare only.
+
 ## Do Not Repeat
 
 - Do not create another D1 or Pages project for this Event.

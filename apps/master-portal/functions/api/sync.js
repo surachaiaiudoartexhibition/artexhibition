@@ -1,3 +1,4 @@
+import { sanitizeInput, badInput } from '../_shared/sanitize.js';
 // Cloudflare Pages Function: /api/sync
 // POST: Webhook Ingestion API for Event Artworks (Authenticated via Bearer Token)
 
@@ -21,6 +22,7 @@ export async function onRequestPost(context) {
 
   try {
     const payload = await request.json();
+    try { sanitizeInput(payload); } catch (inputErr) { return badInput(inputErr); }
     const { action = 'upsert', event_id, global_id } = payload;
 
     // ============================================================
@@ -209,7 +211,8 @@ export async function onRequestPost(context) {
         year_created = excluded.year_created,
         zone = excluded.zone,
         artist_avatar_url = excluded.artist_avatar_url,
-        nationality = excluded.nationality;
+        nationality = excluded.nationality
+      WHERE master_artworks.event_id = excluded.event_id;
     `).bind(
       global_id.trim(),
       event_id.trim(),
