@@ -12,12 +12,14 @@ database_name = "art_event_1"
 database_id = "e483980b-c034-448f-a1a3-9b61d392a13f"
 
 [vars]
+# Secrets are NOT stored here. Set them per Pages project (Settings > Variables and Secrets, type Secret)
+# or with: npx wrangler pages secret put ADMIN_KEY --project-name <project>
+#   ADMIN_KEY            curator admin key
+#   SHARED_SECRET_TOKEN  Bearer token sent to Master /api/sync (must match registered_events.secret_token)
 EVENT_ID = "sirikit"
 EVENT_TITLE = "Queen Sirikit Art Exhibition"
 ADMIN_EMAIL = "surachai.ai.udo@gmail.com"
 MASTER_PORTAL_URL = "https://artexhibition.pages.dev"
-SHARED_SECRET_TOKEN = "sec_sirikit_2026_art"
-ADMIN_KEY = "admin123"
 EVENT_PAGE_BASE_URL = "https://sirikit.pages.dev"
 EVENT_THEME = "heritage"
 

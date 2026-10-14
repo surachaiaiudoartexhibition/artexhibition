@@ -2,9 +2,9 @@ export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json();
     const adminKey = request.headers.get('x-admin-key') || body.adminKey;
-    const expectedKey = env.ADMIN_KEY || 'admin123';
+    const expectedKey = env.ADMIN_KEY;
 
-    if (adminKey !== expectedKey) {
+    if (!expectedKey || !adminKey || adminKey !== expectedKey) {
       return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }

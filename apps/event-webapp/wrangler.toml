@@ -8,11 +8,13 @@ database_name = "art_event_1"
 database_id = "e483980b-c034-448f-a1a3-9b61d392a13f"
 
 [vars]
+# Secrets are NOT stored here. Set them per Pages project (Settings > Variables and Secrets, type Secret)
+# or with: npx wrangler pages secret put ADMIN_KEY --project-name <project>
+#   ADMIN_KEY            curator admin key
+#   SHARED_SECRET_TOKEN  Bearer token sent to Master /api/sync (must match registered_events.secret_token)
 EVENT_ID = "printmaking-2026"
 EVENT_TITLE = "International Contemporary Printmaking 2026"
 MASTER_PORTAL_URL = "http://localhost:8788" # In production: https://master-portal.pages.dev
-SHARED_SECRET_TOKEN = "sec_demo_event_2026_xyz"
-ADMIN_KEY = "admin123"
 # Cloudinary settings for browser unsigned direct upload:
 CLOUDINARY_CLOUD_NAME = "event-demo-account"
 CLOUDINARY_UPLOAD_PRESET = "virtual_exhibition_preset"

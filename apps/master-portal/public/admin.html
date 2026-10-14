@@ -56,7 +56,7 @@
         <a href="/admin.html" class="master-nav-link active" aria-current="page" data-i18n="nav_admin">จัดการอีเวนต์</a>
         <div class="hidden lg:flex items-center gap-2 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-1.5 corner-cut-6 text-xs shadow-inner ml-1">
           <span class="text-[var(--text-subtle)] font-medium font-mono">Master Key:</span>
-          <input type="password" id="master-admin-key" value="master_admin_secret_999" class="bg-transparent border-none text-[var(--text-main)] focus:outline-none w-28 font-mono text-xs">
+          <input type="password" id="master-admin-key" value="" placeholder="รหัสผู้ดูแล" autocomplete="current-password" aria-label="Master admin key" class="bg-transparent border-none text-[var(--text-main)] focus:outline-none w-28 font-mono text-xs">
         </div>
         <div class="h-4 w-px bg-[var(--border-subtle)] hidden sm:block"></div>
         <!-- Bilingual Language Switcher -->
@@ -470,7 +470,7 @@
               Shared Secret Token (Bearer Auth Webhook) <span class="text-rose-500">*</span>
             </label>
             <div class="flex gap-2">
-              <input type="text" id="secret_token" required placeholder="sec_demo_..."
+              <input type="text" id="secret_token" required placeholder="sec_..."
                 class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E0D2] text-[#171C1A] text-sm font-mono focus:ring-2 focus:ring-[#C5A059] focus:outline-none">
               <button type="button" onclick="generateRandomToken()" class="px-3 py-2 bg-[#FAF3E3] hover:bg-[#F4EFE6] text-xs rounded-xl text-[#8C6D2D] border border-[#C5A059]/40 font-medium cursor-pointer">
                 สุ่ม Token
@@ -1039,6 +1039,18 @@
         btnEl.innerHTML = origHtml;
       }
     }
+  </script>
+  <script>
+    // Admin key is never stored in the page source. It is typed once and kept for this tab only.
+    (function () {
+      var KEY = 'master_admin_key';
+      var input = document.getElementById('master-admin-key');
+      if (!input) return;
+      try { var saved = sessionStorage.getItem(KEY); if (saved && !input.value) input.value = saved; } catch (_) {}
+      input.addEventListener('change', function () {
+        try { sessionStorage.setItem(KEY, input.value.trim()); } catch (_) {}
+      });
+    })();
   </script>
 </body>
 </html>

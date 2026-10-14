@@ -18,8 +18,7 @@
     }
   },
   "security": {
-    "sharedSecretToken": "sec_18pohchangartworkshop_61045e6c340ecfdf25c2a3a3e2a2bce7",
-    "adminKey": "admin123"
+    "secretsStoredIn": "Cloudflare Pages secrets (ADMIN_KEY, SHARED_SECRET_TOKEN)"
   },
   "integration": {
     "masterPortalUrl": "https://artexhibition.pages.dev",

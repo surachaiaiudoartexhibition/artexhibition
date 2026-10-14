@@ -8,6 +8,7 @@ database_name = "master-db"
 database_id = "a6867172-3457-4cc1-869c-0ae5e65e8dfd"
 
 [vars]
-MASTER_ADMIN_KEY = "master_admin_secret_999"
-# Default master fallback secret token if not event-specific:
-GLOBAL_SYNC_SECRET = "sec_demo_event_2026_xyz"
+# Secrets are NOT stored here. Set them on the Pages project (Settings > Variables and Secrets, type Secret)
+# or with: npx wrangler pages secret put MASTER_ADMIN_KEY --project-name <project>
+#   MASTER_ADMIN_KEY     master admin key
+#   GLOBAL_SYNC_SECRET   optional; leave unset so only per-event tokens are accepted

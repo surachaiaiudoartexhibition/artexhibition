@@ -8,7 +8,7 @@ export async function onRequestPost(context) {
   const id = params.id;
 
   const adminKey = request.headers.get("x-admin-key");
-  if (env.ADMIN_KEY && adminKey !== env.ADMIN_KEY) {
+  if (!env.ADMIN_KEY || !adminKey || adminKey !== env.ADMIN_KEY) {
     return new Response(JSON.stringify({
       success: false,
       error: "Unauthorized: Invalid or missing admin key."

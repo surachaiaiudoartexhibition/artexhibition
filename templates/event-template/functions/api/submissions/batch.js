@@ -17,7 +17,7 @@ export async function onRequestPost(context) {
   }
 
   const keyToCheck = adminKey || body.adminKey;
-  if (keyToCheck !== 'admin123') {
+  if (!env.ADMIN_KEY || !keyToCheck || keyToCheck !== env.ADMIN_KEY) {
     return new Response(JSON.stringify({ success: false, error: 'Unauthorized: Invalid Admin Key' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }

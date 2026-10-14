@@ -12,12 +12,14 @@ database_name = "d1-18-poh-chang-art-workshop-prod"
 database_id = "722b3455-1166-4967-a0b9-e23c12fa319f"
 
 [vars]
+# Secrets are NOT stored here. Set them per Pages project (Settings > Variables and Secrets, type Secret)
+# or with: npx wrangler pages secret put ADMIN_KEY --project-name <project>
+#   ADMIN_KEY            curator admin key
+#   SHARED_SECRET_TOKEN  Bearer token sent to Master /api/sync (must match registered_events.secret_token)
 EVENT_ID = "18-poh-chang-art-workshop"
 EVENT_TITLE = "18 Poh Chang art workshop"
 ADMIN_EMAIL = "surachai.ai.udo+artworkshop18@gmail.com"
 MASTER_PORTAL_URL = "https://artexhibition.pages.dev"
-SHARED_SECRET_TOKEN = "sec_18pohchangartworkshop_61045e6c340ecfdf25c2a3a3e2a2bce7"
-ADMIN_KEY = "admin123"
 EVENT_PAGE_BASE_URL = "https://18pohchangartworkshop.pages.dev"
 EVENT_THEME = "heritage"
 

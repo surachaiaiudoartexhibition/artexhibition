@@ -113,10 +113,12 @@
    | `EVENT_ID` | `printmaking-2026` | รหัสอ้างอิงงาน |
    | `EVENT_TITLE` | `International Contemporary Printmaking 2026` | ชื่อนิทรรศการที่จะแสดงบนเว็บ |
    | `MASTER_PORTAL_URL` | `https://master-portal.pages.dev` | URL ของเว็บท่ากลาง |
-   | `SHARED_SECRET_TOKEN` | `sec_event_printmaking_99182a` | รหัสสุ่มสำหรับส่ง Webhook |
+   | `SHARED_SECRET_TOKEN` | *(ตั้งเป็นชนิด **Secret**)* | รหัสสุ่มสำหรับส่ง Webhook ต้องตรงกับ `secret_token` ใน Master |
    | `CLOUDINARY_CLOUD_NAME`| `ev-printmaking-cloud` | Cloud Name ของงานนี้ |
    | `CLOUDINARY_UPLOAD_PRESET` | `event_preset` | Unsigned Preset ของงานนี้ |
-   | `ADMIN_KEY` | `admin123` | รหัสผ่านสำหรับภัณฑารักษ์ตรวจรับงาน |
+   | `ADMIN_KEY` | *(ตั้งเป็นชนิด **Secret**)* | รหัสผ่านสำหรับภัณฑารักษ์ตรวจรับงาน ถ้าไม่ตั้ง ระบบจะปฏิเสธคำสั่งแอดมินทั้งหมด |
+
+   > **ห้ามเขียนค่า `ADMIN_KEY`, `SHARED_SECRET_TOKEN`, `MASTER_ADMIN_KEY` ลงใน `wrangler.toml`, `event-manifest.json` หรือไฟล์ HTML** ให้ตั้งผ่าน Dashboard (ชนิด Secret) หรือ `npx wrangler pages secret put <NAME> --project-name=<project>` เท่านั้น สำหรับทดสอบในเครื่องให้ใส่ในไฟล์ `.dev.vars` (ไม่ถูก commit)
 6. กด **Deploy** &rarr; เว็บไซต์ของงานนั้นจะออนไลน์ทันทีที่ `https://printmaking-2026.pages.dev`
 
 ### ขั้นตอนที่ 4.4: นำ Token ไปบันทึกใน Master Portal

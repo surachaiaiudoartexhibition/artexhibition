@@ -51,7 +51,7 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   const adminKey = request.headers.get("x-admin-key");
-  if (env.MASTER_ADMIN_KEY && adminKey !== env.MASTER_ADMIN_KEY) {
+  if (!env.MASTER_ADMIN_KEY || !adminKey || adminKey !== env.MASTER_ADMIN_KEY) {
     return new Response(JSON.stringify({
       success: false,
       error: "Unauthorized: Invalid Master Admin Key."
@@ -118,7 +118,7 @@ export async function onRequestPut(context) {
   const { request, env } = context;
 
   const adminKey = request.headers.get("x-admin-key");
-  if (env.MASTER_ADMIN_KEY && adminKey !== env.MASTER_ADMIN_KEY) {
+  if (!env.MASTER_ADMIN_KEY || !adminKey || adminKey !== env.MASTER_ADMIN_KEY) {
     return new Response(JSON.stringify({
       success: false,
       error: "Unauthorized: Invalid Master Admin Key."
@@ -257,7 +257,7 @@ export async function onRequestDelete(context) {
   const { request, env } = context;
 
   const adminKey = request.headers.get("x-admin-key");
-  if (env.MASTER_ADMIN_KEY && adminKey !== env.MASTER_ADMIN_KEY) {
+  if (!env.MASTER_ADMIN_KEY || !adminKey || adminKey !== env.MASTER_ADMIN_KEY) {
     return new Response(JSON.stringify({
       success: false,
       error: "Unauthorized: Invalid Master Admin Key."

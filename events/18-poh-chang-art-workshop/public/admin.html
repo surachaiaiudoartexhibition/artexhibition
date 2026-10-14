@@ -35,13 +35,13 @@
         <!-- Admin Key Input -->
         <div class="flex items-center gap-2 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] px-3 py-1.5 corner-cut-6 text-xs shadow-inner">
           <span class="text-[var(--text-subtle)] font-medium" data-i18n="admin_key_label">Admin Key:</span>
-          <input type="password" id="admin-key-input" value="admin123" class="bg-transparent border-none text-[var(--text-main)] focus:outline-none w-20 font-mono text-xs">
+          <input type="password" id="admin-key-input" value="" placeholder="รหัสผู้ดูแล" autocomplete="current-password" aria-label="Admin key" class="bg-transparent border-none text-[var(--text-main)] focus:outline-none w-20 font-mono text-xs">
         </div>
 
         <!-- Quick Links -->
         <a href="/gallery.html" class="master-nav-link" data-i18n="nav_gallery">ชมนิทรรศการ</a>
         <a href="/catalog.html?admin=true" target="_blank" class="master-nav-link" data-i18n="nav_catalog_layout">📖 จัดหน้าสูจิบัตร</a>
-        <a href="/catalog-designer.html" target="_blank" onclick="this.href='/catalog-designer.html?adminKey=' + encodeURIComponent(document.getElementById('admin-key-input').value)" class="master-nav-cta hidden sm:inline-flex">
+        <a href="/catalog-designer.html" target="_blank" onclick="try{sessionStorage.setItem('curator_admin_key', document.getElementById('admin-key-input').value.trim())}catch(_){}" class="master-nav-cta hidden sm:inline-flex">
           <span>🎨</span> <span>สตูดิโอเต็มจอ</span>
         </a>
 
@@ -208,7 +208,7 @@
           </p>
         </div>
       </div>
-      <a href="/catalog-designer.html" target="_blank" onclick="this.href='/catalog-designer.html?adminKey=' + encodeURIComponent(document.getElementById('admin-key-input').value)" class="master-nav-cta shrink-0 cursor-pointer">
+      <a href="/catalog-designer.html" target="_blank" onclick="try{sessionStorage.setItem('curator_admin_key', document.getElementById('admin-key-input').value.trim())}catch(_){}" class="master-nav-cta shrink-0 cursor-pointer">
         <span>🚀 เปิดสตูดิโอจัดหน้าเต็มจอ</span>
       </a>
     </div>
@@ -3054,7 +3054,7 @@
       const statsEl = document.getElementById('batch-import-stats');
       const chunkStatusEl = document.getElementById('batch-import-chunk-status');
       const statusChoice = document.getElementById('batch-import-status').value;
-      const adminKey = document.getElementById('admin-key-input')?.value || 'admin123';
+      const adminKey = getAdminKey();
 
       btn.disabled = true;
       btn.innerHTML = '<span>กำลังนำเข้าและบันทึกข้อมูล...</span> <span class="animate-spin inline-block">⏳</span>';
@@ -3570,7 +3570,7 @@
         showToast('กำลังล้างข้อมูล…', 'info');
         const res = await fetch('/api/submissions/reset', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin123' }
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() }
         });
         const data = await res.json();
         if (data.success) {
@@ -3618,7 +3618,7 @@
           );
           const res = await fetch(`/api/submissions/sync-all?offset=${offset}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin123' }
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': getAdminKey() }
           });
           const data = await res.json();
           if (!data.success) {
@@ -3642,6 +3642,18 @@
       }
     }
 
+  </script>
+  <script>
+    // Admin key is never stored in the page source. It is typed once and kept for this tab only.
+    (function () {
+      var KEY = 'curator_admin_key';
+      var input = document.getElementById('admin-key-input');
+      if (!input) return;
+      try { var saved = sessionStorage.getItem(KEY); if (saved && !input.value) input.value = saved; } catch (_) {}
+      input.addEventListener('change', function () {
+        try { sessionStorage.setItem(KEY, input.value.trim()); } catch (_) {}
+      });
+    })();
   </script>
 </body>
 </html>

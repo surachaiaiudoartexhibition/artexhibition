@@ -18,8 +18,7 @@
     }
   },
   "security": {
-    "sharedSecretToken": "sec_sirikit_2026_art",
-    "adminKey": "admin123"
+    "secretsStoredIn": "Cloudflare Pages secrets (ADMIN_KEY, SHARED_SECRET_TOKEN)"
   },
   "integration": {
     "masterPortalUrl": "https://artexhibition.pages.dev",

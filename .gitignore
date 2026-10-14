@@ -22,6 +22,8 @@ scripts/*-local.sqlite-journal
 secrets/
 credentials/
 event-manifest.local.json
+.dev.vars
+**/.dev.vars
 
 # Operating System
 .DS_Store

@@ -81,7 +81,7 @@
         </p>
       </div>
       <div class="space-y-3">
-        <input type="password" id="auth-admin-key-input" placeholder="ใส่รหัส Admin Key (เช่น admin123)" class="w-full px-4 py-2.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] focus:border-[var(--border-accent)] corner-cut-6 text-center font-mono text-[var(--text-main)] text-sm focus:outline-none transition" />
+        <input type="password" id="auth-admin-key-input" placeholder="ใส่รหัส Admin Key" autocomplete="current-password" class="w-full px-4 py-2.5 bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] focus:border-[var(--border-accent)] corner-cut-6 text-center font-mono text-[var(--text-main)] text-sm focus:outline-none transition" />
         <p id="auth-error-msg" class="text-rose-400 text-xs hidden" data-i18n="designer_auth_failed">รหัส Admin Key ไม่ถูกต้อง</p>
         <button onclick="handleVerifyAdminKey()" class="w-full py-2.5 corner-cut-6 bg-[var(--color-accent-gold)] hover:brightness-110 text-black font-bold text-xs shadow-md transition cursor-pointer">
           🔓 ยืนยันสิทธิ์เข้าใช้งานสตูดิโอ
@@ -679,7 +679,13 @@
       const sessionKey = sessionStorage.getItem('curator_admin_key');
       const candidateKey = (paramKey && paramKey !== 'true') ? paramKey : (sessionKey || '');
 
-      if (candidateKey === 'admin123') {
+      if (paramKey && paramKey !== 'true') {
+        // remove a key passed in the URL so it does not stay in history
+        urlParams.delete('adminKey'); urlParams.delete('admin');
+        const q = urlParams.toString();
+        history.replaceState(null, '', location.pathname + (q ? '?' + q : '') + location.hash);
+      }
+      if (candidateKey && await verifyAdminKeyOnServer(candidateKey)) {
         adminKey = candidateKey;
         sessionStorage.setItem('curator_admin_key', candidateKey);
         initStudio();
@@ -691,9 +697,18 @@
       setupCanvasInteraction();
     });
 
-    function handleVerifyAdminKey() {
+    async function verifyAdminKeyOnServer(key) {
+      try {
+        const res = await fetch('/api/auth/verify', { method: 'POST', headers: { 'x-admin-key': key } });
+        return res.ok;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    async function handleVerifyAdminKey() {
       const input = document.getElementById('auth-admin-key-input').value.trim();
-      if (input === 'admin123') {
+      if (input && await verifyAdminKeyOnServer(input)) {
         adminKey = input;
         sessionStorage.setItem('curator_admin_key', input);
         document.getElementById('admin-auth-shield').classList.add('hidden');

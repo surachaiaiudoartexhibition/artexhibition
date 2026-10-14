@@ -105,7 +105,7 @@ async function main() {
     d1Name = await promptUser("6. Cloudflare D1 Database Name", `d1-${eventId}`);
     d1Id = await promptUser("7. Cloudflare D1 Database ID (ปล่อยว่างไว้ก่อนได้ถ้ายังไม่ได้สร้าง)", `d1-id-placeholder-${eventId}`);
     masterPortalUrl = await promptUser("8. URL เว็บท่าหลัก (Master Portal URL)", "http://localhost:8788");
-    adminKey = await promptUser("9. Curator Admin Password (รหัสสำหรับตรวจรับงาน)", "admin123");
+    adminKey = await promptUser("9. Curator Admin Password (รหัสสำหรับตรวจรับงาน, ปล่อยว่างเพื่อสุ่มให้)", "");
   } else {
     // Defaults for CLI mode
     eventId = eventId || `event-${Date.now()}`;
@@ -115,7 +115,10 @@ async function main() {
     uploadPreset = uploadPreset || `${eventId}_preset`;
     d1Name = d1Name || `d1-${eventId}`;
     d1Id = d1Id || `placeholder-${eventId}`;
-    adminKey = adminKey || 'admin123';
+  }
+  // Never fall back to a well-known password
+  if (!adminKey) {
+    adminKey = generateSecureToken('adm');
   }
 
   // Auto-generate Secret Token if not supplied
@@ -170,8 +173,8 @@ async function main() {
       }
     },
     security: {
-      sharedSecretToken: secretToken,
-      adminKey
+      // ADMIN_KEY and SHARED_SECRET_TOKEN live in Cloudflare Pages secrets and in the git-ignored .dev.vars file
+      secretsStoredIn: 'Cloudflare Pages secrets (ADMIN_KEY, SHARED_SECRET_TOKEN)'
     },
     integration: {
       masterPortalUrl,
@@ -182,6 +185,13 @@ async function main() {
   fs.writeFileSync(
     path.join(targetDir, 'event-manifest.json'),
     JSON.stringify(manifest, null, 2),
+    'utf8'
+  );
+
+  // 3b. Local-only secrets for `wrangler pages dev` (git-ignored, never committed)
+  fs.writeFileSync(
+    path.join(targetDir, '.dev.vars'),
+    `ADMIN_KEY=${adminKey}\nSHARED_SECRET_TOKEN=${secretToken}\n`,
     'utf8'
   );
 
@@ -245,9 +255,14 @@ pause
     console.log(`✅ ลงทะเบียนเข้าสู่ Local Master Portal Database เรียบร้อยแล้ว!`);
   }
   console.log("---------------------------------------------------------------");
+  console.log("🔐 ตั้งค่า Secrets บน Cloudflare (ค่าเหล่านี้ไม่ถูกเขียนลงไฟล์ที่ commit):");
+  console.log(`   npx wrangler pages secret put ADMIN_KEY --project-name=${eventId}`);
+  console.log(`   npx wrangler pages secret put SHARED_SECRET_TOKEN --project-name=${eventId}`);
+  console.log(`   (สำเนาสำหรับทดสอบในเครื่องอยู่ที่ ${path.join(targetDir, '.dev.vars')})`);
+  console.log("---------------------------------------------------------------");
   console.log("📌 คำสั่งสำหรับลงทะเบียนบน Master Portal API (หากต้องการลงทะเบียนผ่าน HTTP):");
   console.log(`   POST ${masterPortalUrl}/api/events`);
-  console.log(`   Header: x-admin-key: master_admin_secret_999`);
+  console.log(`   Header: x-admin-key: <MASTER_ADMIN_KEY>`);
   console.log(`   Body: {`);
   console.log(`     "event_id": "${eventId}",`);
   console.log(`     "event_title": "${eventTitle}",`);

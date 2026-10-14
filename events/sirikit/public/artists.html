@@ -929,7 +929,7 @@
       btnSave.disabled = true;
       btnSave.innerHTML = `<span>⏳</span><span>กำลังบันทึกข้อมูล...</span>`;
 
-      const adminKey = prompt('กรุณาระบุรหัสผู้ดูแล (Admin Key) เพื่อยืนยันการแก้ไขข้อมูลศิลปิน:', 'admin123');
+      const adminKey = prompt('กรุณาระบุรหัสผู้ดูแล (Admin Key) เพื่อยืนยันการแก้ไขข้อมูลศิลปิน:', '');
       if (!adminKey) {
         btnSave.disabled = false;
         btnSave.innerHTML = `<span>💾</span><span>บันทึกข้อมูลศิลปิน</span>`;
@@ -1000,7 +1000,7 @@
       const confirmPrompt = `${window.t('confirm_delete_artist') || 'คุณแน่ใจหรือไม่ว่าต้องการลบศิลปินท่านนี้ พร้อมผลงานทั้งหมดที่เกี่ยวข้องอย่างถาวร?'}\n\nศิลปิน: "${artistName}"\nผลงานทั้งหมด: ${artworkCount} รายการ\n\nการลบนี้จะนำศิลปินและผลงานออกจากทุกหน้าแสดงผล และไม่สามารถย้อนกลับได้!`;
       if (!confirm(confirmPrompt)) return;
 
-      const adminKey = prompt('กรุณาระบุรหัสผู้ดูแล (Admin Key) เพื่อยืนยันการลบ:', 'admin123');
+      const adminKey = prompt('กรุณาระบุรหัสผู้ดูแล (Admin Key) เพื่อยืนยันการลบ:', '');
       if (!adminKey) return;
 
       try {

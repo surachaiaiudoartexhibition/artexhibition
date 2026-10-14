@@ -26,6 +26,14 @@ Read this file before changing the repository. It records work already completed
 9. Committed the focused work as `65c10b9` (`fix: align Poh Chang event and master sync`).
 10. Recorded detailed history in `docs/change-log-2026-09-08-event-master-sync.md`.
 
+## Secrets Policy (2026-10-14)
+
+- `ADMIN_KEY`, `SHARED_SECRET_TOKEN` (events) and `MASTER_ADMIN_KEY` (master) are Cloudflare Pages **secrets** only. They are not in `wrangler.toml`, `event-manifest.json` or any HTML/JS.
+- Every admin endpoint fails closed: if the secret is not set, the request is rejected with 401.
+- Admin pages start with an empty key field; the key typed by the curator is kept in `sessionStorage` for that tab only. `catalog-designer.html` verifies the key through `POST /api/auth/verify`.
+- Local testing: put the values in a git-ignored `.dev.vars` file next to `wrangler.toml`.
+- `GLOBAL_SYNC_SECRET` should stay unset in production so Master only accepts per-event tokens.
+
 ## Do Not Repeat
 
 - Do not create another D1 or Pages project for this Event.
